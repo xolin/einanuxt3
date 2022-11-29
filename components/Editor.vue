@@ -30,42 +30,7 @@
                 <input type="range" class="range--input" value="25" min="8" max="50" @input="fontsizeChange($event)"> <!-- oninput="rangeValue.innerText = this.value">> -->
             </div> 
         </div>
-        <!-- <div class="popover__content">
-            
-
-            <select @input="fontsizeChange($event)">
-                <option v-for="el in fontSizeRange" :value="el" :key="el.index"> {{el}}</option>
-            </select>
-            <select @change="fontfamilyChange($event)">
-                <option v-for="el in fontFamilyAvailable" :value="el" :key="el.index">{{el}}</option>
-            </select>
-            
-            <div class="inline-block colorPickerWrapper">
-                <input type="color" @input="fontBackgroundColorChange($event)" />
-            </div>
-            
-            <span class="bg-gray-200 hover:bg-gray-100 border-b-4 border-gray-400 hover:border-gray-200 text-black text-center py-1 px-2 font-bold w-6 h-30 pt-0" @click="$refs.fontBoldCheckbox.click()">
-                <input ref="fontBoldCheckbox" type="checkbox" name="fontBold" id="fontBold" value="Bold" @change="fontWeightChange($event)" class="hidden">
-                <label for="fontBold">
-                    <img src="~/assets/icons/svg/bold.svg" width="10" class="inline" />
-                </label>
-            </span>
-            
-            <span class="bg-gray-200 hover:bg-gray-100 border-b-4 border-gray-400 hover:border-gray-200 text-black text-center py-1 px-2 font-bold w-6 h-30 pt-0" @click="$refs.fontItalicCheckbox.click()">
-                <input ref="fontItalicCheckbox" type="checkbox" name="fontItalic" value="Italic" @input="fontStyleChange($event)" class="hidden">
-                <label for="fontItalic">
-                    <img src="~/assets/icons/svg/italic.svg" width="10" class="inline" />
-                </label>
-            </span>
-
-            <span class="bg-gray-200 hover:bg-gray-100 border-b-4 border-gray-400 hover:border-gray-200 text-black text-center py-1 px-2 font-bold w-6 h-30 pt-0" @click="$refs.fontUnderlineCheckbox.click()">
-                <input ref="fontUnderlineCheckbox" type="checkbox" name="fontUnderline" value="Underline" @input="fontUnderlineChange($event)" class="hidden">
-                <label for="fontUnderline">
-                    <img src="~/assets/icons/svg/underline.svg" width="10" class="inline"/>
-                </label>
-            </span>
-                
-        </div> -->
+        
         <div class="textedit--bottom ">
             <fontfamilytool
                 v-for="fontFamily in fontFamilyAvailable"
