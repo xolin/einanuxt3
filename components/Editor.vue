@@ -152,7 +152,7 @@ async function uploadFile(event) {
         const reader = new FileReader();
         reader.onload = async function(e) {
             img.value = e.target.result;
-
+            
             const photoUrl = URL.createObjectURL(input.files[0]);
 
             const tempImg = new Image();
