@@ -146,7 +146,38 @@ const { $bus } = useNuxtApp();
 $bus.$on('generatePrint', () =>{
     generatePrints()
 })
+async function uploadFile(event) {
+    const input = event.target;
+    if(input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            img.value = e.target.result;
 
+            const photoUrl = URL.createObjectURL(input.files[0]);
+
+            const tempImg = new Image();
+            const imageDimensions = await new Promise((resolve) => {
+                tempImg.onload = () => {
+                    const dimensions = {
+                        height: tempImg.height,
+                        width: tempImg.width
+                    };
+                    resolve(dimensions);
+                }
+                tempImg.src = img.value;
+            })
+
+            addImage(img.value, undefined, undefined, imageDimensions.width, imageDimensions.height)
+            
+            // const data = {};
+            // data.url = img.value;
+            // data.width = imageDimensions.width;
+            // data.height = imageDimensions.height;
+            //$bus.$emit('uploadImage', data) // img.value, data.width, data.height)
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
 function canvasEv() {
     popoverVisible.value = 'hidden'
