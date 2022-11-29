@@ -2,6 +2,18 @@
     <!-- <section class="fixed pl-200"> -->
     <section class="fixed top-12 right-48" @click="canvasEv()">
         <canvas class="canvas" width="600" height="660" ref="canvasEl"></canvas>
+        <div class="options--top">
+            <div class="rounded--btn" @click="$refs.file.click()">
+                img
+                <input type="file" ref="file" @change="uploadFile($event)" class="hidden" />
+            </div>
+            <div class="rounded--btn" @click="addText()">
+                txt
+            </div>
+            <div class="rounded--btn">    
+                ;)
+            </div>
+        </div>
         <div class="textedit--top">
             <div class="inline-block colorPickerWrapper">
                 <input type="color" @input="fontColorChange($event)" />
