@@ -511,4 +511,16 @@ input[type='color'] {
   border-radius: 50%;
   box-shadow: 1px 1px 3px 0px grey;
 }
+
+.rounded--btn {
+   background: #000; 
+   color: #fff;
+   border-radius: 50%;
+   width: 37px;
+   height: 37px;
+   text-align: center;
+   padding-top: 5px;
+   margin-right: 10px;
+   cursor: pointer;
+}
 </style>
