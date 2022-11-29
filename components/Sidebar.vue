@@ -1,56 +1,49 @@
 <template>
     <aside class="ml-[-100%] fixed z-10 top-0 pb-3 px-0 w-full flex flex-col justify-between h-screen border-r bg-white transition duration-300 md:w-3/12 lg:ml-0 lg:w-[25%] xl:w-[20%] 2xl:w-[15%]">
-        <div>
-            <div class="-mx-6 px-10 py-4">
+        <div class="bg-gray-100">
+            <div class="px-4 py-4 bg-gray-300">
                 <a href="#" title="home">
                     Logo
                 </a>
             </div>
-            <div class="flex h-24 w-full justify-center bg-gray-100">
-                <input type="file" @change="uploadFile" />
-            </div>
-            <div class="flex h-24 w-full justify-center bg-gray-100">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @click="generatePrintsEmit">generatePrints</button>
-            </div>
-        </div>
-
-
-        <div>
-
-            <Listbox as="div" v-model="selected">
-                <ListboxLabel class="block text-sm font-medium text-gray-700">Assigned to</ListboxLabel>
-                <div class="relative mt-1">
-                <ListboxButton class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
-                    <span class="flex items-center">
-                    <img :src="selected.avatar" alt="" class="h-6 w-6 flex-shrink-0 rounded-full" />
-                    <span class="ml-3 block truncate">{{ selected.name }}</span>
-                    </span>
-                    <span class="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </span>
-                </ListboxButton>
-
-                <transition leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                    <ListboxOptions class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    <ListboxOption as="template" v-for="person in people" :key="person.id" :value="person" v-slot="{ active, selected }">
-                        <li :class="[active ? 'text-white bg-indigo-600' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-3 pr-9']">
-                        <div class="flex items-center">
-                            <img :src="person.avatar" alt="" class="h-6 w-6 flex-shrink-0 rounded-full" />
-                            <span :class="[selected ? 'font-semibold' : 'font-normal', 'ml-3 block truncate']">{{ person.name }}</span>
-                        </div>
-
-                        <span v-if="selected" :class="[active ? 'text-white' : 'text-indigo-600', 'absolute inset-y-0 right-0 flex items-center pr-4']">
-                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                        </span>
-                        </li>
-                    </ListboxOption>
-                    </ListboxOptions>
-                </transition>
+            <!-- <div class="flex h-24 w-full justify-center mb-3 mt-0 ">
+                <div class="bg-blue-100 w-full justify-center mt-0">
+                    <ul>
+                        
+                        {{activeObject.id}}
+                    </ul>
                 </div>
-            </Listbox>
+            </div> -->
+            <div class="flex h-12 w-full justify-center my-3">
+                <button class="bg-blue-200 hover:bg-blue-500 hover:text-white text-blue-500 text-center py-2 px-4 rounded" @click="$refs.file.click()">
+                    Upload image
+                </button>
+                <input type="file" ref="file" @change="uploadFile" class="hidden" />
+            </div>
 
+            <div class="flex h-12 w-full justify-center my-3">
+                <button class="bg-blue-200 hover:bg-blue-500 hover:text-white text-blue-500 text-center py-2 px-4 rounded" @click="addText">
+                    Add text
+                </button>  
+            </div>
+            <div class="flex h-12 w-full justify-center my-3">
+                <button class="bg-blue-200 hover:bg-blue-500 hover:text-white text-blue-500 text-center py-2 px-4 rounded" @click="generatePrintsEmit">
+                    generatePrints
+                </button>
+            </div>
         </div>
 
+        <div>            
+            <div class="flex h-12 w-full justify-center my-3">
+                <Sizelist />
+
+            </div>
+            <div class="flex h-18 w-full justify-center my-20">
+                <button class="bg-green-200 hover:bg-green-500 hover:text-white text-green-500 text-center py-3 px-8 rounded font-semibold" @click="generatePrintsEmit">
+                    Order
+                </button>
+            </div>
+        </div>
         <div class="px-6 -mx-6 pt-4 flex justify-between items-center border-t">
             <button class="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,31 +55,57 @@
     </aside>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script lang="js">
+import { ref, reactive } from 'vue'
+import { CheckIcon } from "@heroicons/vue/24/solid"
 
 export default {
     name: "Sidebar",
     setup(props, { emit }) {
         const { $bus } = useNuxtApp();
         const fileInput = ref(null);
-        const img = ref({});
-
-        function uploadFile(event) {
+        const img = ref('');
+        const textInput = ref('');
+        const activeObject = reactive({ id: 'none' });
+        
+        $bus.$on('activeObj', (data) => {
+            activeObject.id = data;
+        })
+      
+        async function uploadFile(event) {
             const input = event.target;
             if(input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    img.value.url = e.target.result;
-                    img.onload = function () {
-                        data.height = this.height;
-                        data.width = this.width;
-                        
-                        $bus.$emit('uploadImage', img.value, width, height)
-                    }
+                reader.onload = async function(e) {
+                    img.value = e.target.result;
+                    
+                    const photoUrl = URL.createObjectURL(input.files[0]);
+
+                    const tempImg = new Image();
+                    const imageDimensions = await new Promise((resolve) => {
+                        tempImg.onload = () => {
+                            const dimensions = {
+                                height: tempImg.height,
+                                width: tempImg.width
+                            };
+                            resolve(dimensions);
+                        }
+                        tempImg.src = img.value;
+                    })
+
+                    const data = {};
+                    data.url = img.value;
+                    data.width = imageDimensions.width;
+                    data.height = imageDimensions.height;
+
+                    $bus.$emit('uploadImage', data) // img.value, data.width, data.height)
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        function addText() {
+            $bus.$emit('addText')
         }
 
         function generatePrintsEmit() {
@@ -94,8 +113,8 @@ export default {
         }
 
         return {
-            fileInput, img,
-            uploadFile, generatePrintsEmit
+            fileInput, textInput, img, activeObject,
+            uploadFile, addText, generatePrintsEmit
         }
     }
 }
