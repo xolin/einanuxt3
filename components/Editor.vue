@@ -115,13 +115,13 @@ function positionBtn(obj) {
 }
 
 const { $bus } = useNuxtApp();
-$bus.$on('uploadImage', (data) => {
-    addImage(data.url, undefined, undefined, data.width, data.height)
-})
+// $bus.$on('uploadImage', (data) => {
+//     addImage(data.url, undefined, undefined, data.width, data.height)
+// })
 
-$bus.$on('addText', () => {
-    addText()
-})
+// $bus.$on('addText', () => {
+//     addText()
+// })
 
 $bus.$on('generatePrint', () =>{
     generatePrints()
