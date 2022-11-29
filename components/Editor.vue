@@ -93,6 +93,14 @@ let canvas = null;
 let prints = ref([]);
 let printsCount = ref(0);
 
+const img = ref('');
+
+const optionsTopVisible = ref('visible')
+const optionsTopOpacity = ref(1);
+const optionsTopZindex = ref(10);
+
+
+
 const popoverLeft = ref('0px');
 const popoverTop = ref('0px');
 const popoverVisible = ref('hidden')
@@ -142,6 +150,9 @@ $bus.$on('generatePrint', () =>{
 
 function canvasEv() {
     popoverVisible.value = 'hidden'
+    optionsTopVisible.value = 'visible'
+    optionsTopOpacity.value = 1
+    optionsTopZindex.value = 10
     if(canvas.getActiveObject()) {
         if(canvas.getActiveObject().get('type') === 'i-text'){
             positionBtn(canvas.getActiveObject())
@@ -150,6 +161,11 @@ function canvasEv() {
             popoverZindex.value = 10
             popoverTransform.value = 'translate(0, -20px)'
             popoverTransition.value = 'all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97)'
+
+            
+            optionsTopVisible.value = 'hidden'
+            optionsTopOpacity.value = 0
+            optionsTopZindex.value = -1
         }
     }
     
@@ -341,6 +357,20 @@ onMounted(() => {
   text-align: center;
 }
 
+.options--top {
+    opacity: v-bind(optionsTopOpacity);
+    visibility: v-bind(optionsTopVisible);
+    z-index: v-bind(optionsTopZindex);
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    top: -43px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .textedit--top {
     opacity: v-bind(popoverOpacity);
     visibility: v-bind(popoverVisible);
@@ -348,7 +378,7 @@ onMounted(() => {
     position: absolute;
     width: 100%;
     height: 40px;
-    top: 0px;
+    top: -43px;
     display: flex;
     align-items: center;
     justify-content: center;
