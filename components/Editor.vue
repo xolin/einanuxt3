@@ -3,6 +3,9 @@
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top">
+            <div class="inline-block colorPickerWrapper colorPickerBgDeck">
+                <input type="color" @input="bgDeckColorChange($event)" />
+            </div>
             <div class="rounded--btn" @click="$refs.file.click()">
                 img
                 <input type="file" ref="file" @change="uploadFile($event)" class="hidden" />
@@ -65,7 +68,7 @@ const optionsTopVisible = ref('visible')
 const optionsTopOpacity = ref(1);
 const optionsTopZindex = ref(10);
 
-
+const bgDeckColor = ref('#3f75826b')
 
 const popoverLeft = ref('0px');
 const popoverTop = ref('0px');
@@ -215,6 +218,15 @@ function fontsizeChange(event) {
     canvas.renderAll();
 }
 
+function bgDeckColorChange(event) {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == 'deckcolor'){
+            o.set('fill', event.target.value)
+        }
+    })
+    canvas.renderAll();
+}
+
 function fontColorChange(event) {
     canvas.getActiveObject().set('fill', event.target.value);
     canvas.renderAll();
@@ -303,6 +315,24 @@ function setBackground() {
     })
 }
 
+function setDeckBackground() {
+    const rect = new fabric.Rect({ 
+        top: 0, 
+        left: window.innerWidth/2-120, 
+        width: 220, 
+        height: 680, 
+        fill: bgDeckColor.value,
+        id: 'deckcolor',
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false,
+        selectable: false,
+        hoverCursor: 'default'
+    })
+    rect.moveTo(5)
+    canvas.add(rect)
+}
+
 function resize() {
     console.log('resi');
     const ratio = window.innerWidth / window.innerHeight;
@@ -325,6 +355,7 @@ onMounted(() => {
         // img.scale(0.11);
         // canvas.preserveObjectStacking = true;
     setBackground()
+    setDeckBackground()
 
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
@@ -584,6 +615,12 @@ input[type='color'] {
   height: 1.5em;
   border-radius: 50%;
   box-shadow: 1px 1px 3px 0px grey;
+}
+
+.colorPickerBgDeck {
+    width: 37px;
+    height: 37px;
+    margin-right: 10px;
 }
 
 .rounded--btn {
