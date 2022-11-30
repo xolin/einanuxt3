@@ -438,7 +438,7 @@ onMounted(() => {
     width: 100%;
     height: 40px;
     top: -43px;
-    left: 20px;
+    /* left: 20px; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -464,7 +464,7 @@ onMounted(() => {
     position: absolute;
     width: 100%;
     height: 40px;
-    top: 620px;
+    top: 700px;
     display: flex;
     align-items: center;
     justify-content: center;
