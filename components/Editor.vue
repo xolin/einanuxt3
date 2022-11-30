@@ -175,6 +175,7 @@ function canvasEv() {
 
 function addText() {
     const txt = new fabric.IText('Tu texto', { left: 100, top: 100, fontSize: 20, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000' });
+    txt.moveTo(3);
     canvas.add(txt);
     canvas.sendToBack(txt);
 }
