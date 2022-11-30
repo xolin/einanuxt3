@@ -282,7 +282,7 @@ function generatePrints(){
     printsCount.value++;
     // newCanvas = null
 }
-    
+
 function setBackground() {
     new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
         img.scale(1)
