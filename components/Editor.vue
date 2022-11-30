@@ -1,7 +1,7 @@
 <template>
     <!-- <section class="fixed pl-200"> -->
-    <section class="fixed top-12 right-48" @click="canvasEv()">
-        <canvas class="canvas" width="600" height="660" ref="canvasEl"></canvas>
+    <section ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
+        <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top">
             <div class="rounded--btn" @click="$refs.file.click()">
                 img
@@ -40,18 +40,19 @@
         </div>
 
     </section>
-    <section class="prints">
+    <!-- <section class="prints">
         <b>Prints</b>
         <span v-for="print in prints" :key="print.id">
             <img :src="print.src">
         </span>
-    </section>
+    </section> -->
 </template>
 
 <script setup>
 import { fabric } from 'fabric';
 import { ref, onMounted, computed } from 'vue';
 
+const canvasWrapper = ref(null);
 const canvasEl = ref(null);
 let canvas = null;
 
@@ -133,22 +134,12 @@ async function uploadFile(event) {
             })
 
             addImage(img.value, undefined, undefined, imageDimensions.width, imageDimensions.height)
-            
-            // const data = {};
-            // data.url = img.value;
-            // data.width = imageDimensions.width;
-            // data.height = imageDimensions.height;
-            //$bus.$emit('uploadImage', data) // img.value, data.width, data.height)
         }
         reader.readAsDataURL(input.files[0]);
     }
 }
 
 function canvasEv() {
-    popoverVisible.value = 'hidden'
-    optionsTopVisible.value = 'visible'
-    optionsTopOpacity.value = 1
-    optionsTopZindex.value = 10
     if(canvas.getActiveObject()) {
         if(canvas.getActiveObject().get('type') === 'i-text'){
             positionBtn(canvas.getActiveObject())
@@ -163,6 +154,11 @@ function canvasEv() {
             optionsTopOpacity.value = 0
             optionsTopZindex.value = -1
         }
+    }else {
+        popoverVisible.value = 'hidden'
+        optionsTopVisible.value = 'visible'
+        optionsTopOpacity.value = 1
+        optionsTopZindex.value = 10
     }
     
     // if(canvas.getActiveObject()) {
@@ -241,7 +237,25 @@ function fontUnderlineChange(event) {
     canvas.renderAll();
 }
 
+function showTextOptions() {
+    popoverVisible.value = 'visible'
+    popoverOpacity.value = 1
+    popoverZindex.value = 10
+    popoverTransform.value = 'translate(0, -20px)'
+    popoverTransition.value = 'all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97)'
+    
+    
+    optionsTopVisible.value = 'hidden'
+    optionsTopOpacity.value = 0
+    optionsTopZindex.value = -1
+}
 
+function showGeneralOptions() {
+    popoverVisible.value = 'hidden'
+    optionsTopVisible.value = 'visible'
+    optionsTopOpacity.value = 1
+    optionsTopZindex.value = 10
+}
 
 function generatePrints(){
     const newCanvas = document.createElement('canvas');
@@ -262,9 +276,31 @@ function generatePrints(){
     printsCount.value++;
     // newCanvas = null
 }
+function resize() {
+    
+    console.log('resi');
+    // const outerCanvasContainer = document.getElementById('fabric-canvas-wrapper');
+
+    const ratio = window.innerWidth / window.innerHeight;
+    // const ratio          = canvas.getWidth() / canvas.getHeight();
+    const containerWidth = canvasWrapper.value.clientWidth;
+    const scale          = containerWidth / canvas.getWidth();
+    const zoom           = canvas.getZoom() * scale;
+    
+    // console.log('containerWidth', containerWidth, '---', containerWidth/ratio);
+console.log('canvas.width', canvas.width);
+    canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
+console.log('canvas.width', canvas.width);
+    // canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
+
+}
 
 onMounted(() => {
-    canvas = new fabric.Canvas(canvasEl.value);
+    canvas = new fabric.Canvas(canvasEl.value, {
+        width: 500, height:630
+    });
+
+    window.addEventListener('resize', resize())
 
     // new fabric.Image.fromURL('./img/skatebackground.png', function(img) {
         // img.scale(0.11);
@@ -281,12 +317,52 @@ onMounted(() => {
         selectable: false,
         hoverCursor: 'default',
         top: 0,
-        left: 220,
-        width: 1400,  
+        left: window.innerWidth/2-100 ,
+        width: 230,  
         height: 5000,
         multiplier: 2,
     })
 
+    canvas.on('selection:created', function(event) {
+        showGeneralOptions()
+        if(event.selected[0].type === 'i-text') {
+            positionBtn(event.selected[0])
+            showTextOptions()   
+        }
+    })
+    
+    canvas.on('selection:updated', function(event) {
+        showGeneralOptions()
+        if(event.selected[0].type === 'i-text') {
+            positionBtn(event.selected[0])
+            showTextOptions()   
+        }
+    })
+
+    canvas.on('touch:gesture', function(event) {
+        if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
+            lastSelectedObject.value.opacity = 1
+        }
+    })
+    canvas.on('mouse:down', function(event) {
+        if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
+            lastSelectedObject.value.opacity = 1
+        }
+        
+        if(event.target == null || event.target.id === "background") {
+            showGeneralOptions()
+        }
+    })
+    canvas.on('object:scaling', function(event) {
+        var object = event.target;
+        object.opacity = 0.4
+        lastSelectedObject.value = object
+    })
+    canvas.on('object:rotating', function(event) {
+        var object = event.target;
+        object.opacity = 0.4
+        lastSelectedObject.value = object
+    })
     canvas.on('object:moving', function(event) {
         var object = event.target;
         object.opacity = 0.4
@@ -294,9 +370,9 @@ onMounted(() => {
     })
 
     canvas.on('selection:cleared', function() {
-        lastSelectedObject.value.opacity = 1
-        // object = lastSelectedObject.value
-        // object.opacity = 1
+        if(lastSelectedObject.value){
+            lastSelectedObject.value.opacity = 1
+        }
     })
 
     canvas.on('selection:updated', function(event) {
@@ -308,19 +384,18 @@ onMounted(() => {
         console.log("Selected", object);
     });
     // canvas.getActiveObject(0).bringToFront()
-    
-    //addImage('./b.jpg', 10, 275, 1100, 1410, 0.3)
-    
-    // canvas.on('mouse:down', (e) => this.mouseDown(e));
-    // canvas._onMouseDown('canvas.getActiveObject()', canvas.getActiveObject())
 })
 
 </script>
 
 <style>
-/* .canvas {
+.canvas__wrapper{
+    width: 100%;
+}
+
+.canvas {
     border: 1px solid grey;
-} */
+}
 
 /* Popover */
 .popover__content {

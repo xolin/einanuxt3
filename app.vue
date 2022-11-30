@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Sidebar />
+    <!-- <Sidebar /> -->
     <Editor />
   </div>
 </template>
