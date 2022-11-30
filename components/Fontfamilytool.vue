@@ -12,9 +12,7 @@ defineProps({
 })
 
 function emitFontChange(font) {
-console.log('gont,', font);
     $bus.$emit('fontfamilyChange', font);
-
 }
 
 </script>
