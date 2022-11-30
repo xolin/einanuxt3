@@ -1,6 +1,6 @@
 <template>
     <!-- <section class="fixed pl-200"> -->
-    <section ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
+    <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top">
             <div class="rounded--btn" @click="$refs.file.click()">
@@ -276,37 +276,10 @@ function generatePrints(){
     printsCount.value++;
     // newCanvas = null
 }
-function resize() {
     
-    console.log('resi');
-    // const outerCanvasContainer = document.getElementById('fabric-canvas-wrapper');
-
-    const ratio = window.innerWidth / window.innerHeight;
-    // const ratio          = canvas.getWidth() / canvas.getHeight();
-    const containerWidth = canvasWrapper.value.clientWidth;
-    const scale          = containerWidth / canvas.getWidth();
-    const zoom           = canvas.getZoom() * scale;
-    
-    // console.log('containerWidth', containerWidth, '---', containerWidth/ratio);
-console.log('canvas.width', canvas.width);
-    canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
-console.log('canvas.width', canvas.width);
-    // canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
-
-}
-
-onMounted(() => {
-    canvas = new fabric.Canvas(canvasEl.value, {
-        width: 500, height:630
-    });
-
-    window.addEventListener('resize', resize())
-
-    // new fabric.Image.fromURL('./img/skatebackground.png', function(img) {
-        // img.scale(0.11);
-        // canvas.preserveObjectStacking = true;
+function setBackground() {
     new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
-        img.scale(0.9)
+        img.scale(1)
         canvas.bringToFront(img);
         canvas.add(img);
     }, {
@@ -317,11 +290,35 @@ onMounted(() => {
         selectable: false,
         hoverCursor: 'default',
         top: 0,
-        left: window.innerWidth/2-100 ,
+        left: window.innerWidth/2-120 ,
         width: 230,  
         height: 5000,
         multiplier: 2,
     })
+}
+
+function resize() {
+    console.log('resi');
+    const ratio = window.innerWidth / window.innerHeight;
+    const containerWidth = canvasWrapper.value.clientWidth;
+    const scale          = containerWidth / canvas.getWidth();
+    const zoom           = canvas.getZoom() * scale;
+    
+    canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
+    // canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
+
+}
+onMounted(() => {
+    canvas = new fabric.Canvas(canvasEl.value, {
+        width: 500, height:630
+    });
+    resize()
+    // window.addEventListener('resize', resize()) // We really want a resize?
+
+    // new fabric.Image.fromURL('./img/skatebackground.png', function(img) {
+        // img.scale(0.11);
+        // canvas.preserveObjectStacking = true;
+    setBackground()
 
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
