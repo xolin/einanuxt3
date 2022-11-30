@@ -1,11 +1,22 @@
 <template>
-    <div class="button-font">Aa</div>
+    <span>
+        <div class="button-font" @click="emitFontChange(font)">Aa</div>
+    </span>
 </template>
 
 <script setup>
+const { $bus } = useNuxtApp();
+
 defineProps({
     font: String
 })
+
+function emitFontChange(font) {
+console.log('gont,', font);
+    $bus.$emit('fontfamilyChange', font);
+
+}
+
 </script>
 
 <style scoped>

@@ -112,6 +112,11 @@ const { $bus } = useNuxtApp();
 $bus.$on('generatePrint', () =>{
     generatePrints()
 })
+
+$bus.$on('fontfamilyChange', (font) =>{
+    fontfamilyChange(font)
+})
+
 async function uploadFile(event) {
     const input = event.target;
     if(input.files && input.files[0]) {
@@ -199,8 +204,8 @@ function addImage(image, top, left, width, height, scale) {
 }
 
 
-function fontfamilyChange(event) {
-    canvas.getActiveObject().fontFamily = event.target.value;
+function fontfamilyChange(font) {
+    canvas.getActiveObject().fontFamily = font;
     canvas.renderAll();
 }
 
