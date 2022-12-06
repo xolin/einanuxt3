@@ -8,7 +8,7 @@ export default defineNuxtConfig({
         },
     },
     nitro: {
-      preset: "vercel",
+      preset: "netlify",
     },
     // modules: [
     //   'nuxt-headlessui'

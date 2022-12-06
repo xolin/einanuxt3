@@ -173,8 +173,9 @@ function canvasEv() {
 }
 
 function addText() {
-    const txt = new fabric.IText('Tu texto', { left: 100, top: 100, fontSize: 20, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000' });
+    const txt = new fabric.IText('Tu texto', {left: backgroundPositionLeft.value, top: 4500, fontSize: 1000, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000' });
     txt.moveTo(3);
+    txt.rotate(-90);
     canvas.add(txt);
     canvas.sendToBack(txt);
 }
@@ -555,10 +556,6 @@ onMounted(() => {
 <style>
 .canvas__wrapper{
     width: 100%;
-}
-
-.canvas {
-    border: 1px solid grey;
 }
 
 /* Popover */
