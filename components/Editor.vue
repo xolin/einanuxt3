@@ -188,7 +188,6 @@ function addImage(image, top, left, width, height, scale) {
     if(scale === undefined) scale = 1
 
     new fabric.Image.fromURL(image, function(img) {
-        //img.scale(scale);
         img.moveTo(2)
         img.setControlVisible('ml', false)
         img.setControlVisible('mb', false)
