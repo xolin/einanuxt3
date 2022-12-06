@@ -53,7 +53,7 @@
 
 <script setup>
 import { fabric } from 'fabric';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -69,6 +69,10 @@ const optionsTopOpacity = ref(1);
 const optionsTopZindex = ref(10);
 
 const bgDeckColor = ref('#3f75826b')
+const backgroundPositionLeft = ref(2650)
+const backgroundScale = ref(74500)
+const deckBackgroundWidht = ref(2833)
+const deckBackgroundHeight = ref(10119)
 
 const popoverLeft = ref('0px');
 const popoverTop = ref('0px');
@@ -104,17 +108,10 @@ function positionBtn(obj) {
 }
 
 const { $bus } = useNuxtApp();
-// $bus.$on('uploadImage', (data) => {
-//     addImage(data.url, undefined, undefined, data.width, data.height)
-// })
 
-// $bus.$on('addText', () => {
-//     addText()
+// $bus.$on('generatePrint', () =>{
+//     generatePrints()
 // })
-
-$bus.$on('generatePrint', () =>{
-    generatePrints()
-})
 
 $bus.$on('fontfamilyChange', (font) =>{
     fontfamilyChange(font)
@@ -140,7 +137,6 @@ async function uploadFile(event) {
                 }
                 tempImg.src = img.value;
             })
-
             addImage(img.value, undefined, undefined, imageDimensions.width, imageDimensions.height)
         }
         reader.readAsDataURL(input.files[0]);
@@ -188,13 +184,18 @@ function addImage(image, top, left, width, height, scale) {
     if(left === undefined) left = 150
     if(width === undefined) width = 1700
     if(height === undefined) height = 1400
-    if(scale === undefined) scale = 0.2
+    if(scale === undefined) scale = 1
 
     new fabric.Image.fromURL(image, function(img) {
         img.scale(scale);
-        img.moveTo(1)
+        //img.moveTo(2)
+        img.setControlVisible('ml', false)
+        img.setControlVisible('mb', false)
+        img.setControlVisible('mr', false)
+        img.setControlVisible('mt', false)
         canvas.add(img);
-        canvas.sendToBack(img);
+        canvas.bringForward(img, true)
+        // canvas.sendToBack(img);
         positionBtn(img);
     }, {
         id: Math.random().toString(16).slice(2),
@@ -296,11 +297,81 @@ function generatePrints(){
 }
 
 function setBackground() {
-    new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
-        img.scale(1)
+    //new fabric.Image.fromURL
+    // const oSVG = new fabric.Image.fromURL('./img/maka-deck-template.svg', function (object, options) {
+    //     var obj = fabric.util.groupSVGElements(object, {
+    //     id: 'background',
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     hasControls: false,
+    //     selectable: false,
+    //     hoverCursor: 'default',
+    //     top: 0,
+    //     left: 120,
+    //     width: 1417,
+    //     height: 5060,
+    // });
+    //         obj.scaleToHeight(canvas.height-10)
+    //         .set({ left: canvas.width/2, top: canvas.height/2 })
+    //         .setCoords();
+    //         canvas.add(obj).renderAll();
+    // })
+
+    //     oSVG= object.set({ left: 250, top: 200, angle: 0});
+    //     oSVG = object.scale(0.25);
+    //     canvas.add(oSVG);
+    //     canvas.renderAll();
+    // });
+    
+    // const bg = fabric.loadSVGFromURL('./img/maka-deck-template.svg', function(objects, options) {
+    //     var obj_1 = fabric.util.groupSVGElements(objects, {
+    //     id: 'background',
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     hasControls: false,
+    //     selectable: false,
+    //     hoverCursor: 'default',
+    //     top: 0,
+    //     left: window.innerWidth/2-120,
+    //     width: 1417,
+    //     height: 5060,
+    //     // multiplier: 2,
+    // });
+
+    //     canvas.add(obj_1);
+    // }); 
+
+    // const bgsvg = fabric.loadSVGFromURL('./img/maka-deck-template.svg', function(svg) {
+    //     svg.scale(0.5)
+    //     // svg.moveTo(6)
+    //     // canvas.bringToFront(svg);
+    //     canvas.add(svg);
+    // }, {
+    //     id: 'background',
+    //     lockMovementX: true,
+    //     lockMovementY: true,
+    //     hasControls: false,
+    //     selectable: false,
+    //     hoverCursor: 'default',
+    //     top: 0,
+    //     left: window.innerWidth/2-120,
+    //     width: 1417,
+    //     height: 5060,
+    //     multiplier: 2,
+    // })
+
+    const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
+        //img.scale(1)
         canvas.bringToFront(img);
+        img.moveTo(6)
+        
+        
+        
+        img.scaleToHeight(backgroundScale.value, false)
+        
         canvas.add(img);
     }, {
+        
         id: 'background',
         lockMovementX: true,
         lockMovementY: true,
@@ -308,19 +379,19 @@ function setBackground() {
         selectable: false,
         hoverCursor: 'default',
         top: 0,
-        left: window.innerWidth/2-120 ,
-        width: 230,  
-        height: 5000,
-        multiplier: 2,
+        left: backgroundPositionLeft.value,
+        //left: canvas.getWidth()/2,
+        width: 1417,
+        height: 5060,
     })
 }
 
 function setDeckBackground() {
     const rect = new fabric.Rect({ 
         top: 0, 
-        left: window.innerWidth/2-120, 
-        width: 220, 
-        height: 680, 
+        left: backgroundPositionLeft.value + 350,
+        width: deckBackgroundWidht.value,
+        height: deckBackgroundHeight.value,
         fill: bgDeckColor.value,
         id: 'deckcolor',
         lockMovementX: true,
@@ -334,13 +405,68 @@ function setDeckBackground() {
 }
 
 function resize() {
-    console.log('resi');
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
     const scale          = containerWidth / canvas.getWidth();
     const zoom           = canvas.getZoom() * scale;
     
     canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
+    
+    if(window.innerHeight > 700 &&  window.innerHeight < 900){
+        canvas.setZoom(0.065)
+    }else if(window.innerHeight > 650 &&  window.innerHeight < 699) {
+        canvas.setZoom(0.06)
+    }else if(window.innerHeight > 600 &&  window.innerHeight < 649) {
+        canvas.setZoom(0.055)
+    }else if(window.innerHeight > 550 &&  window.innerHeight < 599) {
+        canvas.setZoom(0.05)
+    }else if(window.innerHeight > 500 &&  window.innerHeight < 549) {
+        canvas.setZoom(0.045)
+    }else if(window.innerHeight > 450 &&  window.innerHeight < 499) {
+        canvas.setZoom(0.04)
+    }else if(window.innerHeight > 400 &&  window.innerHeight < 449) {
+        canvas.setZoom(0.035)
+    }else if(window.innerHeight > 350 &&  window.innerHeight < 399) {
+        canvas.setZoom(0.03)
+    }else if(window.innerHeight > 300 &&  window.innerHeight < 349) {
+        canvas.setZoom(0.025)
+    }
+    const obj = canvas.getObjects();
+    //console.log('window.innerWidth', window.innerWidth, obj);
+    if(window.innerWidth > 300 &&  window.innerWidth < 375) {
+        backgroundPositionLeft.value = 1200
+        console.log('1');
+    }else if(window.innerWidth > 376 &&  window.innerWidth < 425) {
+        backgroundPositionLeft.value = 1600
+        console.log('2');
+    }else if(window.innerWidth > 426 &&  window.innerWidth < 475) {
+        backgroundPositionLeft.value = 2000
+        console.log('3');
+    }else if(window.innerWidth > 476 &&  window.innerWidth < 525) {
+        backgroundPositionLeft.value = 2350
+        console.log('4');
+    }else if(window.innerWidth > 526 &&  window.innerWidth < 575) {
+        backgroundPositionLeft.value = 2700
+        console.log('5');
+    }else if(window.innerWidth > 576 &&  window.innerWidth < 625) {
+        backgroundPositionLeft.value = 3000
+        console.log('6');
+    }else if(window.innerWidth > 626 &&  window.innerWidth < 675) {
+        backgroundPositionLeft.value = 3500
+        deckBackgroundHeight.value = 10119
+        deckBackgroundWidht.value = 2833
+        backgroundScale.value = 74500
+        console.log('7');
+    }else if(window.innerWidth > 676 &&  window.innerWidth < 775) {
+        backgroundPositionLeft.value = 3400
+        deckBackgroundHeight.value = 10719
+        deckBackgroundWidht.value = 2933
+        backgroundScale.value = 79500
+        console.log('8');
+    }else if(window.innerWidth > 776) { // &&  window.innerWidth < 1099) {
+        backgroundPositionLeft.value = 8650
+        console.log('9');
+    }
     // canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
 
 }
@@ -348,6 +474,11 @@ onMounted(() => {
     canvas = new fabric.Canvas(canvasEl.value, {
         width: 500, height:630
     });
+    // canvas.setWidth(1417);
+    // canvas.setHeight(5060)
+    canvas.setZoom(0.06);
+    canvas.renderAll()
+
     resize()
     // window.addEventListener('resize', resize()) // We really want a resize?
 
@@ -415,7 +546,6 @@ onMounted(() => {
         
         
         //object.sendToBack();
-        console.log("Selected", object);
     });
     // canvas.getActiveObject(0).bringToFront()
 })
