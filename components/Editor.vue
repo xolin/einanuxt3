@@ -181,22 +181,23 @@ function addText() {
 }
 
 function addImage(image, top, left, width, height, scale) {
-    if(top === undefined) top = 10
-    if(left === undefined) left = 150
+    if(top === undefined) top = 3000
+    if(left === undefined) left = backgroundPositionLeft.value+660
     if(width === undefined) width = 1700
     if(height === undefined) height = 1400
     if(scale === undefined) scale = 1
 
     new fabric.Image.fromURL(image, function(img) {
-        img.scale(scale);
-        //img.moveTo(2)
+        //img.scale(scale);
+        img.moveTo(2)
         img.setControlVisible('ml', false)
         img.setControlVisible('mb', false)
         img.setControlVisible('mr', false)
         img.setControlVisible('mt', false)
+        img.scale(2)
         canvas.add(img);
-        canvas.bringForward(img, true)
-        // canvas.sendToBack(img);
+        //canvas.bringForward(img, true)
+        canvas.sendToBack(img);
         positionBtn(img);
     }, {
         id: Math.random().toString(16).slice(2),
@@ -204,7 +205,7 @@ function addImage(image, top, left, width, height, scale) {
         left: left,
         width: width,  
         height: height,
-        multiplier: 2,
+        // multiplier: 2,
         opacity: 1
     })
 }
@@ -378,6 +379,7 @@ function setBackground() {
         lockMovementY: true,
         hasControls: false,
         selectable: false,
+        evented: false,
         hoverCursor: 'default',
         top: 0,
         left: backgroundPositionLeft.value,
@@ -399,6 +401,7 @@ function setDeckBackground() {
         lockMovementY: true,
         hasControls: false,
         selectable: false,
+        evented: false,
         hoverCursor: 'default'
     })
     rect.moveTo(5)
