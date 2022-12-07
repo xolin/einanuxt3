@@ -196,7 +196,7 @@ function addImage(image, top, left, width, height, scale) {
         img.scale(2)
         canvas.add(img);
         //canvas.bringForward(img, true)
-        canvas.sendToBack(img);
+        canvas.sendBackwards(img);
         positionBtn(img);
     }, {
         id: Math.random().toString(16).slice(2),
@@ -403,7 +403,8 @@ function setDeckBackground() {
         evented: false,
         hoverCursor: 'default'
     })
-    rect.moveTo(5)
+    rect.moveTo(15)
+    canvas.sendToBack(rect)
     canvas.add(rect)
 }
 
