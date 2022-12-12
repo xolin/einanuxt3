@@ -1,5 +1,6 @@
 <template>
     <!-- <section class="fixed pl-200"> -->
+    <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top">
@@ -16,6 +17,12 @@
             <div class="rounded--btn">    
                 ;)
             </div>
+        </div>
+        <div class="options--top-left cursor-pointer" @click="toggleLayersList()">
+            <Bars4Icon
+              class="h-5 w-5 text-purple-500"
+            />
+
         </div>
         <div class="textedit--top">
             <div class="inline-block colorPickerWrapper">
@@ -68,6 +75,9 @@ const optionsTopVisible = ref('visible')
 const optionsTopOpacity = ref(1);
 const optionsTopZindex = ref(10);
 
+const layersList = shallowRef([])
+const layersListVisible = ref(false)
+
 const bgDeckColor = ref('#3f75826b')
 const backgroundPositionLeft = ref(2650)
 const backgroundScale = ref(74500)
@@ -107,11 +117,39 @@ function positionBtn(obj) {
     popoverTop.value = (absCoords.top - btnHeight / 2) + 100 + 'px';
 }
 
+function toggleLayersList() {
+    layersListVisible.value = !layersListVisible.value
+    updateLayerList()
+}
+
+function updateLayerList() { // TO DO: Refactor to use a filter function
+    layersList.value = []
+    const filteredLayers = []
+    canvas.getObjects().forEach(function(o){
+        if(o.id !== "background"
+            && o.id !== "deckcolor"
+            && o.id !== "opacity1"
+            && o.id !== "opacity2"
+            && o.id !== "opacity3") {
+            filteredLayers.push({ id: o.id, type: o.type, opacity: o.opacity })
+        }
+    })
+    layersList.value = filteredLayers
+}
+
 const { $bus } = useNuxtApp();
 
 // $bus.$on('generatePrint', () =>{
 //     generatePrints()
 // })
+
+$bus.$on('selectObjectFromList', (id) =>{
+    selectObjectFromList(id)
+})
+
+$bus.$on('toggleHideObjectFromList', (opt) =>{
+    toggleHideObjectFromList(opt.selectedId, opt.action)
+})
 
 $bus.$on('fontfamilyChange', (font) =>{
     fontfamilyChange(font)
@@ -173,11 +211,14 @@ function canvasEv() {
 }
 
 function addText() {
-    const txt = new fabric.IText('Tu texto', {left: backgroundPositionLeft.value, top: 4500, fontSize: 1000, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000' });
-    txt.moveTo(3);
+    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value, top: 4500, fontSize: 1000, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 0.4 });
+    txt.moveTo(2);
     txt.rotate(-90);
     canvas.add(txt);
-    canvas.sendToBack(txt);
+    canvas.sendBackwards(txt);
+    setBackground()
+    setOpacityLayer()
+    updateLayerList()
 }
 
 function addImage(image, top, left, width, height, scale) {
@@ -198,8 +239,9 @@ function addImage(image, top, left, width, height, scale) {
         //canvas.bringForward(img, true)
         canvas.sendBackwards(img);
         positionBtn(img);
+        updateLayerList()
     }, {
-        id: Math.random().toString(16).slice(2),
+        id: 'img' + Math.random().toString(16).slice(2),
         top: top,
         left: left,
         width: width,  
@@ -207,6 +249,29 @@ function addImage(image, top, left, width, height, scale) {
         // multiplier: 2,
         opacity: 1
     })
+    // canvas.moveTo(imu, 3)
+}
+
+function selectObjectFromList(id) {
+    let selectedObject = canvas._objects.filter(
+        obj => obj.id === id
+    );
+    return selectedObject[0]
+}
+
+function toggleHideObjectFromList(id, action) {
+    // const selectedObject = selectObjectFromList(id)
+    let selectedObject = canvas._objects.filter(
+        obj => obj.id === id
+    );
+    console.log('selectedObject.opacity', selectedObject.opacity);
+    if(action == 'hide') {
+        selectedObject[0].opacity = 0
+    } else {
+        selectedObject[0].opacity = 1
+    }
+    updateLayerList()
+    canvas.renderAll();
 }
 
 
@@ -403,8 +468,29 @@ function setDeckBackground() {
         evented: false,
         hoverCursor: 'default'
     })
-    rect.moveTo(15)
-    canvas.sendToBack(rect)
+    // canvas.sendToBack(rect)
+    canvas.add(rect)
+    canvas.moveTo(rect,2);
+}
+
+function setOpacityLayer() {
+    const rect = new fabric.Rect({
+        id: 'opacity1',
+        top: 0,
+        left: 0,
+        width: backgroundPositionLeft.value,
+        height: deckBackgroundHeight.value,
+        fill: '#b9b5b4',
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false,
+        selectable: false,
+        evented: false,
+        hoverCursor: 'default',
+        opacity: 0.75
+    })
+    // canvas.bringToFront(rect)
+    canvas.moveTo(rect,20)
     canvas.add(rect)
 }
 
