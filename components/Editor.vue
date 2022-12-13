@@ -60,7 +60,8 @@
 
 <script setup>
 import { fabric } from 'fabric';
-import { ref, onMounted } from 'vue';
+import { ref, shallowRef, onMounted } from 'vue';
+import { Bars4Icon } from '@heroicons/vue/20/solid'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -228,16 +229,19 @@ function addImage(image, top, left, width, height, scale) {
     if(height === undefined) height = 1400
     if(scale === undefined) scale = 1
 
-    new fabric.Image.fromURL(image, function(img) {
-        img.moveTo(2)
+    const imu = new fabric.Image.fromURL(image, function(img) {
+        
         img.setControlVisible('ml', false)
         img.setControlVisible('mb', false)
         img.setControlVisible('mr', false)
         img.setControlVisible('mt', false)
         img.scale(2)
         canvas.add(img);
+        canvas.moveTo(img, 3)
         //canvas.bringForward(img, true)
-        canvas.sendBackwards(img);
+        // canvas.sendToBack(img)
+        
+        //canvas.sendBackwards(img); GOOD ONE!!!!
         positionBtn(img);
         updateLayerList()
     }, {
@@ -492,6 +496,47 @@ function setOpacityLayer() {
     // canvas.bringToFront(rect)
     canvas.moveTo(rect,20)
     canvas.add(rect)
+    // canvas.bringForward(rect)
+
+
+
+    const rect2 = new fabric.Rect({
+        id: 'opacity2',
+        top: 0,
+        left: backgroundPositionLeft.value + 3400,
+        width: backgroundPositionLeft.value+10000,
+        height: deckBackgroundHeight.value,
+        fill: '#b9b5b4',
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false,
+        selectable: false,
+        evented: false,
+        hoverCursor: 'default',
+        opacity: 0.75
+    })
+    // canvas.bringToFront(rect2)
+    canvas.moveTo(rect2,10);
+    canvas.add(rect2)
+
+    const rect3 = new fabric.Rect({
+        id: 'opacity3',
+        top: deckBackgroundHeight.value-10,
+        left: 0,
+        width: 20000,
+        height: deckBackgroundHeight.value,
+        fill: '#b9b5b4',
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false,
+        selectable: false,
+        evented: false,
+        hoverCursor: 'default',
+        opacity: 0.75
+    })
+    // canvas.bringToFront(rect2)
+    canvas.moveTo(rect3,1);
+    canvas.add(rect3)
 }
 
 function resize() {
@@ -577,6 +622,7 @@ onMounted(() => {
         // canvas.preserveObjectStacking = true;
     setBackground()
     setDeckBackground()
+    setOpacityLayer()
 
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
@@ -684,13 +730,30 @@ onMounted(() => {
     z-index: v-bind(optionsTopZindex);
     position: absolute;
     width: 100%;
-    height: 40px;
-    top: -43px;
+    height: 50px;
+    top: -50px;
     /* left: 20px; */
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #b9b5b4;
 }
+
+.options--top-left {
+    opacity: v-bind(optionsTopOpacity);
+    visibility: v-bind(optionsTopVisible);
+    z-index: v-bind(optionsTopZindex);
+    position: absolute;
+    width: 10%;
+    height: 50px;
+    top: -50px;
+    right: 0px;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    background-color: #b9b5b4;
+}
+
 
 .textedit--top {
     opacity: v-bind(popoverOpacity);
