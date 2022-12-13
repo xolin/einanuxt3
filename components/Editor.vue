@@ -543,46 +543,46 @@ function resize() {
     
     canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
     
-    if(window.innerHeight > 700 &&  window.innerHeight < 900){
+    if(window.innerHeight > 700 &&  window.innerHeight <= 900){
         canvas.setZoom(0.065)
-    }else if(window.innerHeight > 650 &&  window.innerHeight < 699) {
+    }else if(window.innerHeight > 650 &&  window.innerHeight <= 699) {
         canvas.setZoom(0.06)
-    }else if(window.innerHeight > 600 &&  window.innerHeight < 649) {
+    }else if(window.innerHeight > 600 &&  window.innerHeight <= 649) {
         canvas.setZoom(0.055)
-    }else if(window.innerHeight > 550 &&  window.innerHeight < 599) {
+    }else if(window.innerHeight > 550 &&  window.innerHeight <= 599) {
         canvas.setZoom(0.05)
-    }else if(window.innerHeight > 500 &&  window.innerHeight < 549) {
+    }else if(window.innerHeight > 500 &&  window.innerHeight <= 549) {
         canvas.setZoom(0.045)
-    }else if(window.innerHeight > 450 &&  window.innerHeight < 499) {
+    }else if(window.innerHeight > 450 &&  window.innerHeight <= 499) {
         canvas.setZoom(0.04)
-    }else if(window.innerHeight > 400 &&  window.innerHeight < 449) {
+    }else if(window.innerHeight > 400 &&  window.innerHeight <= 449) {
         canvas.setZoom(0.035)
-    }else if(window.innerHeight > 350 &&  window.innerHeight < 399) {
+    }else if(window.innerHeight > 350 &&  window.innerHeight <= 399) {
         canvas.setZoom(0.03)
-    }else if(window.innerHeight > 300 &&  window.innerHeight < 349) {
+    }else if(window.innerHeight > 300 &&  window.innerHeight <= 349) {
         canvas.setZoom(0.025)
     }
     const obj = canvas.getObjects();
     //console.log('window.innerWidth', window.innerWidth, obj);
-    if(window.innerWidth > 300 &&  window.innerWidth < 375) {
+    if(window.innerWidth > 300 &&  window.innerWidth <= 375) {
         backgroundPositionLeft.value = 1200
         console.log('1');
-    }else if(window.innerWidth > 376 &&  window.innerWidth < 425) {
+    }else if(window.innerWidth > 376 &&  window.innerWidth <= 425) {
         backgroundPositionLeft.value = 1600
         console.log('2');
-    }else if(window.innerWidth > 426 &&  window.innerWidth < 475) {
+    }else if(window.innerWidth > 426 &&  window.innerWidth <= 475) {
         backgroundPositionLeft.value = 2000
         console.log('3');
-    }else if(window.innerWidth > 476 &&  window.innerWidth < 525) {
+    }else if(window.innerWidth > 476 &&  window.innerWidth <= 525) {
         backgroundPositionLeft.value = 2350
         console.log('4');
-    }else if(window.innerWidth > 526 &&  window.innerWidth < 575) {
+    }else if(window.innerWidth > 526 &&  window.innerWidth <= 575) {
         backgroundPositionLeft.value = 2700
         console.log('5');
-    }else if(window.innerWidth > 576 &&  window.innerWidth < 625) {
+    }else if(window.innerWidth > 576 &&  window.innerWidth <= 625) {
         backgroundPositionLeft.value = 3000
         console.log('6');
-    }else if(window.innerWidth > 626 &&  window.innerWidth < 675) {
+    }else if(window.innerWidth > 626 &&  window.innerWidth <= 675) {
         backgroundPositionLeft.value = 3500
         deckBackgroundHeight.value = 10119
         deckBackgroundWidht.value = 2833
