@@ -35,11 +35,7 @@
 
 
         </div>
-        <div class="tr">
-            <div class="range">
-                <input type="range" class="range--input" value="25" min="8" max="50" @input="fontsizeChange($event)"> <!-- oninput="rangeValue.innerText = this.value">> -->
-            </div> 
-        </div>
+    
         
         <div class="textedit--bottom ">
             <fontfamilytool
@@ -781,105 +777,6 @@ onMounted(() => {
     justify-content: center;
     
 }
-
-
-
-
-
-.range {
-    /* border: 1px solid red; */
-    position: absolute;
-    /* width: 10%; */
-    height: 400px;
-    /* top: -530px; */
-    /* -webkit-transform:rotate(90deg);
-    -moz-transform:rotate(90deg);
-    -o-transform:rotate(90deg); 
-     transform:rotate(270deg); */
-}
-
-.range--input {
-    left: -195px;
-    top: 190px;
-    width: 400px;
-    
-    -webkit-transform:rotate(-90deg);
-    -moz-transform:rotate(-90deg);
-    -o-transform:rotate(-90deg); 
-    transform: rotate(-90deg);
-}
-
-.tr {
-    opacity: v-bind(popoverOpacity);
-    visibility: v-bind(popoverVisible);
-    z-index: v-bind(popoverZindex);
-    position: absolute;
-    width: 10%;
-    left: 20px;
-    height: 400px;
-    top: -530px;
-    padding-bottom: 21.27%; /* = width / 1.41 */
-    position: relative;
-    overflow: hidden;
-}
-
-.tr:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 400%;
-    background: #a09f9f81;
-    transform-origin: 87% -81%;
-    transform: rotate(2deg);
-}
-
-
-input[type=range] {
-  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-  /* width: 100%; Specific width is required for Firefox. */
-  background: transparent; /* Otherwise white in Chrome */
-}
-
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-
-}
-
-input[type=range]:focus {
-  outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
-}
-
-input[type=range]::-ms-track {
-  width: 100%;
-  cursor: pointer;
-
-  /* Hides the slider so custom styles can be added */
-  background: transparent; 
-  border-color: transparent;
-  color: transparent;
-}
-
-.triangle-range-background-slider {
-  position: relative;
-  display: block;
-  margin-top: -27px;
-  height: 20px;
-  background: url('https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg'); 
-  background-size: 100% auto;
-  z-index: 1;
-}
-/* Input to work with triangle */
-input[type=range] {
-  position: relative;
-  z-index: 3;
-}
-
-
-
-
-
 
 input[type='color'] {
   padding: 0;
