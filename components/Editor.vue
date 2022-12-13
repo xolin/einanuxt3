@@ -53,9 +53,8 @@
         </span>
     </section> -->
 </template>
-
 <script setup>
-import { fabric } from 'fabric';
+import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted } from 'vue';
 import { Bars4Icon } from '@heroicons/vue/20/solid'
 

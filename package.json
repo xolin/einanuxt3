@@ -18,7 +18,7 @@
     "tailwindcss": "^3.2.4"
   },
   "dependencies": {
-    "fabric": "^5.2.4",
+    "fabric-with-gestures-notupdated": "^1.0.0",
     "mitt": "^3.0.0"
   }
 }
