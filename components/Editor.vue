@@ -212,8 +212,6 @@ function addText() {
     txt.rotate(-90);
     canvas.add(txt);
     canvas.sendBackwards(txt);
-    setBackground()
-    setOpacityLayer()
     updateLayerList()
 }
 
