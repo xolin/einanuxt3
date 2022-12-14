@@ -360,68 +360,7 @@ function generatePrints(){
 }
 
 function setBackground() {
-    //new fabric.Image.fromURL
-    // const oSVG = new fabric.Image.fromURL('./img/maka-deck-template.svg', function (object, options) {
-    //     var obj = fabric.util.groupSVGElements(object, {
-    //     id: 'background',
-    //     lockMovementX: true,
-    //     lockMovementY: true,
-    //     hasControls: false,
-    //     selectable: false,
-    //     hoverCursor: 'default',
-    //     top: 0,
-    //     left: 120,
-    //     width: 1417,
-    //     height: 5060,
-    // });
-    //         obj.scaleToHeight(canvas.height-10)
-    //         .set({ left: canvas.width/2, top: canvas.height/2 })
-    //         .setCoords();
-    //         canvas.add(obj).renderAll();
-    // })
-
-    //     oSVG= object.set({ left: 250, top: 200, angle: 0});
-    //     oSVG = object.scale(0.25);
-    //     canvas.add(oSVG);
-    //     canvas.renderAll();
-    // });
     
-    // const bg = fabric.loadSVGFromURL('./img/maka-deck-template.svg', function(objects, options) {
-    //     var obj_1 = fabric.util.groupSVGElements(objects, {
-    //     id: 'background',
-    //     lockMovementX: true,
-    //     lockMovementY: true,
-    //     hasControls: false,
-    //     selectable: false,
-    //     hoverCursor: 'default',
-    //     top: 0,
-    //     left: window.innerWidth/2-120,
-    //     width: 1417,
-    //     height: 5060,
-    //     // multiplier: 2,
-    // });
-
-    //     canvas.add(obj_1);
-    // }); 
-
-    // const bgsvg = fabric.loadSVGFromURL('./img/maka-deck-template.svg', function(svg) {
-    //     svg.scale(0.5)
-    //     // svg.moveTo(6)
-    //     // canvas.bringToFront(svg);
-    //     canvas.add(svg);
-    // }, {
-    //     id: 'background',
-    //     lockMovementX: true,
-    //     lockMovementY: true,
-    //     hasControls: false,
-    //     selectable: false,
-    //     hoverCursor: 'default',
-    //     top: 0,
-    //     left: window.innerWidth/2-120,
-    //     width: 1417,
-    //     height: 5060,
-    //     multiplier: 2,
-    // })
 
     const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
         //img.scale(1)
