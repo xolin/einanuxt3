@@ -360,8 +360,6 @@ function generatePrints(){
 }
 
 function setBackground() {
-    
-
     const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
         //img.scale(1)
         canvas.bringToFront(img);
