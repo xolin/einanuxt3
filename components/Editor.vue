@@ -364,11 +364,7 @@ function setBackground() {
         //img.scale(1)
         canvas.bringToFront(img);
         img.moveTo(6)
-        
-        
-        
         img.scaleToHeight(backgroundScale.value, false)
-        
         canvas.add(img);
     }, {
         
