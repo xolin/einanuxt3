@@ -67,7 +67,7 @@ const layersListVisible = ref(false)
 const bgDeckColor = ref('#3f75826b')
 const backgroundPositionLeft = ref(2650)
 const backgroundScale = ref(74500)
-const deckBackgroundWidht = ref(2833)
+const deckBackgroundWidth = ref(2833)
 const deckBackgroundHeight = ref(10119)
 
 const popoverLeft = ref('0px');
@@ -197,11 +197,12 @@ function canvasEv() {
 }
 
 function addText() {
-    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value, top: 4500, fontSize: 1000, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 0.4 });
-    txt.moveTo(2);
-    txt.rotate(-90);
+    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 1 });
+    // txt.moveTo(2);
+    //txt.rotate(-90);
     canvas.add(txt);
-    canvas.sendBackwards(txt);
+    canvas.moveTo(txt, 4)
+    // canvas.sendBackwards(txt);
     updateLayerList()
 }
 
