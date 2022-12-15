@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full px-4 pt-16 layers-list items-end">
+    <div class="layers-list px-4 pt-16 items-end">
       <div class="mx-auto w-full max-w-md rounded-l bg-white p-2">
         <ul v-for="layer in layers" :key="layer.id">
             <li @click="selectObjectFromList(layer.id)">{{layer.id}} - {{layer.type}}
@@ -40,7 +40,8 @@ li {
 }
 .layers-list {
     position: absolute;
-    right: 10px;
+    left: 10px;
     z-index: 1;
+    width: 90%;
 }
 </style>
