@@ -643,11 +643,12 @@ onMounted(() => {
     z-index: v-bind(popoverZindex);
     position: absolute;
     width: 100%;
-    height: 40px;
-    top: -43px;
+    height: 50px;
+    top: -50px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #b9b5b4;
 }
 
 .textedit--bottom {
