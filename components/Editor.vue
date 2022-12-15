@@ -367,7 +367,6 @@ function setBackground() {
         img.scaleToHeight(backgroundScale.value, false)
         canvas.add(img);
     }, {
-        
         id: 'background',
         lockMovementX: true,
         lockMovementY: true,
