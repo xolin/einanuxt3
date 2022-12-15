@@ -506,6 +506,17 @@ onMounted(() => {
     setDeckBackground()
     setOpacityLayer()
 
+    var line9 = new fabric.Line([
+        backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
+        backgroundPositionLeft.value+1700 , 10 //backgroundPositionLeft.value
+    ], {
+        strokeDashArray: [50, 50],
+        stroke: 'red',
+    })
+
+    line9.selectable = false;
+    line9.evented = false;
+
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
         if(event.selected[0].type === 'i-text') {
@@ -546,10 +557,31 @@ onMounted(() => {
         object.opacity = 0.4
         lastSelectedObject.value = object
     })
+
     canvas.on('object:moving', function(event) {
+        var snapZone = 150;
         var object = event.target;
         object.opacity = 0.4
         lastSelectedObject.value = object
+
+        var objectMiddleHorizontal = event.target.left + (event.target.width * event.target.scaleX) / 2;
+        if (objectMiddleHorizontal > backgroundPositionLeft.value+1700 - snapZone && objectMiddleHorizontal < backgroundPositionLeft.value+1700 + snapZone) {
+            
+            event.target.set({
+                //left: backgroundPositionLeft.value / 2 - (event.target.width * event.target.scaleX) / 2,
+                left: backgroundPositionLeft.value+1700 - (event.target.width * event.target.scaleX) / 2,
+            }).setCoords();
+
+            canvas.add(line9);
+
+            document.addEventListener("mouseup", () => {
+                canvas.remove(line9);
+            });
+
+        } else {
+            canvas.remove(line9);
+        }
+
     })
 
     canvas.on('selection:cleared', function() {
