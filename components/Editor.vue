@@ -26,7 +26,7 @@
                 <input type="color" @input="fontColorChange($event)" />
             </div>
         </div>
-    
+        
         <div class="textedit--bottom ">
             <fontfamilytool
                 v-for="fontFamily in fontFamilyAvailable"
@@ -505,7 +505,7 @@ onMounted(() => {
     setBackground()
     setDeckBackground()
     setOpacityLayer()
-
+    
     var line9 = new fabric.Line([
         backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
         backgroundPositionLeft.value+1700 , 10 //backgroundPositionLeft.value
