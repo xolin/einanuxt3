@@ -483,42 +483,8 @@ function resize() {
         canvas.setZoom(0.025)
     }
     const obj = canvas.getObjects();
-    //console.log('window.innerWidth', window.innerWidth, obj);
-    if(window.innerWidth > 300 &&  window.innerWidth <= 375) {
-        backgroundPositionLeft.value = 1200
-        console.log('1');
-    }else if(window.innerWidth > 376 &&  window.innerWidth <= 425) {
-        backgroundPositionLeft.value = 1600
-        console.log('2');
-    }else if(window.innerWidth > 426 &&  window.innerWidth <= 475) {
-        backgroundPositionLeft.value = 2000
-        console.log('3');
-    }else if(window.innerWidth > 476 &&  window.innerWidth <= 525) {
-        backgroundPositionLeft.value = 2350
-        console.log('4');
-    }else if(window.innerWidth > 526 &&  window.innerWidth <= 575) {
-        backgroundPositionLeft.value = 2700
-        console.log('5');
-    }else if(window.innerWidth > 576 &&  window.innerWidth <= 625) {
-        backgroundPositionLeft.value = 3000
-        console.log('6');
-    }else if(window.innerWidth > 626 &&  window.innerWidth <= 675) {
-        backgroundPositionLeft.value = 3500
-        deckBackgroundHeight.value = 10119
-        deckBackgroundWidht.value = 2833
-        backgroundScale.value = 74500
-        console.log('7');
-    }else if(window.innerWidth > 676 &&  window.innerWidth < 775) {
-        backgroundPositionLeft.value = 3400
-        deckBackgroundHeight.value = 10719
-        deckBackgroundWidht.value = 2933
-        backgroundScale.value = 79500
-        console.log('8');
-    }else if(window.innerWidth > 776) { // &&  window.innerWidth < 1099) {
-        backgroundPositionLeft.value = 8650
-        console.log('9');
-    }
-    // canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
+
+    backgroundPositionLeft.value = window.innerWidth/2*15 - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
 
 }
 onMounted(() => {
@@ -716,7 +682,8 @@ input[type='color'] {
 .colorPickerBgDeck {
     width: 37px;
     height: 37px;
-    margin-right: 10px;
+    margin-right: 5px;
+    margin-left: 5px;
 }
 
 .rounded--btn {
@@ -727,7 +694,8 @@ input[type='color'] {
    height: 37px;
    text-align: center;
    padding-top: 5px;
-   margin-right: 10px;
+   margin-right: 5px;
+   margin-left: 5px;
    cursor: pointer;
 }
 </style>
