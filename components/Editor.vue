@@ -377,7 +377,7 @@ function setDeckBackground() {
     const rect = new fabric.Rect({ 
         top: 0, 
         left: backgroundPositionLeft.value + 350,
-        width: deckBackgroundWidht.value,
+        width: deckBackgroundWidth.value,
         height: deckBackgroundHeight.value,
         fill: bgDeckColor.value,
         id: 'deckcolor',
