@@ -8,7 +8,7 @@
       "buildCommand": "npm run generate",
       "outputDirectory": "./vercel/output",
       "rootDirectory": "./",
-      "directoryListing": false,
+      "directoryListing": true,
       "nodeVersion": "18.x"
     }
   }
