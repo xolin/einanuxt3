@@ -204,6 +204,7 @@ function addText() {
     //txt.rotate(-90);
     canvas.add(txt);
     canvas.moveTo(txt, 4)
+    canvas.renderAll();
     // canvas.sendBackwards(txt);
     updateLayerList()
 }
