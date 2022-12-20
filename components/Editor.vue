@@ -148,6 +148,10 @@ $bus.$on('toggleHideObjectFromList', (opt) =>{
     toggleHideObjectFromList(opt.selectedId, opt.action)
 })
 
+$bus.$on('removeObject', (id) => {
+    removeObject(id)
+})
+
 $bus.$on('fontfamilyChange', (font) =>{
     fontfamilyChange(font)
 })
@@ -250,6 +254,16 @@ function addImage(image, top, left, width, height, scale) {
         opacity: 1
     })
     // canvas.moveTo(imu, 3)
+}
+
+function removeObject(id) {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == id){
+            canvas.remove(o)
+            updateLayerList()
+            toggleLayersList()
+        }
+    })
 }
 
 function createBin() {

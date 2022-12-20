@@ -5,6 +5,7 @@
             <li @click="selectObjectFromList(layer.id)">{{layer.id}} - {{layer.type}}
                 <button class="icon mr-4 cursor-pointer" @click="toggleHideObjectFromList(layer.id, 'hide')" v-if="layer.opacity > 0.1">Hide</button>
                 <button class="icon mr-4 cursor-pointer" @click="toggleHideObjectFromList(layer.id, 'show')" v-if="layer.opacity == 0">Show</button>
+                <button class="icon mr-4 cursor-pointer right" @click="removeObjectFromList(layer.id)">X</button>
             </li>
         </ul>
       </div>
@@ -20,6 +21,11 @@
 const props = defineProps({
     layers: Array
 })
+
+function removeObjectFromList(id) {
+    $bus.$emit('removeObject', id)
+}
+
 
 function selectObjectFromList(selectedId) {
     $bus.$emit('selectObjectFromList', selectedId)
