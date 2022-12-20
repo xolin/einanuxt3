@@ -84,6 +84,8 @@ const fontUnderlineCheckbox = ref(null)
 
 const lastSelectedObject = ref(null)
 
+const bin = ref(null)
+
 const fontSizeRange = ref([10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60]);
 const fontFamilyAvailable = ref(['Times New Roman', 'Arial', 'Geneva', 'Courier', 'Helvetica', 'Avenir']);
 
@@ -116,7 +118,8 @@ function updateLayerList() { // TO DO: Refactor to use a filter function
             && o.id !== "deckcolor"
             && o.id !== "opacity1"
             && o.id !== "opacity2"
-            && o.id !== "opacity3") {
+            && o.id !== "opacity3"
+            && o.id !== "bin") {
             filteredLayers.push({ id: o.id, type: o.type, opacity: o.opacity })
         }
     })
@@ -238,6 +241,48 @@ function addImage(image, top, left, width, height, scale) {
         opacity: 1
     })
     // canvas.moveTo(imu, 3)
+}
+
+function createBin() {
+    new fabric.Image.fromURL('../img/bin.png', function(img) {
+        // canvas.bringToFront(img);
+         img.moveTo(6)
+        img.scaleToHeight(backgroundScale.value, false)
+        bin.value = img;
+        canvas.add(img);
+    }, {
+        id: 'bin',
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false,
+        selectable: false,
+        evented: true,
+        hoverCursor: 'default',
+        top: 8050,
+        left: backgroundPositionLeft.value+700,
+        //left: canvas.getWidth()/2,
+        width: 4117,
+        height: 8060,
+        visible: false,
+        scaleX: 1,
+        scaleY: 1,
+    })    
+}
+
+function showBin() {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == 'bin'){
+            o.visible = true
+        }
+    })
+}
+
+function hideBin() {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == 'bin'){
+            o.visible = false
+        }
+    })
 }
 
 function selectObjectFromList(id) {
@@ -533,6 +578,13 @@ onMounted(() => {
         }
     })
 
+    canvas.on('selection:cleared', function() {
+        if(lastSelectedObject.value){
+            lastSelectedObject.value.opacity = 1
+        }
+        hideBin()
+    })
+
     canvas.on('touch:gesture', function(event) {
         if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
             lastSelectedObject.value.opacity = 1
@@ -559,6 +611,7 @@ onMounted(() => {
     })
 
     canvas.on('object:moving', function(event) {
+        showBin()
         var snapZone = 150;
         var object = event.target;
         object.opacity = 0.4
@@ -582,22 +635,49 @@ onMounted(() => {
             canvas.remove(line9);
         }
 
+        var clickElementTop = event.target?.top
+        var clickElementLeft = event.target?.left 
+        if(event.target?.type === 'i-text'){
+            if (clickElementLeft > backgroundPositionLeft.value+700 && clickElementLeft < (backgroundPositionLeft.value+700 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
+                canvas.getObjects().forEach(function(o){
+                    if(o.id === "bin") {
+                        o.scaleX = 12
+                        o.scaleY = 12
+                    }
     })
-
-    canvas.on('selection:cleared', function() {
-        if(lastSelectedObject.value){
-            lastSelectedObject.value.opacity = 1
+            } else {
+                canvas.getObjects().forEach(function(o){
+                    if(o.id === "bin") {
+                        o.scaleX = 10
+                        o.scaleY = 10
+                    }
+                })
+            }
         }
     })
 
     canvas.on('selection:updated', function(event) {
         var object = event.target;
         canvas.sendToBack(object);
-        
-        
-        //object.sendToBack();
     });
-    // canvas.getActiveObject(0).bringToFront()
+        
+    canvas.on('mouse:up', function(event) {
+        var clickElementTop = event.target?.top
+        var clickElementLeft = event.target?.left
+        
+        if (clickElementLeft > backgroundPositionLeft.value+700 && clickElementLeft < (backgroundPositionLeft.value+700 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
+            canvas.getObjects().forEach(function(o) {
+                if(o.id == selectedObject.value) {
+                    canvas.remove(o);
+                    updateLayerList()
+                }
+            })
+        }
+    });
+
+    canvas.on('text:editing:entered', function(event) {
+        clearText(event)
+    })
 })
 
 </script>
