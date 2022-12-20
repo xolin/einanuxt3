@@ -516,7 +516,7 @@ function setOpacityLayer() {
         opacity: 0.75
     })
     // canvas.bringToFront(rect)
-    canvas.moveTo(rect,20)
+    canvas.moveTo(rect,1)
     canvas.add(rect)
     // canvas.bringForward(rect)
 
@@ -538,7 +538,7 @@ function setOpacityLayer() {
         opacity: 0.75
     })
     // canvas.bringToFront(rect2)
-    canvas.moveTo(rect2,10);
+    canvas.moveTo(rect2,2);
     canvas.add(rect2)
 
     const rect3 = new fabric.Rect({
@@ -557,7 +557,7 @@ function setOpacityLayer() {
         opacity: 0.75
     })
     // canvas.bringToFront(rect2)
-    canvas.moveTo(rect3,1);
+    canvas.moveTo(rect3,3);
     canvas.add(rect3)
 }
 
