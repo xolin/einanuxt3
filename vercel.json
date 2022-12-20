@@ -6,7 +6,7 @@
       "devCommand": "npm run dev",
       "installCommand": "npm run install",
       "buildCommand": "npm run generate",
-      "outputDirectory": "/vercel/output",
+      "outputDirectory": "./vercel/output",
       "rootDirectory": "./",
       "directoryListing": false,
       "nodeVersion": "18.x"
