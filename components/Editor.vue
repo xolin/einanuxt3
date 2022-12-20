@@ -269,7 +269,6 @@ function createBin() {
         hoverCursor: 'default',
         top: 8050,
         left: backgroundPositionLeft.value+700,
-        //left: canvas.getWidth()/2,
         width: 4117,
         height: 8060,
         visible: false,
@@ -644,6 +643,7 @@ onMounted(() => {
     setBackground()
     setDeckBackground()
     setOpacityLayer()
+    createBin()
     
     var line9 = new fabric.Line([
         backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
