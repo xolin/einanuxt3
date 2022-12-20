@@ -26,7 +26,6 @@
                 <input type="color" @input="fontColorChange($event)" />
             </div>
         </div>
-        
         <div class="textedit--bottom ">
             <fontfamilytool
                 v-for="fontFamily in fontFamilyAvailable"
@@ -34,7 +33,6 @@
                 :key="fontFamily"
             ></fontfamilytool>
         </div>
-
     </section>
     <!-- <section class="prints">
         <b>Prints</b>
@@ -51,6 +49,7 @@ import { Bars4Icon } from '@heroicons/vue/20/solid'
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
 let canvas = null;
+const isMobileDevice = ref(null);
 
 let prints = ref([]);
 let printsCount = ref(0);
@@ -500,6 +499,34 @@ function setOpacityLayer() {
     canvas.add(rect3)
 }
 
+
+function isMobileDeviceCheck() {
+    console.log('isMobileDeviceCheck');
+    const mobileOsRegExp = "(Android|webOS|iPhone|iPod)";
+    if(screen.width < 500 || navigator.userAgent.match('/'+mobileOsRegExp+'/i')) {
+        isMobileDevice.value = true;
+        console.log('a');
+    }
+    if (isMobileDevice.value) {
+        if (typeof window.orientation === "undefined") {
+            isMobileDevice.value = false; 
+            console.log('b');
+        }
+    }
+    if (typeof navigator.userAgentData != "undefined" && !navigator.userAgentData.mobile) {
+        isMobileDevice.value = false; 
+        console.log('c');
+    }
+    if ( typeof window.orientation !== "undefined" && isMobileDevice.value ) {
+        if (window.navigator.maxTouchPoints > 1 && (navigator.userAgentData.mobile || localStorage.mobile || 'ontouchstart' in document)) {
+            // mobile device found
+            isMobileDevice.value = true; 
+            console.log('Is mobile device!'); 
+        }
+    }
+    console.log('isMobileDevice.value',isMobileDevice.value);
+}
+
 function resize() {
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
@@ -529,7 +556,23 @@ function resize() {
     }
     const obj = canvas.getObjects();
 
-    backgroundPositionLeft.value = window.innerWidth/2*15 - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
+
+    const widths = [window.innerWidth];
+    let windowWidth = null;
+    console.log('isMobileDevice.value',isMobileDevice.value );
+    if(isMobileDevice.value === true){
+        if (window.screen?.width) {
+            widths.push(window.screen?.width);
+        }
+        windowWidth = Math.min(...widths) /2*15;
+    } else {
+        windowWidth = window.innerWidth/2*15
+    }
+
+
+
+    
+    backgroundPositionLeft.value = windowWidth - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
 
 }
 onMounted(() => {
@@ -540,7 +583,7 @@ onMounted(() => {
     // canvas.setHeight(5060)
     canvas.setZoom(0.06);
     canvas.renderAll()
-
+    isMobileDeviceCheck()
     resize()
     // window.addEventListener('resize', resize()) // We really want a resize?
 
