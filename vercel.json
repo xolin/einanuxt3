@@ -1,0 +1,14 @@
+{
+    "projectId": "prj_yh88ra3Vd5R8imPgTUrunWUnpRfC",
+    "orgId": "4lrSpJwBDamdI3HD4RbMU6EL",
+    "settings": {
+      "createdAt": 1670303239826,
+      "devCommand": "npm run dev",
+      "installCommand": "npm run install",
+      "buildCommand": "npm run generate",
+      "outputDirectory": "/vercel/output",
+      "rootDirectory": null,
+      "directoryListing": false,
+      "nodeVersion": "18.x"
+    }
+  }
