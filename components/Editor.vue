@@ -355,6 +355,16 @@ function fontUnderlineChange(event) {
     canvas.renderAll();
 }
 
+function clearText(e) {
+  if (e.target.type === "i-text") {
+    if (e.target.text === "Tu texto") {
+      e.target.text = "";
+      e.target.hiddenTextarea.value = '';
+      canvas.renderAll();
+    };
+  }
+}
+
 function showTextOptions() {
     popoverVisible.value = 'visible'
     popoverOpacity.value = 1
