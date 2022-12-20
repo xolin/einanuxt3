@@ -3,6 +3,9 @@
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas class="canvas" ref="canvasEl"></canvas>
+        <div class="options--top-left cursor-pointer" @click="generatePrints()" >
+            <Bars4Icon class="h-5 w-5 text-purple-500" />
+        </div>
         <div class="options--top">
             <div class="inline-block colorPickerWrapper colorPickerBgDeck">
                 <input type="color" @input="bgDeckColorChange($event)" />
@@ -81,6 +84,7 @@ const fontBoldCheckbox = ref(null)
 const fontItalicCheckbox = ref(null)
 const fontUnderlineCheckbox = ref(null)
 
+const selectedObject = ref(null)
 const lastSelectedObject = ref(null)
 
 const bin = ref(null)
@@ -386,6 +390,7 @@ function showGeneralOptions() {
 }
 
 function generatePrints(){
+    console.log('aa');
     const newCanvas = document.createElement('canvas');
     newCanvas.width = 200;
     newCanvas.height = 600;
@@ -395,13 +400,29 @@ function generatePrints(){
     const canvasBase = canvasEl.value.toDataURL('image/png')
     const imgCanvasBase = document.createElement("img");
     imgCanvasBase.src = canvasBase;
-    imgCanvasBase.width = 200;
+    imgCanvasBase.width = 400;
     imgCanvasBase.height = 630;
 
-    newCanvasCtx.drawImage(imgCanvasBase, 400, 0, 400, 1260, 0, 0, 200, 630);
+    //newCanvasCtx.drawImage(imgCanvasBase, 400, 0, 400, 1260, 0, 0, 200, 630);
+    console.log('imgCanvasBase', imgCanvasBase);
+    //newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, 200, 630);
+    newCanvasCtx.drawImage(imgCanvasBase, 0, 0, 200, 640, 0, 0, 200, 630);
+    document.body.appendChild(imgCanvasBase);
+
+    //newCanvas.toDataURL('image/png');
     
-     prints.value.unshift({id: printsCount.value ,src: newCanvas.toDataURL('image/png')})
-    printsCount.value++;
+    const a = document.createElement("a");
+    // a.href = newCanvas.toDataURL({
+    //   format: "png"
+    // });
+    a.href = newCanvas.toDataURL('image/png')
+    console.log('a.href', a.href);
+    a.download = "Print.png";
+    a.click();
+    
+
+    // prints.value.unshift({id: printsCount.value ,src: newCanvas.toDataURL('image/png')})
+    // printsCount.value++;
     // newCanvas = null
 }
 
@@ -539,6 +560,7 @@ function isMobileDeviceCheck() {
 }
 
 function resize() {
+    console.log('resize');
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
     const scale          = containerWidth / canvas.getWidth();
@@ -548,23 +570,24 @@ function resize() {
     
     if(window.innerHeight > 700 &&  window.innerHeight <= 900){
         canvas.setZoom(0.065)
-    }else if(window.innerHeight > 650 &&  window.innerHeight <= 699) {
-        canvas.setZoom(0.06)
-    }else if(window.innerHeight > 600 &&  window.innerHeight <= 649) {
-        canvas.setZoom(0.055)
-    }else if(window.innerHeight > 550 &&  window.innerHeight <= 599) {
-        canvas.setZoom(0.05)
-    }else if(window.innerHeight > 500 &&  window.innerHeight <= 549) {
-        canvas.setZoom(0.045)
-    }else if(window.innerHeight > 450 &&  window.innerHeight <= 499) {
-        canvas.setZoom(0.04)
-    }else if(window.innerHeight > 400 &&  window.innerHeight <= 449) {
-        canvas.setZoom(0.035)
-    }else if(window.innerHeight > 350 &&  window.innerHeight <= 399) {
-        canvas.setZoom(0.03)
-    }else if(window.innerHeight > 300 &&  window.innerHeight <= 349) {
-        canvas.setZoom(0.025)
     }
+    // }else if(window.innerHeight > 650 &&  window.innerHeight <= 699) {
+    //     canvas.setZoom(0.06)
+    // }else if(window.innerHeight > 600 &&  window.innerHeight <= 649) {
+    //     canvas.setZoom(0.055)
+    // }else if(window.innerHeight > 550 &&  window.innerHeight <= 599) {
+    //     canvas.setZoom(0.05)
+    // }else if(window.innerHeight > 500 &&  window.innerHeight <= 549) {
+    //     canvas.setZoom(0.045)
+    // }else if(window.innerHeight > 450 &&  window.innerHeight <= 499) {
+    //     canvas.setZoom(0.04)
+    // }else if(window.innerHeight > 400 &&  window.innerHeight <= 449) {
+    //     canvas.setZoom(0.035)
+    // }else if(window.innerHeight > 350 &&  window.innerHeight <= 399) {
+    //     canvas.setZoom(0.03)
+    // }else if(window.innerHeight > 300 &&  window.innerHeight <= 349) {
+    //     canvas.setZoom(0.025)
+    // }
     const obj = canvas.getObjects();
 
 
@@ -618,6 +641,7 @@ onMounted(() => {
 
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
+        selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
             showTextOptions()   
@@ -626,6 +650,7 @@ onMounted(() => {
     
     canvas.on('selection:updated', function(event) {
         showGeneralOptions()
+        selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
             showTextOptions()   
@@ -790,6 +815,21 @@ onMounted(() => {
 .options--top-left {
     opacity: v-bind(optionsTopOpacity);
     visibility: v-bind(optionsTopVisible);
+    z-index: v-bind(optionsTopZindex+10);
+    position: absolute;
+    width: 10%;
+    height: 50px;
+    top: -50px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    background-color: #b9b5b4;
+}
+
+.options--top-right {
+    opacity: v-bind(optionsTopOpacity);
+    visibility: v-bind(optionsTopVisible);
     z-index: v-bind(optionsTopZindex);
     position: absolute;
     width: 10%;
@@ -802,7 +842,35 @@ onMounted(() => {
     background-color: #b9b5b4;
 }
 
+.delete-elementbottom {
+    /* opacity: v-bind(popoverOpacity);
+    visibility: v-bind(popoverVisible);
+    z-index: v-bind(popoverZindex); */
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    bottom: 50px;
+    /* left: 280px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #b9b5b4;
 
+    /* padding: 1.5rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    
+    width: auto;
+
+  transform: 'translate(0, 10px);';
+  transition: 'all 0 ease 0'; */
+}
+
+.delete-elementbottom--icon {
+    width: 80px;
+}
 .textedit--top {
     opacity: v-bind(popoverOpacity);
     visibility: v-bind(popoverVisible);
