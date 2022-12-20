@@ -17,8 +17,9 @@
             <div class="rounded--btn" @click="addText()">
                 txt
             </div>
-            <div class="rounded--btn">    
+            <div class="rounded--btn" @click="toogleEmoji()">
                 ;)
+                <EmojiPicker :native="true" @select="onSelectEmoji" v-if="emojiVisible" />
             </div>
         </div>
         <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
@@ -48,6 +49,8 @@
 import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted } from 'vue';
 import { Bars4Icon } from '@heroicons/vue/20/solid'
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -65,6 +68,8 @@ const optionsTopZindex = ref(10);
 
 const layersList = shallowRef([])
 const layersListVisible = ref(false)
+
+const emojiVisible = ref(false)
 
 const bgDeckColor = ref('#3f75826b')
 const backgroundPositionLeft = ref(2650)
@@ -301,7 +306,7 @@ function toggleHideObjectFromList(id, action) {
     let selectedObject = canvas._objects.filter(
         obj => obj.id === id
     );
-    console.log('selectedObject.opacity', selectedObject.opacity);
+
     if(action == 'hide') {
         selectedObject[0].opacity = 0
     } else {
@@ -320,6 +325,14 @@ function fontfamilyChange(font) {
 function fontsizeChange(event) {
     canvas.getActiveObject().fontSize = event.target.value;
     canvas.renderAll();
+}
+
+function onSelectEmoji(emoji) {
+    const smiley = new fabric.IText(emoji.i, {id: 'smiley' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, opacity: 1 });
+    canvas.add(smiley);
+    canvas.moveTo(smiley, 4)
+    canvas.renderAll();
+    updateLayerList()
 }
 
 function bgDeckColorChange(event) {
@@ -367,6 +380,10 @@ function clearText(e) {
       canvas.renderAll();
     };
   }
+}
+
+function toogleEmoji() {
+    emojiVisible.value = !emojiVisible.value
 }
 
 function showTextOptions() {
@@ -933,4 +950,8 @@ input[type='color'] {
    margin-left: 5px;
    cursor: pointer;
 }
+.v3-emoji-picker {
+    position: absolute;
+    left: 220px;
+} 
 </style>
