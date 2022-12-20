@@ -18,7 +18,7 @@
                 ;)
             </div>
         </div>
-        <div class="options--top-left cursor-pointer" @click="toggleLayersList()">
+        <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
             <Bars4Icon class="h-5 w-5 text-purple-500"/>
         </div>
         <div class="textedit--top">
