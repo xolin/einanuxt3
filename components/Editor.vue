@@ -2,6 +2,8 @@
     <!-- <section class="fixed pl-200"> -->
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
+        <button type="button" id="undo" ref="undoButton" v-bind="undoDisabled" @click="undo()">Undo</button>
+        <button type="button" id="redo" ref="redoButton" v-bind="redoDisabled" @click="redo()">Redo</button>
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top-left cursor-pointer" @click="generatePrints()" >
             <Bars4Icon class="h-5 w-5 text-purple-500" />
@@ -105,7 +107,102 @@ fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
 }
 
 const btnWidth = 85, btnHeight = 18;
-    
+
+const undoButton = ref(null)
+const redoButton = ref(null)
+const undoDisabled = ref(false)
+const redoDisabled = ref(false)
+
+
+var _config = {
+    canvasState             : [],
+    currentStateIndex       : -1,
+    undoStatus              : false,
+    redoStatus              : false,
+    undoFinishedStatus      : 1,
+    redoFinishedStatus      : 1,
+    undoButton              : document.getElementById('undo'),
+    redoButton              : document.getElementById('redo'),
+};
+
+var updateCanvasState = function() {
+    if((_config.undoStatus == false && _config.redoStatus == false)){
+        var jsonData        = canvas.toJSON();
+        var canvasAsJson        = JSON.stringify(jsonData);
+        if(_config.currentStateIndex < _config.canvasState.length-1){
+            var indexToBeInserted                  = _config.currentStateIndex+1;
+            _config.canvasState[indexToBeInserted] = canvasAsJson;
+            var numberOfElementsToRetain           = indexToBeInserted+1;
+            _config.canvasState                    = _config.canvasState.splice(0,numberOfElementsToRetain);
+        }else{
+            _config.canvasState.push(canvasAsJson);
+        }
+        _config.currentStateIndex = _config.canvasState.length-1;
+        if((_config.currentStateIndex == _config.canvasState.length-1) && _config.currentStateIndex != -1){
+            redoButton.disabled= "disabled";
+        }
+    }
+}
+
+var undo = function() {
+    if(_config.undoFinishedStatus){
+        if(_config.currentStateIndex == -1){
+            _config.undoStatus = false;
+        }else{
+            if (_config.canvasState.length >= 1) {
+                _config.undoFinishedStatus = 0;
+                if(_config.currentStateIndex != 0){
+                    _config.undoStatus = true;
+                    canvas.loadFromJSON(_config.canvasState[_config.currentStateIndex-1],function(){
+                        var jsonData = JSON.parse(_config.canvasState[_config.currentStateIndex-1]);
+                    canvas.renderAll();
+                    _config.undoStatus = false;
+                    _config.currentStateIndex -= 1;
+                            undoDisabled.value = false
+                            if(_config.currentStateIndex !== _config.canvasState.length-1){
+                                undoDisabled.value = false
+                            }
+                        _config.undoFinishedStatus = 1;
+            });
+            }
+            else if(_config.currentStateIndex == 0){
+            canvas.clear();
+                    _config.undoFinishedStatus = 1;
+                    undoButton.disabled= "disabled";
+                    redoDisabled.value = false
+            _config.currentStateIndex -= 1;
+            }
+        }
+        }
+    }
+}
+
+var redo = function() {
+    if(_config.redoFinishedStatus){
+        if((_config.currentStateIndex == _config.canvasState.length-1) && _config.currentStateIndex != -1){
+            redoButton.disabled= "disabled";
+        }else{
+        if (_config.canvasState.length > _config.currentStateIndex && _config.canvasState.length != 0){
+                _config.redoFinishedStatus = 0;
+            _config.redoStatus = true;
+            canvas.loadFromJSON(_config.canvasState[_config.currentStateIndex+1],function(){
+                        var jsonData = JSON.parse(_config.canvasState[_config.currentStateIndex+1]);
+                    canvas.renderAll();
+                    _config.redoStatus = false;
+                _config.currentStateIndex += 1;
+                        if(_config.currentStateIndex != -1){
+                            redoDisabled.value = false
+                        }
+                    _config.redoFinishedStatus = 1;
+        if((_config.currentStateIndex == _config.canvasState.length-1) && _config.currentStateIndex != -1){
+            redoButton.disabled= "disabled";
+        }
+            });
+        }
+        }
+    }
+}
+
 function positionBtn(obj) {
     var absCoords = canvas.getAbsoluteCoords(obj);
 
@@ -706,6 +803,13 @@ onMounted(() => {
         if(event.target == null || event.target.id === "background") {
             showGeneralOptions()
         }
+    })
+    canvas.on('object:added', function(event) {
+        updateCanvasState();
+    })
+
+    canvas.on('object:modified', function(event) {
+        updateCanvasState();
     })
     canvas.on('object:scaling', function(event) {
         var object = event.target;
