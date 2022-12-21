@@ -341,7 +341,7 @@ function fontsizeChange(event) {
 }
 
 function onSelectEmoji(emoji) {
-    const smiley = new fabric.IText(emoji.i, {id: 'smiley' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, opacity: 1 });
+    const smiley = new fabric.IText(emoji.i, {id: 'smiley' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, opacity: 1, type: 'smiley' });
     canvas.add(smiley);
     canvas.moveTo(smiley, 4)
     canvas.renderAll();
@@ -675,7 +675,6 @@ onMounted(() => {
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
-            showTextOptions()   
         }
     })
     
@@ -684,7 +683,6 @@ onMounted(() => {
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
-            showTextOptions()   
         }
     })
 
@@ -745,8 +743,8 @@ onMounted(() => {
             canvas.remove(line9);
         }
 
-        var clickElementTop = event.target?.top
-        var clickElementLeft = event.target?.left 
+        var clickElementTop = event.target?.top + object.height/2
+        var clickElementLeft = event.target?.left + object.width/2
         if(event.target?.type === 'i-text'){
             if (clickElementLeft > backgroundPositionLeft.value+700 && clickElementLeft < (backgroundPositionLeft.value+700 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
                 canvas.getObjects().forEach(function(o){
@@ -786,6 +784,9 @@ onMounted(() => {
     });
 
     canvas.on('text:editing:entered', function(event) {
+        if(event.target.type !== 'smiley'){
+            showTextOptions()
+        }
         clearText(event)
     })
 })
