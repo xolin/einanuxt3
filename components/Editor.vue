@@ -2,19 +2,17 @@
     <!-- <section class="fixed pl-200"> -->
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
-        <button type="button" id="undo" ref="undoButton" v-bind="undoDisabled" @click="undo()">Undo</button>
-        <button type="button" id="redo" ref="redoButton" v-bind="redoDisabled" @click="redo()">Redo</button>
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top-left cursor-pointer" @click="generatePrints()" >
-            <Bars4Icon class="h-5 w-5 text-purple-500" />
+            <ArrowDownCircleIcon class="h-10 w-10 text-black-500" />
         </div>
         <div class="options--top">
             <div class="inline-block colorPickerWrapper colorPickerBgDeck">
-                <input type="color" @input="bgDeckColorChange($event)" />
+                <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
             </div>
             <div class="rounded--btn" @click="$refs.file.click()">
                 img
-                <input type="file" ref="file" @change="uploadFile($event)" class="hidden" />
+                <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
             </div>
             <div class="rounded--btn" @click="addText()">
                 txt
@@ -24,8 +22,13 @@
                 <EmojiPicker :native="true" @select="onSelectEmoji" v-if="emojiVisible" />
             </div>
         </div>
+        <div hidden>
+            <!-- Hidden until release -->
+            <button type="button" id="undo" ref="undoButton" v-bind="undoDisabled" @click="undo()">Undo</button>
+            <button type="button" id="redo" ref="redoButton" v-bind="redoDisabled" @click="redo()">Redo</button>
+        </div>
         <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
-            <Bars4Icon class="h-5 w-5 text-purple-500"/>
+            <Bars4Icon class="h-8 w-8 text-black-500"/>
         </div>
         <div class="textedit--top">
             <div class="inline-block colorPickerWrapper">
@@ -50,7 +53,7 @@
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted } from 'vue';
-import { Bars4Icon } from '@heroicons/vue/20/solid'
+import { Bars4Icon, ArrowDownCircleIcon } from '@heroicons/vue/20/solid'
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 
@@ -73,7 +76,7 @@ const layersListVisible = ref(false)
 
 const emojiVisible = ref(false)
 
-const bgDeckColor = ref('#3f75826b')
+const bgDeckColor = ref('#6697CC') // Old value: #3f75826b
 const backgroundPositionLeft = ref(2650)
 const backgroundScale = ref(74500)
 const deckBackgroundWidth = ref(2833)
@@ -517,35 +520,46 @@ function showGeneralOptions() {
 }
 
 function generatePrints(){
-    console.log('aa');
+    canvas.discardActiveObject().renderAll()
+    hideBin()
+    
     const newCanvas = document.createElement('canvas');
-    newCanvas.width = 200;
-    newCanvas.height = 600;
+    newCanvas.width = deckBackgroundWidth.value;
+    newCanvas.height = deckBackgroundHeight.value;
     const newCanvasCtx = newCanvas.getContext('2d');
     
+    canvas.setZoom(1)
+    canvas.width = deckBackgroundWidth.value //deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
+    canvas.height = deckBackgroundHeight.value
+    const canvasBase = canvas.toDataURL('image/jpeg')
+    canvas.setZoom(0.065)
+    resize()
     
-    const canvasBase = canvasEl.value.toDataURL('image/png')
-    const imgCanvasBase = document.createElement("img");
-    imgCanvasBase.src = canvasBase;
-    imgCanvasBase.width = 400;
-    imgCanvasBase.height = 630;
+        
+    canvas.opacity = 0
 
-    //newCanvasCtx.drawImage(imgCanvasBase, 400, 0, 400, 1260, 0, 0, 200, 630);
-    console.log('imgCanvasBase', imgCanvasBase);
-    //newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, 200, 630);
-    newCanvasCtx.drawImage(imgCanvasBase, 0, 0, 200, 640, 0, 0, 200, 630);
-    document.body.appendChild(imgCanvasBase);
 
-    //newCanvas.toDataURL('image/png');
-    
-    const a = document.createElement("a");
-    // a.href = newCanvas.toDataURL({
-    //   format: "png"
-    // });
-    a.href = newCanvas.toDataURL('image/png')
-    console.log('a.href', a.href);
-    a.download = "Print.png";
-    a.click();
+        const imgCanvasBase = document.createElement("img");
+        imgCanvasBase.width = deckBackgroundWidth.value
+        imgCanvasBase.height = deckBackgroundHeight.value
+        imgCanvasBase.src = canvasBase;
+        document.body.appendChild(imgCanvasBase)
+        newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+280, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
+        setTimeout(() => {
+            //document.body.imgCanvasBase.remove()
+            const a = document.createElement("a");
+            a.href = newCanvas.toDataURL('image/jpeg')
+            a.download = "Print.jpg";
+            a.click();
+            
+            // const aImg = document.createElement("img");
+            // aImg.src = a.href;
+            // aImg.width = deckBackgroundWidth.value
+            // aImg.height = deckBackgroundHeight.value
+            document.body.removeChild(imgCanvasBase)
+            canvas.opacity = 1
+        }, 1200);    
+    // document.body.appendChild(aImg)
     
 
     // prints.value.unshift({id: printsCount.value ,src: newCanvas.toDataURL('image/png')})
@@ -642,7 +656,7 @@ function setOpacityLayer() {
         id: 'opacity3',
         top: deckBackgroundHeight.value-10,
         left: 0,
-        width: 20000,
+        width: 40000,
         height: deckBackgroundHeight.value,
         fill: '#b9b5b4',
         lockMovementX: true,
@@ -660,34 +674,27 @@ function setOpacityLayer() {
 
 
 function isMobileDeviceCheck() {
-    console.log('isMobileDeviceCheck');
     const mobileOsRegExp = "(Android|webOS|iPhone|iPod)";
     if(screen.width < 500 || navigator.userAgent.match('/'+mobileOsRegExp+'/i')) {
         isMobileDevice.value = true;
-        console.log('a');
     }
     if (isMobileDevice.value) {
         if (typeof window.orientation === "undefined") {
             isMobileDevice.value = false; 
-            console.log('b');
         }
     }
     if (typeof navigator.userAgentData != "undefined" && !navigator.userAgentData.mobile) {
         isMobileDevice.value = false; 
-        console.log('c');
     }
     if ( typeof window.orientation !== "undefined" && isMobileDevice.value ) {
-        if (window.navigator.maxTouchPoints > 1 && (navigator.userAgentData.mobile || localStorage.mobile || 'ontouchstart' in document)) {
+        if (window.navigator.maxTouchPoints > 1 && ( localStorage.mobile || 'ontouchstart' in document)) {
             // mobile device found
             isMobileDevice.value = true; 
-            console.log('Is mobile device!'); 
         }
     }
-    console.log('isMobileDevice.value',isMobileDevice.value);
 }
 
 function resize() {
-    console.log('resize');
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
     const scale          = containerWidth / canvas.getWidth();
@@ -720,7 +727,6 @@ function resize() {
 
     const widths = [window.innerWidth];
     let windowWidth = null;
-    console.log('isMobileDevice.value',isMobileDevice.value );
     if(isMobileDevice.value === true){
         if (window.screen?.width) {
             widths.push(window.screen?.width);
