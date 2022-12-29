@@ -529,7 +529,7 @@ function generatePrints(){
     const newCanvasCtx = newCanvas.getContext('2d');
     
     canvas.setZoom(1)
-    canvas.width = deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
+    canvas.width = 10000// deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
     canvas.height = deckBackgroundHeight.value
     setTimeout(() => {
     const canvasBase = canvas.toDataURL('image/jpeg')
@@ -537,15 +537,13 @@ function generatePrints(){
     canvas.setZoom(0.065)
     resize()
         const imgCanvasBase = document.createElement("img");
-        imgCanvasBase.width = deckBackgroundWidth.value
+            imgCanvasBase.width = '10000px' // deckBackgroundWidth.value
         imgCanvasBase.height = deckBackgroundHeight.value
         imgCanvasBase.src = canvasBase;
             imgCanvasBase.onload = function() {
                 imgCanvasBase.decode()
                 .then(() => {
         document.body.appendChild(imgCanvasBase)
-                    console.log('backgroundPositionLeft.value+280', backgroundPositionLeft.value+280);
-                    console.log('imgCanvasBase.width', imgCanvasBase.width);
         newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+280, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
         setTimeout(() => {
             const a = document.createElement("a");
