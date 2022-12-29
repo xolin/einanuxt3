@@ -529,37 +529,41 @@ function generatePrints(){
     const newCanvasCtx = newCanvas.getContext('2d');
     
     canvas.setZoom(1)
-    canvas.width = deckBackgroundWidth.value //deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
+    canvas.width = deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
     canvas.height = deckBackgroundHeight.value
+    setTimeout(() => {
     const canvasBase = canvas.toDataURL('image/jpeg')
+        setTimeout(() => {
     canvas.setZoom(0.065)
     resize()
-    
-        
-    canvas.opacity = 0
-
-
         const imgCanvasBase = document.createElement("img");
         imgCanvasBase.width = deckBackgroundWidth.value
         imgCanvasBase.height = deckBackgroundHeight.value
         imgCanvasBase.src = canvasBase;
+            imgCanvasBase.onload = function() {
+                imgCanvasBase.decode()
+                .then(() => {
         document.body.appendChild(imgCanvasBase)
+                    console.log('backgroundPositionLeft.value+280', backgroundPositionLeft.value+280);
+                    console.log('imgCanvasBase.width', imgCanvasBase.width);
         newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+280, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
         setTimeout(() => {
-            //document.body.imgCanvasBase.remove()
             const a = document.createElement("a");
-            a.href = newCanvas.toDataURL('image/jpeg')
+                        const newCanvasJPG = newCanvas.toDataURL('image/jpeg')
+                        setTimeout(() => {
+                            a.href = newCanvasJPG
             a.download = "Print.jpg";
             a.click();
-            
-            // const aImg = document.createElement("img");
-            // aImg.src = a.href;
-            // aImg.width = deckBackgroundWidth.value
-            // aImg.height = deckBackgroundHeight.value
-            document.body.removeChild(imgCanvasBase)
-            canvas.opacity = 1
-        }, 1200);    
-    // document.body.appendChild(aImg)
+                        }, 1000);    
+                        //document.body.removeChild(imgCanvasBase)
+                    }, 1000);
+                })
+                .catch((encodingError) => {
+                    console.log('encodingError', encodingError);
+                })
+            }
+        }, 1000);
+    }, 1000);
     
 
     // prints.value.unshift({id: printsCount.value ,src: newCanvas.toDataURL('image/png')})
