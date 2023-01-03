@@ -7,11 +7,19 @@
             <ArrowDownCircleIcon class="h-10 w-10 text-black-500" />
         </div>
         <div class="options--top">
-            <div class="inline-block colorPickerWrapper colorPickerBgDeck">
+            <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
+            <button type="button" id="addZoom" @click="moreZoomButton" hidden>ZoomIn</button>
+            <button type="button" id="removeZoom" @click="lessZoomButton" hidden> ZoomOut </button>
+            
+            <div class="inline-block colorPickerWrapper colorPickerBgDeck" >
+                
+                <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
                 <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
             </div>
-            <div class="rounded--btn" @click="$refs.file.click()">
-                img
+            <div @click="$refs.file.click()" id="btn-add-picture">
+                
+                <!-- <svg src="./img/icon/insta-board-icon-add-skateboard-picture.svg" style="width: 37px; height: 37px;"> </svg> -->
+
                 <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
             </div>
             <div class="rounded--btn" @click="addText()">
@@ -19,7 +27,15 @@
             </div>
             <div class="rounded--btn" @click="toogleEmoji()">
                 ;)
-                <EmojiPicker :native="true" @select="onSelectEmoji" v-if="emojiVisible" />
+                <EmojiPicker :native="true" 
+                    @select="onSelectEmoji" 
+                    v-if="emojiVisible" 
+                    hide-search="true" 
+                    hide-group-icons="true" 
+                    hide-group-names="true" 
+                    disable-sticky-group-names="true"
+                    disable-skin-tones="true" 
+                />
             </div>
         </div>
         <div hidden>
@@ -311,6 +327,26 @@ function canvasEv() {
     // }
 }
 
+function moreZoomButton() {
+    canvas.zoomToPoint(new fabric.Point(canvas.width / 2, canvas.height / 2), canvas.getZoom()+0.010);
+    canvas.renderAll()
+}
+
+function lessZoomButton() {
+    if(canvas.getZoom() > 0.055){
+        canvas.zoomToPoint(new fabric.Point(canvas.width / 2, canvas.height / 2), canvas.getZoom()-0.010);
+        canvas.renderAll()
+    }
+}
+
+function changeZoom(value) {
+    console.log('vaaaaa', value);
+    if(value !== undefined) {
+        canvas.setZoom(value)
+        canvas.renderAll();
+    }
+}
+
 function addText() {
     const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 1 });
     // txt.moveTo(2);
@@ -407,6 +443,10 @@ function hideBin() {
     })
 }
 
+function confirmPostion() {
+    canvas.discardActiveObject().renderAll();
+}
+
 function selectObjectFromList(id) {
     let selectedObject = canvas._objects.filter(
         obj => obj.id === id
@@ -499,6 +539,10 @@ function toogleEmoji() {
     emojiVisible.value = !emojiVisible.value
 }
 
+function hideEmojis() {
+    emojiVisible.value = false
+}
+
 function showTextOptions() {
     popoverVisible.value = 'visible'
     popoverOpacity.value = 1
@@ -531,37 +575,36 @@ function generatePrints(){
     canvas.setZoom(1)
     canvas.width = 10000// deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
     canvas.height = deckBackgroundHeight.value
-    setTimeout(() => {
+    
+        
     const canvasBase = canvas.toDataURL('image/jpeg')
-        setTimeout(() => {
+        
     canvas.setZoom(0.065)
     resize()
-        const imgCanvasBase = document.createElement("img");
-            imgCanvasBase.width = '10000px' // deckBackgroundWidth.value
-        imgCanvasBase.height = deckBackgroundHeight.value
-        imgCanvasBase.src = canvasBase;
-            imgCanvasBase.onload = function() {
-                imgCanvasBase.decode()
-                .then(() => {
-        document.body.appendChild(imgCanvasBase)
-        newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+280, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
-        setTimeout(() => {
-            const a = document.createElement("a");
-                        const newCanvasJPG = newCanvas.toDataURL('image/jpeg')
-                        setTimeout(() => {
-                            a.href = newCanvasJPG
-            a.download = "Print.jpg";
-            a.click();
-                        }, 1000);    
-                        //document.body.removeChild(imgCanvasBase)
-                    }, 1000);
-                })
-                .catch((encodingError) => {
-                    console.log('encodingError', encodingError);
-                })
-            }
-        }, 1000);
-    }, 1000);
+    const imgCanvasBase = document.createElement("img");
+    imgCanvasBase.width = '10000px' // deckBackgroundWidth.value
+    imgCanvasBase.height = deckBackgroundHeight.value
+    imgCanvasBase.src = canvasBase;
+    imgCanvasBase.onload = function() {
+        imgCanvasBase.decode()
+        .then(() => {
+            document.body.appendChild(imgCanvasBase)
+            newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+280, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
+            setTimeout(() => {
+                const a = document.createElement("a");
+                const newCanvasJPG = newCanvas.toDataURL('image/jpeg')
+                setTimeout(() => {
+                    a.href = newCanvasJPG
+                    a.download = "Print.jpg";
+                    a.click();
+                }, 10);    
+                document.body.removeChild(imgCanvasBase)
+            }, 10);
+        })
+        .catch((encodingError) => {
+            console.log('encodingError', encodingError);
+        })
+    }
     
 
     // prints.value.unshift({id: printsCount.value ,src: newCanvas.toDataURL('image/png')})
@@ -702,10 +745,25 @@ function resize() {
     const scale          = containerWidth / canvas.getWidth();
     const zoom           = canvas.getZoom() * scale;
     
+    const widths = [window.innerWidth];
+    let windowWidth = null;
+    if(isMobileDevice.value === true){
+        if (window.screen?.width) {
+            widths.push(window.screen?.width);
+        }
+        windowWidth = Math.min(...widths) /2*15;
+    } else {
+        windowWidth = window.innerWidth/2*15
+    }
+    
     canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
     
-    if(window.innerHeight > 700 &&  window.innerHeight <= 900){
-        canvas.setZoom(0.065)
+    if(window.innerHeight > 700 &&  window.innerHeight <= 900 && window.innerHeight > 650){
+        canvas.setZoom(0.055)
+    }else if(window.innerHeight < 650){
+        canvas.setZoom(0.052)
+    }else{
+        backgroundPositionLeft.value = windowWidth - 1417/2
     }
     // }else if(window.innerHeight > 650 &&  window.innerHeight <= 699) {
     //     canvas.setZoom(0.06)
@@ -727,38 +785,18 @@ function resize() {
     const obj = canvas.getObjects();
 
 
-    const widths = [window.innerWidth];
-    let windowWidth = null;
-    if(isMobileDevice.value === true){
-        if (window.screen?.width) {
-            widths.push(window.screen?.width);
-        }
-        windowWidth = Math.min(...widths) /2*15;
-    } else {
-        windowWidth = window.innerWidth/2*15
-    }
-
-
-
-    
-    backgroundPositionLeft.value = windowWidth - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
+    //backgroundPositionLeft.value = windowWidth - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
+    backgroundPositionLeft.value = windowWidth - 1417/2
 
 }
 onMounted(() => {
     canvas = new fabric.Canvas(canvasEl.value, {
         width: 500, height:630
     });
-    // canvas.setWidth(1417);
-    // canvas.setHeight(5060)
     canvas.setZoom(0.06);
     canvas.renderAll()
     isMobileDeviceCheck()
     resize()
-    // window.addEventListener('resize', resize()) // We really want a resize?
-
-    // new fabric.Image.fromURL('./img/skatebackground.png', function(img) {
-        // img.scale(0.11);
-        // canvas.preserveObjectStacking = true;
     setBackground()
     setDeckBackground()
     setOpacityLayer()
@@ -774,6 +812,31 @@ onMounted(() => {
 
     line9.selectable = false;
     line9.evented = false;
+    var confirmIconCode = "data:image/png;base64,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";
+
+    const confirmIcon = document.createElement("img");
+    confirmIcon.src = confirmIconCode
+    //confirmIcon.src = './img/icon/Eo_circle_green_checkmark.svg'
+
+    function renderConfirmIcon(ctx, left, top, styleOverride, fabricObject) {
+        var size = this.cornerSize;
+        ctx.save();
+        ctx.translate(left, top);
+        ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+        ctx.drawImage(confirmIcon, -size/2, -size/2, size, size);
+        ctx.restore();
+    }
+    
+    fabric.Object.prototype.controls.deleteControl = new fabric.Control({
+        x: 0.5,
+        y: 0.5,
+        offsetY: -20,
+        cursorStyle: 'pointer',
+        mouseUpHandler: confirmPostion,
+        render: renderConfirmIcon,
+        cornerSize: 32
+    });
+   
 
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
@@ -812,6 +875,27 @@ onMounted(() => {
             showGeneralOptions()
         }
     })
+    // canvas.on("mouse:wheel", function(opt) {
+    //     opt.e.preventDefault()
+    //     opt.e.stopPropagation()
+    //     if (opt.e.ctrlKey) {
+    //         console.log("pinch")
+    //         var delta = opt.e.deltaY;
+    //         var zoom = canvas.getZoom();
+    //         zoom *= 0.999 ** delta;
+    //         canvas.setZoom(zoom);
+    //     } else {
+    //         var e = opt.e;
+    //         console.log('00000000:::: ', e);
+    //         var vpt = this.viewportTransform;
+    //         // if(e.deltaX > 0 && e.deltaY > 0){ 
+    //             vpt[4] += e.deltaX;
+    //             vpt[5] += e.deltaY;
+    //             this.requestRenderAll();
+    //         // }
+    //     }
+    // })
+
     canvas.on('object:added', function(event) {
         updateCanvasState();
     })
@@ -882,6 +966,7 @@ onMounted(() => {
     });
         
     canvas.on('mouse:up', function(event) {
+        hideEmojis()
         var clickElementTop = event.target?.top
         var clickElementLeft = event.target?.left
         
@@ -1044,10 +1129,11 @@ onMounted(() => {
 }
 
 input[type='color'] {
-  padding: 0;
-  width: 150%;
-  height: 150%;
-  margin: -25%;
+    padding: 0;
+    width: 50px;
+    height: 70px;
+    margin-top: -50px;
+    margin-left: -10px;
 }
 
 .colorPickerWrapper {
@@ -1065,6 +1151,17 @@ input[type='color'] {
     margin-left: 5px;
 }
 
+.btn-add-color {
+    width: 37px;
+    height: 37px;
+}
+
+#btn-add-picture {
+    width: 37px;
+    height: 37px;
+    background: url('./img/icon/insta-board-icon-add-skateboard-picture.svg');    
+}
+
 .rounded--btn {
    background: #000; 
    color: #fff;
@@ -1079,6 +1176,8 @@ input[type='color'] {
 }
 .v3-emoji-picker {
     position: absolute;
-    left: 220px;
+    top: 50px;
+    left: 0px;
+    width: 100%;
 } 
 </style>
