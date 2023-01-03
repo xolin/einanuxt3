@@ -1,55 +1,65 @@
 <template>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />            
     <!-- <section class="fixed pl-200"> -->
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top-left cursor-pointer" @click="generatePrints()" >
-            <ArrowDownCircleIcon class="h-10 w-10 text-black-500" />
+            <span class="rounded--btn material-symbols-sharp">download</span>
         </div>
         <div class="options--top">
             <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
-            <button type="button" id="addZoom" @click="moreZoomButton" hidden>ZoomIn</button>
-            <button type="button" id="removeZoom" @click="lessZoomButton" hidden> ZoomOut </button>
             
-            <div class="inline-block colorPickerWrapper colorPickerBgDeck" >
-                
+            <span class="rounded--btn material-symbols-sharp" @click="toggleShowColorpicker()">palette
+                <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
+            </span>
+
+            <!-- <div class="inline-block colorPickerWrapper colorPickerBgDeck" >    
                 <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
                 <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
-            </div>
-            <div @click="$refs.file.click()" id="btn-add-picture">
+            </div> -->            
+            
                 
-                <!-- <svg src="./img/icon/insta-board-icon-add-skateboard-picture.svg" style="width: 37px; height: 37px;"> </svg> -->
-
-                <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
-            </div>
-            <div class="rounded--btn" @click="addText()">
-                txt
-            </div>
-            <div class="rounded--btn" @click="toogleEmoji()">
-                ;)
-                <EmojiPicker :native="true" 
-                    @select="onSelectEmoji" 
-                    v-if="emojiVisible" 
-                    hide-search="true" 
-                    hide-group-icons="true" 
-                    hide-group-names="true" 
-                    disable-sticky-group-names="true"
-                    disable-skin-tones="true" 
-                />
-            </div>
+            <span class="rounded--btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
+            <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
+            <span class="rounded--btn material-symbols-sharp" @click="addText()">text_fields</span>
+            <span class="rounded--btn material-symbols-sharp" @click="toogleEmoji()">add_reaction</span>
+            
+            <Chrome class="colorpicker" v-model="colors" />
+            <EmojiPicker :native="true" 
+                @select="onSelectEmoji" 
+                v-if="emojiVisible" 
+                hide-search="true" 
+                hide-group-icons="true" 
+                hide-group-names="true" 
+                disable-sticky-group-names="true"
+                disable-skin-tones="true" 
+            />
         </div>
         <div hidden>
             <!-- Hidden until release -->
             <button type="button" id="undo" ref="undoButton" v-bind="undoDisabled" @click="undo()">Undo</button>
             <button type="button" id="redo" ref="redoButton" v-bind="redoDisabled" @click="redo()">Redo</button>
         </div>
-        <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
-            <Bars4Icon class="h-8 w-8 text-black-500"/>
-        </div>
+        
+        <!-- <div class="options--top-right">
+            <span class="rounded--btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>0">
+                layers
+            </span>
+            <span class="rounded--btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
+            <span class="rounded--btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
+        </div> -->
+        <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
+            
+        </div> -->
         <div class="textedit--top">
             <div class="inline-block colorPickerWrapper">
                 <input type="color" @input="fontColorChange($event)" />
             </div>
+        </div>
+        <div class="objectmove--top" @click="confirmPostion()">
+            <img src="/img/icon/Eo_circle_green_checkmark.svg " class="btn-add-color" />
         </div>
         <div class="textedit--bottom ">
             <fontfamilytool
@@ -69,9 +79,9 @@
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted } from 'vue';
-import { Bars4Icon, ArrowDownCircleIcon } from '@heroicons/vue/20/solid'
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
+import { Chrome } from '@ckpack/vue-color';
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -106,6 +116,10 @@ const popoverZindex = ref(-1);
 const popoverTransform = ref('translate(0, 10px);')
 const popoverTransition = ref('all 0 ease 0')
 
+const objectMoveVisible = ref('hidden')
+
+const colorpickerVisible = ref('hidden')
+
 const fontBoldCheckbox = ref(null)
 const fontItalicCheckbox = ref(null)
 const fontUnderlineCheckbox = ref(null)
@@ -115,6 +129,7 @@ const lastSelectedObject = ref(null)
 
 const bin = ref(null)
 
+const colors = ref('#194D33A8')
 const fontSizeRange = ref([10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60]);
 const fontFamilyAvailable = ref(['Times New Roman', 'Arial', 'Geneva', 'Courier', 'Helvetica', 'Avenir']);
 
@@ -312,8 +327,11 @@ function canvasEv() {
             optionsTopVisible.value = 'hidden'
             optionsTopOpacity.value = 0
             optionsTopZindex.value = -1
-        }
-    }else {
+        }else if(canvas.getActiveObject().get('type') === 'image') {
+            objectMoveVisible.value = 'visible'
+            optionsTopVisible.value = 'hidden'
+        } 
+    } else {
         popoverVisible.value = 'hidden'
         optionsTopVisible.value = 'visible'
         optionsTopOpacity.value = 1
@@ -486,15 +504,20 @@ function onSelectEmoji(emoji) {
     canvas.moveTo(smiley, 4)
     canvas.renderAll();
     updateLayerList()
+    hideEmojis()
 }
 
-function bgDeckColorChange(event) {
+function bgDeckColorChange(event) { //UNUSED???? DELETE
     canvas.getObjects().forEach(function(o){
         if(o.id == 'deckcolor'){
             o.set('fill', event.target.value)
         }
     })
     canvas.renderAll();
+}
+
+function toggleShowColorpicker() {
+    colorpickerVisible.value == 'visible' ? colorpickerVisible.value = 'hidden' : colorpickerVisible.value = 'visible'
 }
 
 function fontColorChange(event) {
@@ -812,31 +835,6 @@ onMounted(() => {
 
     line9.selectable = false;
     line9.evented = false;
-    var confirmIconCode = "data:image/png;base64,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";
-
-    const confirmIcon = document.createElement("img");
-    confirmIcon.src = confirmIconCode
-    //confirmIcon.src = './img/icon/Eo_circle_green_checkmark.svg'
-
-    function renderConfirmIcon(ctx, left, top, styleOverride, fabricObject) {
-        var size = this.cornerSize;
-        ctx.save();
-        ctx.translate(left, top);
-        ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
-        ctx.drawImage(confirmIcon, -size/2, -size/2, size, size);
-        ctx.restore();
-    }
-    
-    fabric.Object.prototype.controls.deleteControl = new fabric.Control({
-        x: 0.5,
-        y: 0.5,
-        offsetY: -20,
-        cursorStyle: 'pointer',
-        mouseUpHandler: confirmPostion,
-        render: renderConfirmIcon,
-        cornerSize: 32
-    });
-   
 
     canvas.on('selection:created', function(event) {
         showGeneralOptions()
@@ -1114,6 +1112,18 @@ onMounted(() => {
     background-color: #b9b5b4;
 }
 
+.objectmove--top {
+    visibility: v-bind(objectMoveVisible);
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    top: -50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #b9b5b4;
+}
+
 .textedit--bottom {
     opacity: v-bind(popoverOpacity);
     visibility: v-bind(popoverVisible);
@@ -1163,7 +1173,8 @@ input[type='color'] {
 }
 
 .rounded--btn {
-   background: #000; 
+   background: rgb(38, 37, 37); 
+   /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
    color: #fff;
    border-radius: 50%;
    width: 37px;
@@ -1174,10 +1185,21 @@ input[type='color'] {
    margin-left: 5px;
    cursor: pointer;
 }
+span.rounded--btn {
+    padding-top: 7px;
+}
+
 .v3-emoji-picker {
     position: absolute;
     top: 50px;
-    left: 0px;
-    width: 100%;
-} 
+    left: v-bind((innerWidth/2));
+    /* width: 100%; */
+}
+
+.colorpicker {
+    position: absolute;
+    top: 50px;
+    left: v-bind((innerWidth/2));
+    visibility: v-bind(colorpickerVisible);
+}
 </style>
