@@ -130,7 +130,7 @@ const bin = ref(null)
 
 const colors = ref('#194D33A8')
 const fontSizeRange = ref([10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60]);
-const fontFamilyAvailable = ref(['Times New Roman', 'Arial', 'Geneva', 'Courier', 'Helvetica', 'Avenir']);
+const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
     return {
