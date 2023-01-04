@@ -521,6 +521,10 @@ function fontsizeChange(event) {
 
 function onSelectEmoji(emoji) {
     const smiley = new fabric.IText(emoji.i, {id: 'smiley' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, opacity: 1, type: 'smiley' });
+    smiley.setControlVisible('ml', false)
+    smiley.setControlVisible('mb', false)
+    smiley.setControlVisible('mr', false)
+    smiley.setControlVisible('mt', false)
     canvas.add(smiley);
     canvas.moveTo(smiley, 4)
     canvas.renderAll();
