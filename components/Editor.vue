@@ -6,27 +6,26 @@
     <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas class="canvas" ref="canvasEl"></canvas>
         <div class="options--top-left cursor-pointer" @click="generatePrints()" >
-            <span class="rounded--btn material-symbols-sharp">download</span>
+            <span class="rounded__btn material-symbols-sharp">download</span>
         </div>
         <div class="options--top">
             <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
             
-            <span class="rounded--btn material-symbols-sharp" @click="toggleShowColorpicker()">palette
+            <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()">palette
                 <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
             </span>
-
             <!-- <div class="inline-block colorPickerWrapper colorPickerBgDeck" >    
                 <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
                 <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
             </div> -->            
             
                 
-            <span class="rounded--btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
+            <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
             <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
-            <span class="rounded--btn material-symbols-sharp" @click="addText()">text_fields</span>
-            <span class="rounded--btn material-symbols-sharp" @click="toogleEmoji()">add_reaction</span>
+            <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
+            <span class="rounded__btn material-symbols-sharp" @click="toogleEmoji()">add_reaction</span>
             
-            <Chrome class="colorpicker" v-model="colors" />
+            <Chrome class="colorpicker" v-model="colors" @update:modelValue="setDeckColor()" />
             <EmojiPicker :native="true" 
                 @select="onSelectEmoji" 
                 v-if="emojiVisible" 
@@ -44,11 +43,11 @@
         </div>
         
         <!-- <div class="options--top-right">
-            <span class="rounded--btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>0">
+            <span class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>0">
                 layers
             </span>
-            <span class="rounded--btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
-            <span class="rounded--btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
+            <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
+            <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
         </div> -->
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
             
@@ -78,7 +77,7 @@
 </template>
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
-import { ref, shallowRef, onMounted } from 'vue';
+import { ref, shallowRef, onMounted, computed } from 'vue';
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 import { Chrome } from '@ckpack/vue-color';
@@ -146,6 +145,10 @@ const undoButton = ref(null)
 const redoButton = ref(null)
 const undoDisabled = ref(false)
 const redoDisabled = ref(false)
+
+const colorpickerVisibleClassObject = computed(() => ({
+    'rounded__btn-active': colorpickerVisible.value === 'visible'
+}))
 
 
 var _config = {
@@ -511,6 +514,15 @@ function bgDeckColorChange(event) { //UNUSED???? DELETE
     canvas.getObjects().forEach(function(o){
         if(o.id == 'deckcolor'){
             o.set('fill', event.target.value)
+        }
+    })
+    canvas.renderAll();
+}
+
+function setDeckColor() {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == 'deckcolor'){
+            o.set('fill', colors.value.hex)
         }
     })
     canvas.renderAll();
@@ -1172,7 +1184,7 @@ input[type='color'] {
     background: url('./img/icon/insta-board-icon-add-skateboard-picture.svg');    
 }
 
-.rounded--btn {
+.rounded__btn {
    background: rgb(38, 37, 37); 
    /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
    color: #fff;
@@ -1185,8 +1197,12 @@ input[type='color'] {
    margin-left: 5px;
    cursor: pointer;
 }
-span.rounded--btn {
+span.rounded__btn {
     padding-top: 7px;
+}
+
+.rounded__btn-active {
+    background: #2b9f4e !important;
 }
 
 .v3-emoji-picker {
