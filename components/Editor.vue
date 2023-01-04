@@ -29,11 +29,11 @@
             <EmojiPicker :native="true" 
                 @select="onSelectEmoji" 
                 v-if="emojiVisible" 
-                hide-search="true" 
-                hide-group-icons="true" 
-                hide-group-names="true" 
-                disable-sticky-group-names="true"
-                disable-skin-tones="true" 
+                :hide-search="true" 
+                :hide-group-icons="true" 
+                :hide-group-names="true" 
+                :disable-sticky-group-names="true"
+                :disable-skin-tones="true" 
             />
         </div>
         <div hidden>
