@@ -565,9 +565,17 @@ function clearText(e) {
     if (e.target.text === "Tu texto") {
       e.target.text = "";
       e.target.hiddenTextarea.value = '';
-      canvas.renderAll();
     };
+    canvas.renderAll();
   }
+}
+
+function unclearText(e) {
+    if (e.target.text === "") {
+        e.target.text = "Tu texto"
+        // e.target.hiddenTextarea.value = 'Tu texto';
+    }
+    canvas.renderAll()
 }
 
 function toogleEmoji() {
@@ -995,6 +1003,10 @@ onMounted(() => {
             showTextOptions()
         }
         clearText(event)
+    })
+
+    canvas.on('text:editing:exited', function(event) {
+        unclearText(event)  
     })
 })
 
