@@ -339,6 +339,7 @@ function canvasEv() {
         } 
     } else {
         popoverVisible.value = 'hidden'
+        objectMoveVisible.value = 'hidden'
         optionsTopVisible.value = 'visible'
         optionsTopOpacity.value = 1
         optionsTopZindex.value = 10
