@@ -573,7 +573,6 @@ function clearText(e) {
 function unclearText(e) {
     if (e.target.text === "") {
         e.target.text = "Tu texto"
-        // e.target.hiddenTextarea.value = 'Tu texto';
     }
     canvas.renderAll()
 }
