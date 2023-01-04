@@ -308,7 +308,7 @@ async function uploadFile(event) {
         reader.onload = async function(e) {
             img.value = e.target.result;
             
-            const photoUrl = URL.createObjectURL(input.files[0]);
+            //const photoUrl = URL.createObjectURL(input.files[0]);
 
             const tempImg = new Image();
             const imageDimensions = await new Promise((resolve) => {
@@ -493,7 +493,6 @@ function selectObjectFromList(id) {
 }
 
 function toggleHideObjectFromList(id, action) {
-    // const selectedObject = selectObjectFromList(id)
     let selectedObject = canvas._objects.filter(
         obj => obj.id === id
     );
@@ -506,7 +505,6 @@ function toggleHideObjectFromList(id, action) {
     updateLayerList()
     canvas.renderAll();
 }
-
 
 function fontfamilyChange(font) {
     canvas.getActiveObject().fontFamily = font;
@@ -865,8 +863,8 @@ onMounted(() => {
     line9.evented = false;
 
     canvas.on('selection:created', function(event) {
-        console.log('eeevee', event);
         if(event.selected[0].type === 'i-text' ){
+            objectMoveVisible.value = 'hidden'
             showTextOptions()
         }else if(event.selected[0].type === 'image') {
             objectMoveVisible.value = 'visible'
@@ -875,8 +873,6 @@ onMounted(() => {
             showGeneralOptions()
         }
 
-
-
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
@@ -884,7 +880,16 @@ onMounted(() => {
     })
     
     canvas.on('selection:updated', function(event) {
-        showGeneralOptions()
+        if(event.selected[0].type === 'i-text' ){
+            objectMoveVisible.value = 'hidden'
+            showTextOptions()
+        }else if(event.selected[0].type === 'image') {
+            objectMoveVisible.value = 'visible'
+            optionsTopVisible.value = 'hidden'
+        }else{
+            showGeneralOptions()
+        }
+
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
@@ -933,11 +938,11 @@ onMounted(() => {
     //     }
     // })
 
-    canvas.on('object:added', function(event) {
+    canvas.on('object:added', function() {
         updateCanvasState();
     })
 
-    canvas.on('object:modified', function(event) {
+    canvas.on('object:modified', function() {
         updateCanvasState();
     })
     canvas.on('object:scaling', function(event) {
