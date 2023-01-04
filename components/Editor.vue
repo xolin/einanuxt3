@@ -1007,6 +1007,10 @@ onMounted(() => {
     width: 100%;
 }
 
+.canvas {
+    top: -50px !important;
+}
+
 /* Popover */
 .popover__content {
   opacity: v-bind(popoverOpacity);
@@ -1049,8 +1053,8 @@ onMounted(() => {
     /* left: 20px; */
     display: flex;
     align-items: center;
-    justify-content: center;
-    background-color: #b9b5b4;
+    justify-content: end;
+    background-color: transparent;
 }
 
 .options--top-left {
@@ -1065,7 +1069,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content:center;
-    background-color: #b9b5b4;
+    background-color: transparent;
 }
 
 .options--top-right {
