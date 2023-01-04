@@ -1066,7 +1066,7 @@ onMounted(() => {
     visibility: v-bind(optionsTopVisible);
     z-index: v-bind(optionsTopZindex+10);
     position: absolute;
-    width: 10%;
+    width: 15%;
     height: 50px;
     top: -50px;
     left: 0px;
