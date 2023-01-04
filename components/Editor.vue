@@ -1130,7 +1130,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #b9b5b4;
+    background-color: transparent;
 }
 
 .objectmove--top {
@@ -1142,7 +1142,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #b9b5b4;
+    background-color: transparent;
 }
 
 .textedit--bottom {
