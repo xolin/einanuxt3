@@ -138,7 +138,6 @@ const lastSelectedObject = ref(null)
 const bin = ref(null)
 
 const colors = ref('#194D33A8')
-const fontSizeRange = ref([10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60]);
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
@@ -511,11 +510,6 @@ function toggleHideObjectFromList(id, action) {
 
 function fontfamilyChange(font) {
     canvas.getActiveObject().fontFamily = font;
-    canvas.renderAll();
-}
-
-function fontsizeChange(event) {
-    canvas.getActiveObject().fontSize = event.target.value;
     canvas.renderAll();
 }
 
