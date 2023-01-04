@@ -1194,7 +1194,7 @@ input[type='color'] {
 }
 
 .rounded__btn {
-   background: rgb(38, 37, 37); 
+   background: rgba(38, 37, 37, 0.82); 
    /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
    color: #fff;
    border-radius: 50%;
