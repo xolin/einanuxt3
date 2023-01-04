@@ -53,9 +53,18 @@
             
         </div> -->
         <div class="textedit--top">
-            <div class="inline-block colorPickerWrapper">
+            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5">format_color_text</span>
+            
+            
+
+
+
+
+
+
+            <!-- <div class="inline-block colorPickerWrapper">
                 <input type="color" @input="fontColorChange($event)" />
-            </div>
+            </div> -->
         </div>
         <div class="objectmove--top" @click="confirmPostion()">
             <img src="/img/icon/Eo_circle_green_checkmark.svg " class="btn-add-color" />
@@ -320,7 +329,10 @@ async function uploadFile(event) {
 }
 
 function canvasEv() {
+    console.log('¡ssafkoadjsvkabdskvbsadlkb akdsb');
+    console.log('canvas.getActiveObject()', canvas.getActiveObject());
     if(canvas.getActiveObject()) {
+        console.log('canvas.getActiveObject().get(asdihaskdjbklsabhclkahdsbviabwkn)', canvas.getActiveObject().get('type'));
         if(canvas.getActiveObject().get('type') === 'i-text'){
             positionBtn(canvas.getActiveObject())
             popoverVisible.value = 'visible'
@@ -331,6 +343,7 @@ function canvasEv() {
 
             
             optionsTopVisible.value = 'hidden'
+            objectMoveVisible.value = 'hidden'
             optionsTopOpacity.value = 0
             optionsTopZindex.value = -1
         }else if(canvas.getActiveObject().get('type') === 'image') {
@@ -373,7 +386,7 @@ function changeZoom(value) {
 }
 
 function addText() {
-    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 1 });
+    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), type: 'i-text', left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 1 });
     // txt.moveTo(2);
     //txt.rotate(-90);
     canvas.add(txt);
@@ -407,6 +420,7 @@ function addImage(image, top, left, width, height, scale) {
         updateLayerList()
     }, {
         id: 'img' + Math.random().toString(16).slice(2),
+        type: 'image',
         top: top,
         left: left,
         width: width,  
@@ -588,6 +602,7 @@ function showTextOptions() {
     popoverTransition.value = 'all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97)'
     
     
+    objectMoveVisible.value = 'hidden'
     optionsTopVisible.value = 'hidden'
     optionsTopOpacity.value = 0
     optionsTopZindex.value = -1
@@ -595,6 +610,7 @@ function showTextOptions() {
 
 function showGeneralOptions() {
     popoverVisible.value = 'hidden'
+    objectMoveVisible.value = 'hidden'
     optionsTopVisible.value = 'visible'
     optionsTopOpacity.value = 1
     optionsTopZindex.value = 10
@@ -851,7 +867,18 @@ onMounted(() => {
     line9.evented = false;
 
     canvas.on('selection:created', function(event) {
-        showGeneralOptions()
+        console.log('eeevee', event);
+        if(event.selected[0].type === 'i-text' ){
+            showTextOptions()
+        }else if(event.selected[0].type === 'image') {
+            objectMoveVisible.value = 'visible'
+            optionsTopVisible.value = 'hidden'
+        }else{
+            showGeneralOptions()
+        }
+
+
+
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
             positionBtn(event.selected[0])
@@ -993,9 +1020,6 @@ onMounted(() => {
     });
 
     canvas.on('text:editing:entered', function(event) {
-        if(event.target.type !== 'smiley'){
-            showTextOptions()
-        }
         clearText(event)
     })
 
@@ -1057,7 +1081,7 @@ onMounted(() => {
     /* left: 20px; */
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: flex-end;
     background-color: transparent;
 }
 
@@ -1130,7 +1154,7 @@ onMounted(() => {
     top: -50px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     background-color: transparent;
 }
 
@@ -1140,9 +1164,10 @@ onMounted(() => {
     width: 100%;
     height: 50px;
     top: -50px;
+    right: 10px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     background-color: transparent;
 }
 
@@ -1202,13 +1227,14 @@ input[type='color'] {
    width: 37px;
    height: 37px;
    text-align: center;
-   padding-top: 5px;
+   padding-top: 7px;
    margin-right: 5px;
    margin-left: 5px;
    cursor: pointer;
 }
-span.rounded__btn {
-    padding-top: 7px;
+
+.rounded__btn-pt5 {
+    padding-top: 5px;
 }
 
 .rounded__btn-active {
