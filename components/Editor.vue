@@ -9,6 +9,7 @@
             <span class="rounded__btn material-symbols-sharp">download</span>
         </div>
         <div class="options--top">
+            <Chrome class="colorpicker" v-model="colors" @update:modelValue="setDeckColor()" />
             <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
             
             <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()">palette
@@ -23,9 +24,8 @@
             <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
             <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
             <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            <span class="rounded__btn material-symbols-sharp" @click="toogleEmoji()">add_reaction</span>
+            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toogleEmoji()">add_reaction</span>
             
-            <Chrome class="colorpicker" v-model="colors" @update:modelValue="setDeckColor()" />
             <EmojiPicker :native="true" 
                 @select="onSelectEmoji" 
                 v-if="emojiVisible" 
@@ -150,6 +150,9 @@ const colorpickerVisibleClassObject = computed(() => ({
     'rounded__btn-active': colorpickerVisible.value === 'visible'
 }))
 
+const emojipickerVisibleClassObject = computed(() => ({
+    'rounded__btn-active': emojiVisible.value === true
+}))
 
 var _config = {
     canvasState             : [],
