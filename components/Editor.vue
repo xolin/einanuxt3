@@ -53,15 +53,9 @@
             
         </div> -->
         <div class="textedit--top">
-            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5">format_color_text</span>
+            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()">format_color_text</span>
+            <Chrome class="textcolorpicker" v-model="textColor" @update:modelValue="setTextColor()" />
             
-            
-
-
-
-
-
-
             <!-- <div class="inline-block colorPickerWrapper">
                 <input type="color" @input="fontColorChange($event)" />
             </div> -->
@@ -127,6 +121,8 @@ const popoverTransition = ref('all 0 ease 0')
 const objectMoveVisible = ref('hidden')
 
 const colorpickerVisible = ref('hidden')
+const textcolorpickerVisible = ref('hidden')
+
 
 const fontBoldCheckbox = ref(null)
 const fontItalicCheckbox = ref(null)
@@ -138,6 +134,7 @@ const lastSelectedObject = ref(null)
 const bin = ref(null)
 
 const colors = ref('#194D33A8')
+const textColor = ref('3D94FF')
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
@@ -156,6 +153,10 @@ const redoDisabled = ref(false)
 
 const colorpickerVisibleClassObject = computed(() => ({
     'rounded__btn-active': colorpickerVisible.value === 'visible'
+}))
+
+const textcolorpickerVisibleClassObject = computed(() => ({
+    'rounded__btn-active': textcolorpickerVisible.value === 'visible'
 }))
 
 const emojipickerVisibleClassObject = computed(() => ({
@@ -328,10 +329,7 @@ async function uploadFile(event) {
 }
 
 function canvasEv() {
-    console.log('¡ssafkoadjsvkabdskvbsadlkb akdsb');
-    console.log('canvas.getActiveObject()', canvas.getActiveObject());
     if(canvas.getActiveObject()) {
-        console.log('canvas.getActiveObject().get(asdihaskdjbklsabhclkahdsbviabwkn)', canvas.getActiveObject().get('type'));
         if(canvas.getActiveObject().get('type') === 'i-text'){
             positionBtn(canvas.getActiveObject())
             popoverVisible.value = 'visible'
@@ -377,7 +375,6 @@ function lessZoomButton() {
 }
 
 function changeZoom(value) {
-    console.log('vaaaaa', value);
     if(value !== undefined) {
         canvas.setZoom(value)
         canvas.renderAll();
@@ -537,10 +534,19 @@ function toggleShowColorpicker() {
     colorpickerVisible.value == 'visible' ? colorpickerVisible.value = 'hidden' : colorpickerVisible.value = 'visible'
 }
 
-function fontColorChange(event) {
-    canvas.getActiveObject().set('fill', event.target.value);
+function setTextColor() {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == selectedObject.value){
+            o.set('fill', textColor.value.hex)
+        }
+    })
     canvas.renderAll();
 }
+
+function toggleShowTextColorpicker() {
+    textcolorpickerVisible.value == 'visible' ? textcolorpickerVisible.value = 'hidden' : textcolorpickerVisible.value = 'visible'
+}
+
 function fontBackgroundColorChange(event) {
     canvas.getActiveObject().set('textBackgroundColor', event.target.value);
     canvas.renderAll();
@@ -864,6 +870,7 @@ onMounted(() => {
 
     canvas.on('selection:created', function(event) {
         if(event.selected[0].type === 'i-text' ){
+            colorpickerVisible.value = 'hidden'
             objectMoveVisible.value = 'hidden'
             showTextOptions()
         }else if(event.selected[0].type === 'image') {
@@ -871,7 +878,9 @@ onMounted(() => {
             optionsTopVisible.value = 'hidden'
         }else{
             showGeneralOptions()
+            colorpickerVisible.value = 'hidden'
         }
+        textcolorpickerVisible.value = 'hidden'
 
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
@@ -881,14 +890,17 @@ onMounted(() => {
     
     canvas.on('selection:updated', function(event) {
         if(event.selected[0].type === 'i-text' ){
+            colorpickerVisible.value = 'hidden'
             objectMoveVisible.value = 'hidden'
             showTextOptions()
-        }else if(event.selected[0].type === 'image') {
+        }else if(event.selected[0].type === 'image') {    
             objectMoveVisible.value = 'visible'
             optionsTopVisible.value = 'hidden'
         }else{
             showGeneralOptions()
+            colorpickerVisible.value = 'hidden'
         }
+        textcolorpickerVisible.value = 'hidden'
 
         selectedObject.value = canvas.getActiveObject().get('id')
         if(event.selected[0].type === 'i-text') {
@@ -900,6 +912,7 @@ onMounted(() => {
         if(lastSelectedObject.value){
             lastSelectedObject.value.opacity = 1
         }
+        textcolorpickerVisible.value = 'hidden'
         hideBin()
     })
 
@@ -938,12 +951,14 @@ onMounted(() => {
     //     }
     // })
 
-    canvas.on('object:added', function() {
+    canvas.on('object:added', function(event) {
         updateCanvasState();
+        lastSelectedObject.value = event.target
     })
 
-    canvas.on('object:modified', function() {
+    canvas.on('object:modified', function(event) {
         updateCanvasState();
+        lastSelectedObject.value = event.target
     })
     canvas.on('object:scaling', function(event) {
         var object = event.target;
@@ -990,7 +1005,7 @@ onMounted(() => {
                         o.scaleX = 12
                         o.scaleY = 12
                     }
-    })
+                })
             } else {
                 canvas.getObjects().forEach(function(o){
                     if(o.id === "bin") {
@@ -1009,6 +1024,13 @@ onMounted(() => {
         
     canvas.on('mouse:up', function(event) {
         hideEmojis()
+        
+        if(event.target != null) {
+            console.log(event.target.id, lastSelectedObject.value.id)
+            if(event.target.id != lastSelectedObject.value.id) {
+                textcolorpickerVisible.value = 'hidden'
+            }
+        }
         var clickElementTop = event.target?.top
         var clickElementLeft = event.target?.left
         
@@ -1257,4 +1279,20 @@ input[type='color'] {
     left: v-bind((innerWidth/2));
     visibility: v-bind(colorpickerVisible);
 }
+
+.textcolorpicker {
+    position: absolute;
+    top: 50px;
+    left: v-bind((innerWidth/2));
+    visibility: v-bind(textcolorpickerVisible);
+}
+
+.vc-chrome-fields-wrap, .vc-chrome-alpha-wrap { /* Hide Hex and alpha selector color picker */
+    display: none;
+}
+
+.vc-chrome-hue-wrap {
+    margin-top: 11px;
+}
+
 </style>
