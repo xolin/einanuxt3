@@ -510,15 +510,6 @@ function onSelectEmoji(emoji) {
     hideEmojis()
 }
 
-function bgDeckColorChange(event) { //UNUSED???? DELETE
-    canvas.getObjects().forEach(function(o){
-        if(o.id == 'deckcolor'){
-            o.set('fill', event.target.value)
-        }
-    })
-    canvas.renderAll();
-}
-
 function setDeckColor() {
     canvas.getObjects().forEach(function(o){
         if(o.id == 'deckcolor'){
