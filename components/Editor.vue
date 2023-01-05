@@ -439,7 +439,7 @@ function removeObject(id) {
 
 function createBin() {
     new fabric.Image.fromURL('../img/delete_forever.png', function(img) {
-         img.moveTo(6)
+        img.moveTo(6)
         img.scaleToHeight(backgroundScale.value, false)
         bin.value = img;
         canvas.add(img);
@@ -1029,13 +1029,13 @@ onMounted(() => {
         var clickElementVerticalCenter = event.target?.top + (event.target?.height/2)
         if(!isNaN(clickElementHorizontalCenter) && !isNaN(clickElementVerticalCenter)) {
             if (clickElementHorizontalCenter > backgroundPositionLeft.value+3000 && clickElementHorizontalCenter < (backgroundPositionLeft.value+3000 + 8000) && clickElementVerticalCenter > 8050 && clickElementVerticalCenter < (10050 + 80)) {
-            canvas.getObjects().forEach(function(o) {
-                if(o.id == selectedObject.value) {
-                    canvas.remove(o);
-                    updateLayerList()
+                canvas.getObjects().forEach(function(o) {
+                    if(o.id == selectedObject.value) {
+                        canvas.remove(o);
+                        updateLayerList()
                         showGeneralOptions()
-                }
-            })
+                    }
+                })
             }
         }
     });
