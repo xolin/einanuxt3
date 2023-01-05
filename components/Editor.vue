@@ -1054,7 +1054,6 @@ onMounted(() => {
     canvas.on('mouse:up', function(event) {
         hideEmojis()
         if(event.target != null) {
-            console.log(event.target.id, lastSelectedObject.value.id)
             if(event.target.id != lastSelectedObject.value.id) {
                 textcolorpickerVisible.value = 'hidden'
             }
