@@ -3,13 +3,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />            
     <!-- <section class="fixed pl-200"> -->
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
-    <section v-resize="resize" ref="canvasWrapper" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
-        <canvas class="canvas" ref="canvasEl"></canvas>
+    <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
+        <canvas ref="canvasEl" class="canvas"></canvas>
         <div class="options--top-left cursor-pointer" @click="generatePrints()" >
             <span class="rounded__btn material-symbols-sharp">download</span>
         </div>
         <div class="options--top">
-            <Chrome class="colorpicker" v-model="colors" @update:modelValue="setDeckColor()" />
+            <Chrome v-model="colors" class="colorpicker" @update:modelValue="setDeckColor()" />
             <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
             
             <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()">palette
@@ -22,24 +22,25 @@
             
                 
             <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
-            <input type="file" ref="file"  accept="image/*;capture=camera" @change="uploadFile($event)" class="hidden" />
+            <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
             <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
             <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toogleEmoji()">add_reaction</span>
             
-            <EmojiPicker :native="true" 
-                @select="onSelectEmoji" 
+            <EmojiPicker
                 v-if="emojiVisible" 
+                :native="true" 
                 :hide-search="true" 
                 :hide-group-icons="true" 
                 :hide-group-names="true" 
-                :disable-sticky-group-names="true"
-                :disable-skin-tones="true" 
+                :disable-sticky-group-names="true" 
+                :disable-skin-tones="true"
+                @select="onSelectEmoji" 
             />
         </div>
         <div hidden>
             <!-- Hidden until release and refactor-->
-            <button type="button" id="undo" ref="undoButton" v-bind="undoDisabled" @click="undo()">Undo</button>
-            <button type="button" id="redo" ref="redoButton" v-bind="redoDisabled" @click="redo()">Redo</button>
+            <button id="undo" ref="undoButton" type="button" v-bind="undoDisabled" @click="undo()">Undo</button>
+            <button id="redo" ref="redoButton" type="button" v-bind="redoDisabled" @click="redo()">Redo</button>
         </div>
         
         <!-- <div class="options--top-right">
@@ -54,7 +55,7 @@
         </div> -->
         <div class="textedit--top">
             <span class="rounded__btn material-symbols-sharp rounded__btn-pt5" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()">format_color_text</span>
-            <Chrome class="textcolorpicker" v-model="textColor" @update:modelValue="setTextColor()" />
+            <Chrome v-model="textColor" class="textcolorpicker" @update:modelValue="setTextColor()" />
             
             <!-- <div class="inline-block colorPickerWrapper">
                 <input type="color" @input="fontColorChange($event)" />
@@ -66,17 +67,11 @@
         <div class="textedit--bottom ">
             <fontfamilytool
                 v-for="fontFamily in fontFamilyAvailable"
-                :font="fontFamily" 
-                :key="fontFamily"
+                :key="fontFamily" 
+                :font="fontFamily"
             ></fontfamilytool>
         </div>
     </section>
-    <!-- <section class="prints">
-        <b>Prints</b>
-        <span v-for="print in prints" :key="print.id">
-            <img :src="print.src">
-        </span>
-    </section> -->
 </template>
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
@@ -89,9 +84,6 @@ const canvasWrapper = ref(null);
 const canvasEl = ref(null);
 let canvas = null;
 const isMobileDevice = ref(null);
-
-let prints = ref([]);
-let printsCount = ref(0);
 
 const img = ref('');
 
@@ -124,11 +116,6 @@ const objectMoveVisible = ref('hidden')
 
 const colorpickerVisible = ref('hidden')
 const textcolorpickerVisible = ref('hidden')
-
-
-const fontBoldCheckbox = ref(null)
-const fontItalicCheckbox = ref(null)
-const fontUnderlineCheckbox = ref(null)
 
 const selectedObject = ref(null)
 const lastSelectedObject = ref(null)
@@ -190,7 +177,7 @@ var updateCanvasState = function() {
         }
         _config.currentStateIndex = _config.canvasState.length-1;
         if((_config.currentStateIndex == _config.canvasState.length-1) && _config.currentStateIndex != -1){
-            redoButton.disabled= "disabled";
+            redoButton.value.disabled= "disabled";
         }
     }
 }
@@ -219,7 +206,7 @@ var undo = function() {
             else if(_config.currentStateIndex == 0){
             canvas.clear();
                     _config.undoFinishedStatus = 1;
-                    undoButton.disabled= "disabled";
+                    undoButton.value.disabled= "disabled";
                     redoDisabled.value = false
             _config.currentStateIndex -= 1;
             }
@@ -231,7 +218,7 @@ var undo = function() {
 var redo = function() {
     if(_config.redoFinishedStatus){
         if((_config.currentStateIndex == _config.canvasState.length-1) && _config.currentStateIndex != -1){
-            redoButton.disabled= "disabled";
+            redoButton.value.disabled= "disabled";
         }else{
         if (_config.canvasState.length > _config.currentStateIndex && _config.canvasState.length != 0){
                 _config.redoFinishedStatus = 0;
@@ -246,7 +233,7 @@ var redo = function() {
                         }
                     _config.redoFinishedStatus = 1;
         if((_config.currentStateIndex == _config.canvasState.length-1) && _config.currentStateIndex != -1){
-            redoButton.disabled= "disabled";
+            redoButton.value.disabled= "disabled";
         }
             });
         }
@@ -665,11 +652,6 @@ function generatePrints(){
             console.log('encodingError', encodingError);
         })
     }
-    
-
-    // prints.value.unshift({id: printsCount.value ,src: newCanvas.toDataURL('image/png')})
-    // printsCount.value++;
-    // newCanvas = null
 }
 
 function calculateBackgroundDeckTopOffset() {
