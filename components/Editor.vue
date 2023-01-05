@@ -118,6 +118,8 @@ const popoverZindex = ref(-1);
 const popoverTransform = ref('translate(0, 10px);')
 const popoverTransition = ref('all 0 ease 0')
 
+const textEditFontTop = ref('450px')
+
 const objectMoveVisible = ref('hidden')
 
 const colorpickerVisible = ref('hidden')
@@ -607,6 +609,10 @@ function showTextOptions() {
     optionsTopVisible.value = 'hidden'
     optionsTopOpacity.value = 0
     optionsTopZindex.value = -1
+
+    if(window.innerHeight > 570) {
+        textEditFontTop.value = Math.floor((450 + calculateBackgroundDeckTopOffset()/7))+'px'
+    }
 }
 
 function showGeneralOptions() {
@@ -666,6 +672,14 @@ function generatePrints(){
     // newCanvas = null
 }
 
+function calculateBackgroundDeckTopOffset() {
+    let topBackground = 0;
+    if(window.innerHeight > 570) {
+        topBackground = ((window.innerHeight - 570) /2) *15
+    }
+    return topBackground
+}
+
 function setBackground() {
     const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
         //img.scale(1)
@@ -681,7 +695,7 @@ function setBackground() {
         selectable: false,
         evented: false,
         hoverCursor: 'default',
-        top: 0,
+        top: calculateBackgroundDeckTopOffset(),
         left: backgroundPositionLeft.value,
         //left: canvas.getWidth()/2,
         width: 1417,
@@ -691,7 +705,7 @@ function setBackground() {
 
 function setDeckBackground() {
     const rect = new fabric.Rect({ 
-        top: 0, 
+        top: calculateBackgroundDeckTopOffset(), 
         left: backgroundPositionLeft.value + 350,
         width: deckBackgroundWidth.value,
         height: deckBackgroundHeight.value,
@@ -714,7 +728,7 @@ function setOpacityLayer() {
         top: 0,
         left: 0,
         width: backgroundPositionLeft.value,
-        height: deckBackgroundHeight.value,
+        height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
         fill: '#b9b5b4',
         lockMovementX: true,
         lockMovementY: true,
@@ -734,7 +748,7 @@ function setOpacityLayer() {
         top: 0,
         left: backgroundPositionLeft.value + 3400,
         width: backgroundPositionLeft.value+10000,
-        height: deckBackgroundHeight.value,
+        height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
         fill: '#b9b5b4',
         lockMovementX: true,
         lockMovementY: true,
@@ -749,7 +763,7 @@ function setOpacityLayer() {
 
     const rect3 = new fabric.Rect({
         id: 'opacity3',
-        top: deckBackgroundHeight.value-10,
+        top: (deckBackgroundHeight.value-10)+calculateBackgroundDeckTopOffset(),
         left: 0,
         width: 40000,
         height: deckBackgroundHeight.value,
@@ -764,6 +778,26 @@ function setOpacityLayer() {
     })
     canvas.moveTo(rect3,3);
     canvas.add(rect3)
+
+    if (calculateBackgroundDeckTopOffset() > 0) {
+        const rect4 = new fabric.Rect({
+            id: 'opacity4',
+            top: 0,
+            left: backgroundPositionLeft.value,
+            width: deckBackgroundWidth.value+569,
+            height: calculateBackgroundDeckTopOffset(),
+            fill: '#b9b5b4',
+            lockMovementX: true,
+            lockMovementY: true,
+            hasControls: false,
+            selectable: false,
+            evented: false,
+            hoverCursor: 'default',
+            opacity: 0.75
+        })
+        canvas.moveTo(rect4, 4);
+        canvas.add(rect4)
+    }
 }
 
 
@@ -1199,7 +1233,7 @@ onMounted(() => {
     position: absolute;
     width: 100%;
     height: 40px;
-    top: 450px;
+    top: v-bind(textEditFontTop);
     display: flex;
     align-items: center;
     justify-content: center;
