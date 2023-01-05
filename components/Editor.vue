@@ -37,7 +37,7 @@
             />
         </div>
         <div hidden>
-            <!-- Hidden until release -->
+            <!-- Hidden until release and refactor-->
             <button type="button" id="undo" ref="undoButton" v-bind="undoDisabled" @click="undo()">Undo</button>
             <button type="button" id="redo" ref="redoButton" v-bind="redoDisabled" @click="redo()">Redo</button>
         </div>
@@ -438,8 +438,7 @@ function removeObject(id) {
 }
 
 function createBin() {
-    new fabric.Image.fromURL('../img/bin.png', function(img) {
-        // canvas.bringToFront(img);
+    new fabric.Image.fromURL('../img/delete_forever.png', function(img) {
          img.moveTo(6)
         img.scaleToHeight(backgroundScale.value, false)
         bin.value = img;
@@ -453,7 +452,7 @@ function createBin() {
         evented: true,
         hoverCursor: 'default',
         top: 8050,
-        left: backgroundPositionLeft.value+700,
+        left: backgroundPositionLeft.value+2800,
         width: 4117,
         height: 8060,
         visible: false,
@@ -705,7 +704,6 @@ function setDeckBackground() {
         evented: false,
         hoverCursor: 'default'
     })
-    // canvas.sendToBack(rect)
     canvas.add(rect)
     canvas.moveTo(rect,2);
 }
@@ -726,10 +724,8 @@ function setOpacityLayer() {
         hoverCursor: 'default',
         opacity: 0.75
     })
-    // canvas.bringToFront(rect)
     canvas.moveTo(rect,1)
     canvas.add(rect)
-    // canvas.bringForward(rect)
 
 
 
@@ -748,7 +744,6 @@ function setOpacityLayer() {
         hoverCursor: 'default',
         opacity: 0.75
     })
-    // canvas.bringToFront(rect2)
     canvas.moveTo(rect2,2);
     canvas.add(rect2)
 
@@ -767,7 +762,6 @@ function setOpacityLayer() {
         hoverCursor: 'default',
         opacity: 0.75
     })
-    // canvas.bringToFront(rect2)
     canvas.moveTo(rect3,3);
     canvas.add(rect3)
 }
@@ -996,10 +990,11 @@ onMounted(() => {
             canvas.remove(line9);
         }
 
-        var clickElementTop = event.target?.top + object.height/2
-        var clickElementLeft = event.target?.left + object.width/2
+        var clickElementHorizontalCenter = event.target?.left + (event.target?.width/2)
+        var clickElementVerticalCenter = event.target?.top + (event.target?.height/2)
         if(event.target?.type === 'i-text'){
-            if (clickElementLeft > backgroundPositionLeft.value+700 && clickElementLeft < (backgroundPositionLeft.value+700 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
+            if (clickElementHorizontalCenter > backgroundPositionLeft.value+3000 && clickElementHorizontalCenter < (backgroundPositionLeft.value+3000 + 8000) && clickElementVerticalCenter > 8050 && clickElementVerticalCenter < (10050 + 80)) {
+            //if (clickElementLeft > backgroundPositionLeft.value+3000 && clickElementLeft < (backgroundPositionLeft.value+3000 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
                 canvas.getObjects().forEach(function(o){
                     if(o.id === "bin") {
                         o.scaleX = 12
@@ -1024,23 +1019,24 @@ onMounted(() => {
         
     canvas.on('mouse:up', function(event) {
         hideEmojis()
-        
         if(event.target != null) {
             console.log(event.target.id, lastSelectedObject.value.id)
             if(event.target.id != lastSelectedObject.value.id) {
                 textcolorpickerVisible.value = 'hidden'
             }
         }
-        var clickElementTop = event.target?.top
-        var clickElementLeft = event.target?.left
-        
-        if (clickElementLeft > backgroundPositionLeft.value+700 && clickElementLeft < (backgroundPositionLeft.value+700 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
+        var clickElementHorizontalCenter = event.target?.left + (event.target?.width/2)
+        var clickElementVerticalCenter = event.target?.top + (event.target?.height/2)
+        if(!isNaN(clickElementHorizontalCenter) && !isNaN(clickElementVerticalCenter)) {
+            if (clickElementHorizontalCenter > backgroundPositionLeft.value+3000 && clickElementHorizontalCenter < (backgroundPositionLeft.value+3000 + 8000) && clickElementVerticalCenter > 8050 && clickElementVerticalCenter < (10050 + 80)) {
             canvas.getObjects().forEach(function(o) {
                 if(o.id == selectedObject.value) {
                     canvas.remove(o);
                     updateLayerList()
+                        showGeneralOptions()
                 }
             })
+            }
         }
     });
 
