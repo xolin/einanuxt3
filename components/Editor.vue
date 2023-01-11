@@ -12,9 +12,9 @@
             <Chrome v-model="colors" class="colorpicker" @update:modelValue="setDeckColor()" />
             <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
             
-            <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()">palette
-                <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
+            <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
             </span>
+                <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
             <!-- <div class="inline-block colorPickerWrapper colorPickerBgDeck" >    
                 <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
                 <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
@@ -24,7 +24,7 @@
             <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
             <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
             <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toogleEmoji()">add_reaction</span>
+            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toogleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
             
             <EmojiPicker
                 v-if="emojiVisible" 
@@ -151,6 +151,14 @@ const textcolorpickerVisibleClassObject = computed(() => ({
 const emojipickerVisibleClassObject = computed(() => ({
     'rounded__btn-active': emojiVisible.value === true
 }))
+
+const colorpickerVisibleIconComputed = computed(() => 
+    colorpickerVisible.value === 'visible' ? 'close' : 'palette'
+)
+
+const emojipickerVisibleIconComputed = computed(() =>
+    emojiVisible.value === true ? 'close' : 'add_reaction'
+)
 
 var _config = {
     canvasState             : [],
