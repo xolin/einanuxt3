@@ -1159,6 +1159,21 @@ onMounted(() => {
     background-color: #b9b5b4;
 }
 
+.options--bottom-right {
+    /* opacity: v-bind(optionsTopOpacity);
+    visibility: v-bind(optionsTopVisible);
+    z-index: v-bind(optionsTopZindex); */
+    position: absolute;
+    width: 50%;
+    height: 50px;
+    bottom: 50px;
+    right: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* background-color: #b9b5b4; */
+}
+
 .delete-elementbottom {
     /* opacity: v-bind(popoverOpacity);
     visibility: v-bind(popoverVisible);
