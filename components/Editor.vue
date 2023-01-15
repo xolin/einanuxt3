@@ -156,6 +156,10 @@ const colorpickerVisibleIconComputed = computed(() =>
     colorpickerVisible.value === 'visible' ? 'close' : 'palette'
 )
 
+const textcolorpickerVisibleIconComputed = computed(() => 
+    textcolorpickerVisible.value === 'visible' ? 'close' : 'format_color_text'
+)
+
 const emojipickerVisibleIconComputed = computed(() =>
     emojiVisible.value === true ? 'close' : 'add_reaction'
 )
