@@ -831,7 +831,7 @@ function resize() {
     
     canvas.setDimensions({width: containerWidth, height: containerWidth / ratio});
     
-    if(window.innerHeight > 700 &&  window.innerHeight <= 900 && window.innerHeight > 650){
+    if(window.innerHeight <= 900 && window.innerHeight > 650){
         canvas.setZoom(0.055)
     }else if(window.innerHeight < 650){
         canvas.setZoom(0.052)
