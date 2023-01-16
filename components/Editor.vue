@@ -952,12 +952,12 @@ onMounted(() => {
 
     canvas.on('touch:gesture', function(event) {
         if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
-            lastSelectedObject.value.opacity = 1
+            lastSelectedObject.value.opacity = 0.75
         }
     })
     canvas.on('mouse:down', function(event) {
         if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
-            lastSelectedObject.value.opacity = 1
+            lastSelectedObject.value.opacity = 0.75
         }
         
         if(event.target == null || event.target.id === "background") {
