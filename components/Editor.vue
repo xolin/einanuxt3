@@ -97,11 +97,13 @@ const layersListVisible = ref(false)
 const emojiVisible = ref(false)
 const generatingPrints = ref(false)
 
-const bgDeckColor = ref('#6697CC') // Old value: #3f75826b
+const bgDeckColor = ref('#026ed9') // Old value: #6697CC, older: #3f75826b
 const backgroundPositionLeft = ref(2650)
 const backgroundScale = ref(74500)
 const deckBackgroundWidth = ref(2833)
 const deckBackgroundHeight = ref(10119)
+
+
 
 const popoverLeft = ref('0px');
 const popoverTop = ref('0px');
@@ -123,7 +125,7 @@ const lastSelectedObject = ref(null)
 
 const bin = ref(null)
 
-const colors = ref('#194D33A8')
+const colors = ref('#026ed9')
 const textColor = ref('3D94FF')
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
@@ -633,6 +635,9 @@ function showGeneralOptions() {
 
 function generatePrints(){
     generatingPrints.value = true
+    const canvasHeight = (deckBackgroundHeight.value + calculateBackgroundDeckTopOffset())
+    console.log(canvas.toSVG())
+    // console.log(JSON.stringify(canvas))
     canvas.discardActiveObject().renderAll()
     hideBin()
     
@@ -641,24 +646,25 @@ function generatePrints(){
     newCanvas.height = deckBackgroundHeight.value;
     const newCanvasCtx = newCanvas.getContext('2d');
     
+    const lastZoom = canvas.getZoom()
     canvas.setZoom(1)
     canvas.width = 10000// deckBackgroundWidth.value // CHANGE THIS TO THE SIMULATED CANVAS SIZE TO GET THE FUlL IMAGE SIZE
-    canvas.height = deckBackgroundHeight.value
+    canvas.height = canvasHeight
     
         
     const canvasBase = canvas.toDataURL('image/jpeg')
         
-    canvas.setZoom(0.065)
+    canvas.setZoom(lastZoom)
     resize()
     const imgCanvasBase = document.createElement("img");
     imgCanvasBase.width = '10000px' // deckBackgroundWidth.value
-    imgCanvasBase.height = deckBackgroundHeight.value
+    imgCanvasBase.height = canvasHeight
     imgCanvasBase.src = canvasBase;
     imgCanvasBase.onload = function() {
         imgCanvasBase.decode()
         .then(() => {
             document.body.appendChild(imgCanvasBase)
-            newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+280, 0, deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
+            newCanvasCtx.drawImage(imgCanvasBase, backgroundPositionLeft.value+345, calculateBackgroundDeckTopOffset(), deckBackgroundWidth.value, deckBackgroundHeight.value, 0, 0, deckBackgroundWidth.value, deckBackgroundHeight.value);
             setTimeout(() => {
                 const a = document.createElement("a");
                 const newCanvasJPG = newCanvas.toDataURL('image/jpeg')
@@ -667,7 +673,7 @@ function generatePrints(){
                     a.download = "Print.jpg";
                     a.click();
                     generatingPrints.value = false              
-                }, 10);    
+                }, 10);
                 document.body.removeChild(imgCanvasBase)
             }, 10);
         })
@@ -687,11 +693,21 @@ function calculateBackgroundDeckTopOffset() {
 }
 
 function setBackground() {
-    const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
+    console.log('setBackground',canvas.getObjects().length);
+    canvas.getObjects().forEach(function(o){
+        console.log('--------', o.id);
+        if(o.id === "background") {
+            console.log('baaaackkk');
+            return false
+        }
+    })
+    console.log('!!!!!!!!!');
+    //const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
+    const imge = new fabric.Image.fromURL('./img/mockup/2023-instaboard-MOCKUP.png', function(img) {
         //img.scale(1)
         canvas.bringToFront(img);
         img.moveTo(6)
-        img.scaleToHeight(backgroundScale.value, false)
+        //img.scaleToHeight(backgroundScale.value, false)
         canvas.add(img);
     }, {
         id: 'background',
@@ -702,19 +718,20 @@ function setBackground() {
         evented: false,
         hoverCursor: 'default',
         top: calculateBackgroundDeckTopOffset(),
-        left: backgroundPositionLeft.value,
+        left: backgroundPositionLeft.value+345,
         //left: canvas.getWidth()/2,
-        width: 1417,
-        height: 5060,
+        width: deckBackgroundWidth.value,
+        height: deckBackgroundHeight.value,
     })
 }
 
 function setDeckBackground() {
     const rect = new fabric.Rect({ 
         top: calculateBackgroundDeckTopOffset(), 
-        left: backgroundPositionLeft.value + 350,
-        width: deckBackgroundWidth.value,
-        height: deckBackgroundHeight.value,
+        left: backgroundPositionLeft.value + 445,
+        width: deckBackgroundWidth.value-100,
+        //height: 5060,
+         height: deckBackgroundHeight.value-100,
         fill: bgDeckColor.value,
         id: 'deckcolor',
         lockMovementX: true,
@@ -733,16 +750,16 @@ function setOpacityLayer() {
         id: 'opacity1',
         top: 0,
         left: 0,
-        width: backgroundPositionLeft.value,
+        width: backgroundPositionLeft.value+ 345,
         height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
-        fill: '#b9b5b4',
+        fill: '#fff',
         lockMovementX: true,
         lockMovementY: true,
         hasControls: false,
         selectable: false,
         evented: false,
         hoverCursor: 'default',
-        opacity: 0.75
+        opacity: 1
     })
     canvas.moveTo(rect,1)
     canvas.add(rect)
@@ -752,17 +769,17 @@ function setOpacityLayer() {
     const rect2 = new fabric.Rect({
         id: 'opacity2',
         top: 0,
-        left: backgroundPositionLeft.value + 3400,
+        left: backgroundPositionLeft.value + deckBackgroundWidth.value+345,
         width: backgroundPositionLeft.value+10000,
         height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
-        fill: '#b9b5b4',
+        fill: '#fff',
         lockMovementX: true,
         lockMovementY: true,
         hasControls: false,
         selectable: false,
         evented: false,
         hoverCursor: 'default',
-        opacity: 0.75
+        opacity: 1
     })
     canvas.moveTo(rect2,2);
     canvas.add(rect2)
@@ -773,14 +790,14 @@ function setOpacityLayer() {
         left: 0,
         width: 40000,
         height: deckBackgroundHeight.value,
-        fill: '#b9b5b4',
+        fill: '#fff',
         lockMovementX: true,
         lockMovementY: true,
         hasControls: false,
         selectable: false,
         evented: false,
         hoverCursor: 'default',
-        opacity: 0.75
+        opacity: 1
     })
     canvas.moveTo(rect3,3);
     canvas.add(rect3)
@@ -789,17 +806,17 @@ function setOpacityLayer() {
         const rect4 = new fabric.Rect({
             id: 'opacity4',
             top: 0,
-            left: backgroundPositionLeft.value,
-            width: deckBackgroundWidth.value+569,
+            left: backgroundPositionLeft.value+345,
+            width: deckBackgroundWidth.value,
             height: calculateBackgroundDeckTopOffset(),
-            fill: '#b9b5b4',
+            fill: '#fff',
             lockMovementX: true,
             lockMovementY: true,
             hasControls: false,
             selectable: false,
             evented: false,
             hoverCursor: 'default',
-            opacity: 0.75
+            opacity: 1
         })
         canvas.moveTo(rect4, 4);
         canvas.add(rect4)
@@ -943,12 +960,16 @@ onMounted(() => {
     })
 
     canvas.on('selection:cleared', function() {
+        console.log('aaa', lastSelectedObject.value);
         if(lastSelectedObject.value){
+            console.log('bbbb', lastSelectedObject.value);
             lastSelectedObject.value.opacity = 1
         }
+        console.log('cccc', lastSelectedObject.value);
         textcolorpickerVisible.value = 'hidden'
         hideBin()
     })
+    
 
     canvas.on('touch:gesture', function(event) {
         if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
@@ -1018,7 +1039,7 @@ onMounted(() => {
             event.target.set({
                 //left: backgroundPositionLeft.value / 2 - (event.target.width * event.target.scaleX) / 2,
                 left: backgroundPositionLeft.value+1700 - (event.target.width * event.target.scaleX) / 2,
-            }).setCoords();
+            })//.setCoords();
 
             canvas.add(line9);
 
