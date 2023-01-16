@@ -95,6 +95,7 @@ const layersList = shallowRef([])
 const layersListVisible = ref(false)
 
 const emojiVisible = ref(false)
+const generatingPrints = ref(false)
 
 const bgDeckColor = ref('#6697CC') // Old value: #3f75826b
 const backgroundPositionLeft = ref(2650)
@@ -152,6 +153,10 @@ const emojipickerVisibleClassObject = computed(() => ({
     'rounded__btn-active': emojiVisible.value === true
 }))
 
+const downloadVisibleClassObject = computed(() => ({
+    'rounded__btn-active': generatingPrints.value === true
+}))
+
 const colorpickerVisibleIconComputed = computed(() => 
     colorpickerVisible.value === 'visible' ? 'close' : 'palette'
 )
@@ -162,6 +167,10 @@ const textcolorpickerVisibleIconComputed = computed(() =>
 
 const emojipickerVisibleIconComputed = computed(() =>
     emojiVisible.value === true ? 'close' : 'add_reaction'
+)
+
+const downloadVisibleIconComputed = computed(() => 
+    generatingPrints.value === true ? 'hourglass_empty' : 'download'
 )
 
 var _config = {
@@ -623,6 +632,7 @@ function showGeneralOptions() {
 }
 
 function generatePrints(){
+    generatingPrints.value = true
     canvas.discardActiveObject().renderAll()
     hideBin()
     
@@ -656,12 +666,14 @@ function generatePrints(){
                     a.href = newCanvasJPG
                     a.download = "Print.jpg";
                     a.click();
+                    generatingPrints.value = false              
                 }, 10);    
                 document.body.removeChild(imgCanvasBase)
             }, 10);
         })
         .catch((encodingError) => {
             console.log('encodingError', encodingError);
+            generatingPrints.value = false
         })
     }
 }
