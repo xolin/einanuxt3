@@ -5,8 +5,8 @@
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
-        <div class="options--top-left cursor-pointer" @click="generatePrints()" >
-            <span class="rounded__btn material-symbols-sharp">download</span>
+        <div class="options--top-left cursor-pointer" @click="generatePrints()">
+            <span class="rounded__btn material-symbols-sharp" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
         </div>
         <div class="options--top">
             <Chrome v-model="colors" class="colorpicker" @update:modelValue="setDeckColor()" />
@@ -14,7 +14,7 @@
             
             <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
             </span>
-                <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
+            <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
             <!-- <div class="inline-block colorPickerWrapper colorPickerBgDeck" >    
                 <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
                 <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
@@ -43,18 +43,18 @@
             <button id="redo" ref="redoButton" type="button" v-bind="redoDisabled" @click="redo()">Redo</button>
         </div>
         
-        <!-- <div class="options--top-right">
+        <div class="options--bottom-right">
             <span class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>0">
                 layers
             </span>
             <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
             <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
-        </div> -->
+        </div>
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
             
         </div> -->
         <div class="textedit--top">
-            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()">format_color_text</span>
+            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
             <Chrome v-model="textColor" class="textcolorpicker" @update:modelValue="setTextColor()" />
             
             <!-- <div class="inline-block colorPickerWrapper">
