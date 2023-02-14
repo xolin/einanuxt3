@@ -84,6 +84,7 @@ const canvasWrapper = ref(null);
 const canvasEl = ref(null);
 let canvas = null;
 const isMobileDevice = ref(null);
+const uuid = ref(null);
 
 const img = ref('');
 
@@ -690,6 +691,18 @@ function calculateBackgroundDeckTopOffset() {
         topBackground = ((window.innerHeight - 570) /2) *15
     }
     return topBackground
+}
+
+function makeId(tokenLen) {
+    if (tokenLen == null) {
+        tokenLen = 16;
+    }
+    var text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < tokenLen; ++i)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    uuid.value = text;
 }
 
 function setBackground() {
