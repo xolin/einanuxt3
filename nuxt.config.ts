@@ -1,3 +1,4 @@
+import { defineNuxtConfig } from 'nuxt/config'
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
   pages: true,
@@ -10,6 +11,7 @@ export default defineNuxtConfig({
       ]
     }
   },
+  // plugins: [{ src: "~/plugins/vue-paycard.js", mode: "client" }],
   css: ['~/assets/css/main.css'],
     postcss: {
         plugins: {
@@ -20,7 +22,7 @@ export default defineNuxtConfig({
     nitro: {
       preset: 'vercel-edge',
     },
-    // modules: [
-    //   'nuxt-headlessui'
-    // ]
+    //modules: [
+      //'@vueuse/nuxt',
+    //]
 })

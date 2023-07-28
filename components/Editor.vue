@@ -5,8 +5,12 @@
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
-        <div class="options--top-left cursor-pointer" @click="generatePrints()">
-            <span class="rounded__btn material-symbols-sharp" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+        <div class="options--bottom-left">
+            <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
+                layers
+            </span>
+            <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
+            <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
         </div>
         <div class="options--top">
             <Chrome v-model="colors" class="colorpicker" @update:modelValue="setDeckColor()" />
@@ -44,17 +48,14 @@
         </div>
         
         <div class="options--bottom-right">
-            <span class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>0">
-                layers
-            </span>
-            <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
-            <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
+            <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="finishEdition()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+            <!-- <span class="rounded__btn cursor-pointer material-symbols-sharp color-blue rounded__btn-downloadbig" @click="generatePrints()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span> -->
         </div>
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
             
         </div> -->
         <div class="textedit--top">
-            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
+            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5 rounded__btn--activecolor" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
             <Chrome v-model="textColor" class="textcolorpicker" @update:modelValue="setTextColor()" />
             
             <!-- <div class="inline-block colorPickerWrapper">
@@ -64,7 +65,7 @@
         <div class="objectmove--top" @click="confirmPostion()">
             <img src="/img/icon/Eo_circle_green_checkmark.svg " class="btn-add-color" />
         </div>
-        <div class="textedit--bottom ">
+        <div class="textedit--top-center ">
             <fontfamilytool
                 v-for="fontFamily in fontFamilyAvailable"
                 :key="fontFamily" 
@@ -79,6 +80,8 @@ import { ref, shallowRef, onMounted, computed } from 'vue';
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 import { Chrome } from '@ckpack/vue-color';
+
+import { useStore } from 'vuex'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -104,6 +107,7 @@ const backgroundScale = ref(74500)
 const deckBackgroundWidth = ref(2833)
 const deckBackgroundHeight = ref(10119)
 
+const activeTextColor = ref('#ff3c22')
 
 
 const popoverLeft = ref('0px');
@@ -339,6 +343,24 @@ async function uploadFile(event) {
         }
         reader.readAsDataURL(input.files[0]);
     }
+    let data = new FormData();
+    data.append('file', input.files[0]);
+    data.append('uuid', uuid.value)
+
+    const config = {
+        method: 'POST',
+        // headers: {
+        //     'content-type': 'multipart/form-data'
+        // },
+        body: data
+    }
+    fetch('http://localhost/api/uploads', config, data)
+        .then(function () {
+            console.log('aaaarrr', data);
+        })
+        .catch(function () {
+            console.log('errrroor');
+        });
 }
 
 function canvasEv() {
@@ -395,7 +417,7 @@ function changeZoom(value) {
 }
 
 function addText() {
-    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), type: 'i-text', left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, fontFamily: 'Arial', fontWeight: 'normal', fill: '#000000', opacity: 1 });
+    const txt = new fabric.IText('Tu texto', {id: 'txt' + Math.random().toString(16).slice(2), type: 'i-text', left: backgroundPositionLeft.value+600, top: 4500, fontSize: 600, fontFamily: 'Arial', fontWeight: 'normal', fill: '#ff3c22', opacity: 1 });
     // txt.moveTo(2);
     //txt.rotate(-90);
     canvas.add(txt);
@@ -458,6 +480,7 @@ function createBin() {
         canvas.add(img);
     }, {
         id: 'bin',
+        excludeFromExport: true,
         lockMovementX: true,
         lockMovementY: true,
         hasControls: false,
@@ -552,10 +575,16 @@ function setTextColor() {
             o.set('fill', textColor.value.hex)
         }
     })
+    activeTextColor.value = textColor.value.hex
     canvas.renderAll();
 }
 
 function toggleShowTextColorpicker() {
+    canvas.getObjects().forEach(function(o){
+        if(o.id == selectedObject.value){
+            textColor.value = o.fill
+        }
+    });
     textcolorpickerVisible.value == 'visible' ? textcolorpickerVisible.value = 'hidden' : textcolorpickerVisible.value = 'visible'
 }
 
@@ -634,11 +663,61 @@ function showGeneralOptions() {
     optionsTopZindex.value = 10
 }
 
+function finishEdition(){
+    generatePrints.value = true
+    const svgContent = canvas.toSVG({
+            width: 25000,
+            height: 25000,
+            viewBox: {
+                x: 0,
+                y: 0,
+                width: 25000,
+                height: 25000
+            }
+        }),
+        blob = new Blob([svgContent], {
+          type: "image/svg+xml"
+        })
+    const a = document.createElement("a");
+    if(typeof(a.download) === "string") {
+        let url = window.URL.createObjectURL(blob);
+        a.download = "print.svg";
+        a.href = url
+    }else {
+        navigator.msSaveBlob(blob, 'test.svg')
+    }
+      
+    a.target = "_blank";
+    setTimeout(() => {
+        a.click();
+    }, 1000);
+    
+                
+    
+
+    const canvasJSON = canvas.toJSON()
+    //fetch('http://api.einaskateco.com/designs/', {
+    fetch('http://localhost:80/api/designs/', {
+        method: 'POST',
+        // contentType: 'multipart/form-data',
+        headers: {
+            'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+            "json": JSON.stringify(canvasJSON),
+            "svg": canvas.toSVG(),
+            "source": 'web',
+            "uuid": uuid.value,
+            "img_generated": canvas.toDataURL('jpeg')//jpeg
+        })
+    })
+    generatePrints.value = false
+}
+
 function generatePrints(){
     generatingPrints.value = true
     const canvasHeight = (deckBackgroundHeight.value + calculateBackgroundDeckTopOffset())
-    console.log(canvas.toSVG())
-    // console.log(JSON.stringify(canvas))
     canvas.discardActiveObject().renderAll()
     hideBin()
     
@@ -669,20 +748,45 @@ function generatePrints(){
             setTimeout(() => {
                 const a = document.createElement("a");
                 const newCanvasJPG = newCanvas.toDataURL('image/jpeg')
+                
+                //const canvasJSON = canvas.JSON()
+                // console.log('canvasJSON', canvasJSON);
+                // fetch('http://localhost/api/designs/', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     // 'Content-Type': 'application/x-www-form-urlencoded',
+                //     },
+                //     body: JSON.stringify({
+                //         "json": canvasJSON,
+                //         "svg": canvas.toSVG(),
+                //         "source": 'web',
+                //         "img_generated": newCanvasJPG
+                //     })
+                // })
                 setTimeout(() => {
                     a.href = newCanvasJPG
                     a.download = "Print.jpg";
                     a.click();
-                    generatingPrints.value = false              
-                }, 10);
+                    generatingPrints.value = false
+                }, 100);
                 document.body.removeChild(imgCanvasBase)
-            }, 10);
+            }, 100);
         })
         .catch((encodingError) => {
             console.log('encodingError', encodingError);
             generatingPrints.value = false
         })
     }
+
+    //.then(
+    // var respon = response.text()
+    //     console.log(respon);
+    // )
+
+    
+
+
 }
 
 function calculateBackgroundDeckTopOffset() {
@@ -716,7 +820,7 @@ function setBackground() {
     })
     console.log('!!!!!!!!!');
     //const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
-    const imge = new fabric.Image.fromURL('./img/mockup/2023-instaboard-MOCKUP.png', function(img) {
+    const imge = new fabric.Image.fromURL('../img/mockup/2023-instaboard-MOCKUP.png', function(img) {
         //img.scale(1)
         canvas.bringToFront(img);
         img.moveTo(6)
@@ -761,6 +865,7 @@ function setDeckBackground() {
 function setOpacityLayer() {
     const rect = new fabric.Rect({
         id: 'opacity1',
+        excludeFromExport: true,
         top: 0,
         left: 0,
         width: backgroundPositionLeft.value+ 345,
@@ -781,6 +886,7 @@ function setOpacityLayer() {
 
     const rect2 = new fabric.Rect({
         id: 'opacity2',
+        excludeFromExport: true,
         top: 0,
         left: backgroundPositionLeft.value + deckBackgroundWidth.value+345,
         width: backgroundPositionLeft.value+10000,
@@ -799,6 +905,7 @@ function setOpacityLayer() {
 
     const rect3 = new fabric.Rect({
         id: 'opacity3',
+        excludeFromExport: true,
         top: (deckBackgroundHeight.value-10)+calculateBackgroundDeckTopOffset(),
         left: 0,
         width: 40000,
@@ -818,6 +925,7 @@ function setOpacityLayer() {
     if (calculateBackgroundDeckTopOffset() > 0) {
         const rect4 = new fabric.Rect({
             id: 'opacity4',
+            excludeFromExport: true,
             top: 0,
             left: backgroundPositionLeft.value+345,
             width: deckBackgroundWidth.value,
@@ -920,6 +1028,7 @@ onMounted(() => {
     setDeckBackground()
     setOpacityLayer()
     createBin()
+    makeId()
     
     var line9 = new fabric.Line([
         backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
@@ -933,9 +1042,12 @@ onMounted(() => {
     line9.evented = false;
 
     canvas.on('selection:created', function(event) {
-        if(event.selected[0].type === 'i-text' ){
+        console.log('selection:created => event', event);
+        if(event.selected[0].type === 'i-text'){
+            activeTextColor.value = event.selected[0].fill
             colorpickerVisible.value = 'hidden'
             objectMoveVisible.value = 'hidden'
+            positionBtn(event.selected[0])
             showTextOptions()
         }else if(event.selected[0].type === 'image') {
             objectMoveVisible.value = 'visible'
@@ -947,19 +1059,20 @@ onMounted(() => {
         textcolorpickerVisible.value = 'hidden'
 
         selectedObject.value = canvas.getActiveObject().get('id')
-        if(event.selected[0].type === 'i-text') {
-            positionBtn(event.selected[0])
-        }
     })
     
     canvas.on('selection:updated', function(event) {
-        if(event.selected[0].type === 'i-text' ){
+        console.log('selection:updated => event', event);
+        if(event.selected[0].type === 'i-text'){
+            activeTextColor.value = event.selected[0].fill
             colorpickerVisible.value = 'hidden'
             objectMoveVisible.value = 'hidden'
+            positionBtn(event.selected[0])
             showTextOptions()
         }else if(event.selected[0].type === 'image') {    
             objectMoveVisible.value = 'visible'
             optionsTopVisible.value = 'hidden'
+            popoverVisible.value = 'hidden'
         }else{
             showGeneralOptions()
             colorpickerVisible.value = 'hidden'
@@ -967,9 +1080,6 @@ onMounted(() => {
         textcolorpickerVisible.value = 'hidden'
 
         selectedObject.value = canvas.getActiveObject().get('id')
-        if(event.selected[0].type === 'i-text') {
-            positionBtn(event.selected[0])
-        }
     })
 
     canvas.on('selection:cleared', function() {
@@ -993,7 +1103,7 @@ onMounted(() => {
         if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
             lastSelectedObject.value.opacity = 0.75
         }
-        
+        lastSelectedObject.value.opacity = 1
         if(event.target == null || event.target.id === "background") {
             showGeneralOptions()
         }
@@ -1184,13 +1294,13 @@ onMounted(() => {
     visibility: v-bind(optionsTopVisible);
     z-index: v-bind(optionsTopZindex+10);
     position: absolute;
-    width: 15%;
+    width: 35%;
     height: 50px;
     top: -50px;
     left: 0px;
     display: flex;
     align-items: center;
-    justify-content:center;
+    justify-content: flex-start;
     background-color: transparent;
 }
 
@@ -1208,6 +1318,20 @@ onMounted(() => {
     justify-content:center;
     background-color: #b9b5b4;
 }
+
+.options--bottom-left {
+    position: absolute;
+    width: 50%;
+    height: 50px;
+    bottom: 50px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* background-color: #b9b5b4; */
+}
+
+
 
 .options--bottom-right {
     /* opacity: v-bind(optionsTopOpacity);
@@ -1258,9 +1382,10 @@ onMounted(() => {
     visibility: v-bind(popoverVisible);
     z-index: v-bind(popoverZindex);
     position: absolute;
-    width: 100%;
+    width: 20%;
     height: 50px;
     top: -50px;
+    right: 0;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -1270,13 +1395,28 @@ onMounted(() => {
 .objectmove--top {
     visibility: v-bind(objectMoveVisible);
     position: absolute;
-    width: 100%;
+    width: 20%;
     height: 50px;
     top: -50px;
     right: 10px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    background-color: transparent;
+}
+
+.textedit--top-center {
+    visibility: v-bind(popoverVisible);
+    z-index: v-bind(popoverZindex);
+    position: absolute;
+    width: 80%; /* 100%; */
+    height: 50px;
+    top: -47px;
+    /* right: 10px; */
+    /* top: v-bind(textEditFontTop); */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: transparent;
 }
 
@@ -1322,12 +1462,6 @@ input[type='color'] {
     height: 37px;
 }
 
-#btn-add-picture {
-    width: 37px;
-    height: 37px;
-    background: url('./img/icon/insta-board-icon-add-skateboard-picture.svg');    
-}
-
 .rounded__btn {
    background: rgba(38, 37, 37, 0.82); 
    /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
@@ -1340,6 +1474,17 @@ input[type='color'] {
    margin-right: 5px;
    margin-left: 5px;
    cursor: pointer;
+}
+.rounded__btn--activecolor {
+    background: v-bind(activeTextColor);
+}
+
+.rounded__btn-downloadbig {
+   width: 47px;
+   height: 47px;
+   font-size: 32px !important;
+   margin-right: 10px;
+   margin-bottom: 10px;
 }
 
 .rounded__btn-pt5 {
@@ -1360,7 +1505,8 @@ input[type='color'] {
 .colorpicker {
     position: absolute;
     top: 50px;
-    left: v-bind((innerWidth/2));
+    width: 25%;
+    min-width: 200px;
     visibility: v-bind(colorpickerVisible);
 }
 
@@ -1379,4 +1525,10 @@ input[type='color'] {
     margin-top: 11px;
 }
 
+.color-green {
+    background-color: #78b657;
+}
+.color-blue {
+    background-color: rgb(56, 107, 147);
+}
 </style>
