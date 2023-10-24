@@ -40,9 +40,6 @@
                     <li class="mr-3">
                         <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Features</a>
                     </li>
-                    <li class="mr-3">
-                        <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Reviews</a>
-                    </li>
                     <!-- <li class="mr-3">
                         <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Reviews</a>
                     </li> -->
@@ -65,13 +62,20 @@
         <!--Left Col-->
         <div class="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left">
             <!-- <p class="uppercase tracking-loose w-full">Custom skateboards</p> -->
-            <h1 class="my-4 text-5xl font-bold leading-tight">
-              Skateboarding hecho a medida.
+            <!-- <h1 class="my-4 text-5xl font-bold leading-tight">
+              ¡Patina la tabla de tus sueños!
+            </h1> -->
+            <div>
+              <h1 class="mb-0 my-4 text-5xl font-bold leading-tight inline-flex">
+              Diseña tu tabla en un  
+            </h1>
+            <h1 class="mt-0 ml-0 flip-horizontal-bottom text-5xl font-bold leading-tight inline-flex">
+             kickflip
             </h1>
             </div>
             
             <p class="leading-normal text-2xl mb-8">
-              Diseña tu tabla perfecta!
+              ¡Diseña la tabla perfecta!
               <!-- Sub-hero message, not too long and not too short. Make it just right! -->
             </p>
               <a href="/editor" class="mx-auto">
@@ -345,7 +349,7 @@
     </svg>
     <section class="container mx-auto text-center py-6 mb-12">
       <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-white">
-        Empieza a diseñar tu tabla!
+        ¡Empieza a diseñar tu tabla!
       </h2>
       <div class="w-full mb-4">
         <div class="h-1 mx-auto bg-white w-1/6 opacity-25 my-0 py-0 rounded-t"></div>
@@ -370,7 +374,6 @@
         <div class="w-full flex flex-col md:flex-row py-6">
           <div class="flex-1 mb-6 text-black text-center">
             <a class="text-pink-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="#">
-              <!--Icon from: http://www.potlabicons.com/ -->
               <svg id="eina_logo" class="mx-auto mb-2" fill="#db2777" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 816.25 886.26"><path d="M162.93,237.19v124.6h183.7q15.94,0,16,16V507.15q0,17.6-16,17.57H162.93v123L349.82,714.8q12.76,4.8,12.78,22.37V872.94a15.31,15.31,0,0,1-4.79,11.18c-4.27,2.15-7.47,2.67-9.59,1.6L12.78,764.32C10.63,762.2,9,761.13,8,761.13c-5.34-3.2-8-8-8-14.38V138.16c0-6.39,2.65-10.63,8-12.78,2.12-2.12,3.72-3.19,4.79-3.19L348.22.79a15,15,0,0,1,9.59,0A15.35,15.35,0,0,1,362.6,12V147.74q0,17.59-12.78,22.37Zm653.32,424.9v84.66c0,6.39-2.15,11.18-6.39,14.38-2.15,0-4.27,1.07-6.39,3.19L468,885.72c-2.15,1.07-5.35.55-9.59-1.6a15.31,15.31,0,0,1-4.79-11.18V737.17c0-11.71,4.24-19.17,12.78-22.37l186.89-67.09v-123H469.62q-16,0-16-17.57V377.76q0-15.94,16-16h183.7V237.19L466.43,170.11c-8.54-3.2-12.78-10.64-12.78-22.37V12A15.35,15.35,0,0,1,458.44.79a15,15,0,0,1,9.59,0l335.44,121.4c2.12,0,4.24,1.07,6.39,3.19,4.24,1.07,6.39,5.34,6.39,12.78V662.09Z"/></svg>
               CUSTOM DECKS
             </a>
@@ -430,7 +433,7 @@
           </div>
         </div>
       </div>
-    </footer>
+    </footer> -->
   </div>
 </template>
 
@@ -533,4 +536,36 @@
     display: block;
     margin: auto;
   }
+
+  .flip-horizontal-bottom {
+    -webkit-animation: flip-horizontal-bottom 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) ;
+            animation: flip-horizontal-bottom 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) ;
+            animation-delay: 1s;
+            animation-iteration-count: 1;
+            animation-timing-function: ease-in;
+    /* margin-left: 10px; */
+  }
+
+  
+  @-webkit-keyframes flip-horizontal-bottom {
+    0% {
+      -webkit-transform: rotateX(0);
+              transform: rotateX(0);
+    }
+    100% {
+      -webkit-transform: rotateX(-360deg);
+              transform: rotateX(-360deg);
+    }
+  }
+  @keyframes flip-horizontal-bottom {
+    0% {
+      -webkit-transform: rotateX(0);
+              transform: rotateX(0);
+    }
+    100% {
+      -webkit-transform: rotateX(-360deg);
+              transform: rotateX(-360deg);
+    }
+  }
+
 </style>

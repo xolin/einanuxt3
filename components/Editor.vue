@@ -11,6 +11,55 @@
             </span>
             <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
             <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
+            <div id="download-modal" class="hidden relative z-10 overflow-x-hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" tabindex="-1" aria-hidden="true">
+            <!--
+                Background backdrop, show/hide based on modal state.
+
+                Entering: "ease-out duration-300"
+                From: "opacity-0"
+                To: "opacity-100"
+                Leaving: "ease-in duration-200"
+                From: "opacity-100"
+                To: "opacity-0"
+            -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+                <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <!--
+                        Modal panel, show/hide based on modal state.
+
+                        Entering: "ease-out duration-300"
+                        From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        To: "opacity-100 translate-y-0 sm:scale-100"
+                        Leaving: "ease-in duration-200"
+                        From: "opacity-100 translate-y-0 sm:scale-100"
+                        To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    -->
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xs">
+                        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <!-- <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                            </div> -->
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Sólo te falta el último paso!</h3>
+                            <div class="mt-2">
+                                <p class="text-center text-sm text-gray-500">Envíanos el archivo que te vas a descargar.</p>
+                                <p class="text-center text-sm text-gray-500">Mándanoslo por <a href="https://wa.me/message/NXHYFT7HFKQTL1" target="_blank">Whatsapp</a> o <a href="mailto:info@einaskateco.com">Email</a>.</p>
+                                <div class=" px-4 py-3 mb-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button type="button" @click="startDownload()" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 ">Ok!</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="options--top">
             <Chrome v-model="colors" class="colorpicker" @update:modelValue="setDeckColor()" />
@@ -48,7 +97,7 @@
         </div>
         
         <div class="options--bottom-right">
-            <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="finishEdition()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+            <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="toggleSvgAlert()" data-modal-target="download-modal" data-modal-toggle="download" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
             <!-- <span class="rounded__btn cursor-pointer material-symbols-sharp color-blue rounded__btn-downloadbig" @click="generatePrints()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span> -->
         </div>
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
@@ -664,6 +713,8 @@ function showGeneralOptions() {
 }
 
 function finishEdition(){
+}
+function startDownload(){
     generatePrints.value = true
     const svgContent = canvas.toSVG({
             width: 25000,
@@ -693,26 +744,35 @@ function finishEdition(){
     }, 1000);
     
                 
-    
+    toggleSvgAlert()
 
-    const canvasJSON = canvas.toJSON()
-    //fetch('http://api.einaskateco.com/designs/', {
-    fetch('http://localhost:80/api/designs/', {
-        method: 'POST',
-        // contentType: 'multipart/form-data',
-        headers: {
-            'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({
-            "json": JSON.stringify(canvasJSON),
-            "svg": canvas.toSVG(),
-            "source": 'web',
-            "uuid": uuid.value,
-            "img_generated": canvas.toDataURL('jpeg')//jpeg
-        })
-    })
+    // const canvasJSON = canvas.toJSON()
+    // //fetch('http://api.einaskateco.com/designs/', {
+    // fetch('http://localhost:80/api/designs/', {
+    //     method: 'POST',
+    //     // contentType: 'multipart/form-data',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     // 'Content-Type': 'application/x-www-form-urlencoded',
+    //     },
+    //     body: JSON.stringify({
+    //         "json": JSON.stringify(canvasJSON),
+    //         "svg": canvas.toSVG(),
+    //         "source": 'web',
+    //         "uuid": uuid.value,
+    //         "img_generated": canvas.toDataURL('jpeg')//jpeg
+    //     })
+    // })
     generatePrints.value = false
+}
+
+function toggleSvgAlert() {
+    document.getElementById('download-modal').classList.toggle('hidden')
+    
+    // if(document.getElementById('download-modal').style.visibility == 'hidden')
+    //     document.getElementById('download-modal').style.visibility = 'visible'
+    // else
+    //     document.getElementById('download-modal').style.visibility = 'hidden'
 }
 
 function generatePrints(){
@@ -1205,7 +1265,6 @@ onMounted(() => {
         
     canvas.on('mouse:up', function(event) {
         hideEmojis()
-        colorpickerVisible.value = 'hidden'
         if(event.target != null) {
             if(event.target.id != lastSelectedObject.value.id) {
                 textcolorpickerVisible.value = 'hidden'
@@ -1533,5 +1592,9 @@ input[type='color'] {
 }
 .color-blue {
     background-color: rgb(56, 107, 147);
+}
+
+.hidden {
+    display: none !important;
 }
 </style>
