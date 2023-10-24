@@ -45,7 +45,7 @@
                             </svg>
                             </div> -->
                             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Sólo te falta el último paso!</h3>
+                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Sólo te falta un último paso!</h3>
                             <div class="mt-2">
                                 <p class="text-center text-sm text-gray-500">Envíanos el archivo que te vas a descargar.</p>
                                 <p class="text-center text-sm text-gray-500">Mándanoslo por <a href="https://wa.me/message/NXHYFT7HFKQTL1" target="_blank">Whatsapp</a> o <a href="mailto:info@einaskateco.com">Email</a>.</p>
@@ -1212,29 +1212,29 @@ onMounted(() => {
 
     canvas.on('object:moving', function(event) {
         showBin()
-        var snapZone = 150;
+        // var snapZone = 150;
         var object = event.target;
         object.opacity = 0.4
         lastSelectedObject.value = object
 
-        var objectMiddleHorizontal = event.target.left + (event.target.width * event.target.scaleX) / 2;
-        if (objectMiddleHorizontal > backgroundPositionLeft.value+1700 - snapZone && objectMiddleHorizontal < backgroundPositionLeft.value+1700 + snapZone) {
-            console.log('objectMiddleHorizontal', objectMiddleHorizontal);
-            console.log('backgroundPositionLeft.value+1700', backgroundPositionLeft.value+1700);
-            event.target.set({
-                //left: backgroundPositionLeft.value / 2 - (event.target.width * event.target.scaleX) / 2,
-                left: backgroundPositionLeft.value+1700 - (event.target.width * event.target.scaleX) / 2,
-            })//.setCoords();
+        // var objectMiddleHorizontal = event.target.left + (event.target.width * event.target.scaleX) / 2;
+        // if (objectMiddleHorizontal > backgroundPositionLeft.value+1700 - snapZone && objectMiddleHorizontal < backgroundPositionLeft.value+1700 + snapZone) {
+        //     console.log('objectMiddleHorizontal', objectMiddleHorizontal);
+        //     console.log('backgroundPositionLeft.value+1700', backgroundPositionLeft.value+1700);
+        //     event.target.set({
+        //         //left: backgroundPositionLeft.value / 2 - (event.target.width * event.target.scaleX) / 2,
+        //         left: backgroundPositionLeft.value+1700 - (event.target.width * event.target.scaleX) / 2,
+        //     })//.setCoords();
 
-            canvas.add(line9);
+        //     canvas.add(line9);
 
-            document.addEventListener("mouseup", () => {
-                canvas.remove(line9);
-            });
+        //     document.addEventListener("mouseup", () => {
+        //         canvas.remove(line9);
+        //     });
 
-        } else {
-            canvas.remove(line9);
-        }
+        // } else {
+        //     canvas.remove(line9);
+        // }
 
         var clickElementHorizontalCenter = event.target?.left + (event.target?.width/2)
         var clickElementVerticalCenter = event.target?.top + (event.target?.height/2)
