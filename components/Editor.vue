@@ -1056,6 +1056,7 @@ onMounted(() => {
             showGeneralOptions()
             colorpickerVisible.value = 'hidden'
         }
+        
         textcolorpickerVisible.value = 'hidden'
 
         selectedObject.value = canvas.getActiveObject().get('id')
@@ -1158,7 +1159,8 @@ onMounted(() => {
 
         var objectMiddleHorizontal = event.target.left + (event.target.width * event.target.scaleX) / 2;
         if (objectMiddleHorizontal > backgroundPositionLeft.value+1700 - snapZone && objectMiddleHorizontal < backgroundPositionLeft.value+1700 + snapZone) {
-            
+            console.log('objectMiddleHorizontal', objectMiddleHorizontal);
+            console.log('backgroundPositionLeft.value+1700', backgroundPositionLeft.value+1700);
             event.target.set({
                 //left: backgroundPositionLeft.value / 2 - (event.target.width * event.target.scaleX) / 2,
                 left: backgroundPositionLeft.value+1700 - (event.target.width * event.target.scaleX) / 2,

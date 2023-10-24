@@ -1,6 +1,8 @@
 import { defineNuxtConfig } from 'nuxt/config'
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+  modules: ['nuxt-gtag'],
+  gtag: { id: 'G-6QYKDDGTZK' },
   pages: true,
   ssr: false,
     app: {
@@ -20,7 +22,7 @@ export default defineNuxtConfig({
         },
     },
     nitro: {
-      preset: 'vercel-edge',
+      preset: 'node-server',
     },
     //modules: [
       //'@vueuse/nuxt',

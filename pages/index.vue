@@ -43,6 +43,9 @@
                     <li class="mr-3">
                         <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Reviews</a>
                     </li>
+                    <!-- <li class="mr-3">
+                        <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Reviews</a>
+                    </li> -->
                 </ul>
                 <a href="/editor">
                   <button
@@ -65,6 +68,8 @@
             <h1 class="my-4 text-5xl font-bold leading-tight">
               Skateboarding hecho a medida.
             </h1>
+            </div>
+            
             <p class="leading-normal text-2xl mb-8">
               Diseña tu tabla perfecta!
               <!-- Sub-hero message, not too long and not too short. Make it just right! -->
@@ -144,7 +149,7 @@
         </div>
       </div>
     </section>
-    <section class="bg-white border-b py-8">
+    <!-- <section class="bg-white border-b py-8">
       <div class="container mx-auto flex flex-wrap pt-4 pb-12">
         <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
           Reviews
@@ -315,7 +320,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
     <!-- Change the colour #f8fafc to match the previous section colour -->
     <svg class="wave-top" viewBox="0 0 1439 147" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -354,8 +359,13 @@
         </button>
       </a>
     </section>
+    <footer class="bg-white p-10">
+      <a href="https://einaskateco.com">
+        <svg id="eina_logo" class="mx-auto mb-2" fill="#db2777" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 816.25 886.26"><path d="M162.93,237.19v124.6h183.7q15.94,0,16,16V507.15q0,17.6-16,17.57H162.93v123L349.82,714.8q12.76,4.8,12.78,22.37V872.94a15.31,15.31,0,0,1-4.79,11.18c-4.27,2.15-7.47,2.67-9.59,1.6L12.78,764.32C10.63,762.2,9,761.13,8,761.13c-5.34-3.2-8-8-8-14.38V138.16c0-6.39,2.65-10.63,8-12.78,2.12-2.12,3.72-3.19,4.79-3.19L348.22.79a15,15,0,0,1,9.59,0A15.35,15.35,0,0,1,362.6,12V147.74q0,17.59-12.78,22.37Zm653.32,424.9v84.66c0,6.39-2.15,11.18-6.39,14.38-2.15,0-4.27,1.07-6.39,3.19L468,885.72c-2.15,1.07-5.35.55-9.59-1.6a15.31,15.31,0,0,1-4.79-11.18V737.17c0-11.71,4.24-19.17,12.78-22.37l186.89-67.09v-123H469.62q-16,0-16-17.57V377.76q0-15.94,16-16h183.7V237.19L466.43,170.11c-8.54-3.2-12.78-10.64-12.78-22.37V12A15.35,15.35,0,0,1,458.44.79a15,15,0,0,1,9.59,0l335.44,121.4c2.12,0,4.24,1.07,6.39,3.19,4.24,1.07,6.39,5.34,6.39,12.78V662.09Z"/></svg>
+      </a>
+    </footer>
     <!--Footer-->
-    <footer class="bg-white">
+    <!-- <footer class="bg-white">
       <div class="container mx-auto px-8">
         <div class="w-full flex flex-col md:flex-row py-6">
           <div class="flex-1 mb-6 text-black text-center">
