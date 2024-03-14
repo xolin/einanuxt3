@@ -1,115 +1,123 @@
 <template>
-  <div class="wrapper" id="app">
+      <div class="wrapper" id="app">
     <div class="card-form">
-      <div class="card-list">
-        <div class="card-item">
-          <p class="card-item__title">Resumen del pedido</p>
-          <ul class="card-item__bottomborder">
-            <li>
-              <div class="bold">
-                Skate Deck  
-              </div>
-              <div class="card-item__totalsright">
-                100€
-              </div>
-            </li>
-          </ul>
-          <div class="card-item__totals card-item__bottomborder">
-            <div class="card-item__totalsleft">Subtotal:</div>
-            <div class="card-item__totalsright">100€</div>
-            <div class="card-item__totalsleft">Envio:</div>
-            <div class="card-item__totalsright">0,00€</div>
-            <hr />
-            <hr />
-          </div>
-          <div class="card-item__totals card-item__total">
-            <div>TOTAL:</div>
-            <div class="card-item__totalsright">100€</div>
-          </div>
-        </div>
-      </div>
       <div class="card-form__inner">
         <div class="card-input">
-          <label for="phoneEmail" class="card-input__label">Phone/Email</label>
-          <input type="text" id="phoneEmail" v-model="phoneEmail" @change="setContact" class="card-input__input">
+          <label for="cardNumber" class="card-input__label">User</label>
+          <input type="text" id="cardNumber" class="card-input__input" v-mask="generateCardNumberMask" v-model="cardNumber" v-on:focus="focusInput" v-on:blur="blurInput" data-ref="cardNumber" autocomplete="off">
         </div>
-
         <div class="card-input">
-          <label for="name" class="card-input__label">Name</label>
-          <input type="text" id="name" v-model="name" class="card-input__input">
+          <label for="cardName" class="card-input__label">Password</label>
+          <input type="text" id="cardName" class="card-input__input" v-model="cardName" v-on:focus="focusInput" v-on:blur="blurInput" data-ref="cardName" autocomplete="off">
         </div>
+        
 
-        <div class="card-input">
-          <label for="address" class="card-input__label">Address</label>
-          <input type="text" id="address" v-model="address" class="card-input__input">
-        </div>
-
-        <div class="card-input">
-          <label for="addressMore" class="card-input__label">More</label>
-          <input type="text" id="addressMore" v-model="addressMore" class="card-input__input">
-        </div>
-
-        <div class="card-input">
-          <label for="postalCode" class="card-input__label">Postal code</label>
-          <input type="text" id="postalCode" v-model="postalCode" class="card-input__input">
-        </div>
-
-        <div class="card-input" >
-          <label for="city" class="card-input__label">City</label>
-          <input type="text" id="city" v-model="city" class="card-input__input">
-        </div>
-
-        <button class="card-form__button" @click="saveShippment">
-          Next
+        <button class="card-form__button" @click="login()">
+          Submit
         </button>
       </div>
     </div>
   </div>
 </template>
+<script>
+// import {useFormStore} from '~~/stores/FormStore';
+// const store = useFormStore;
 
-<script setup>
-import { ref } from 'vue';
-import { useStore } from 'vuex';
-import { useStorage } from '@vueuse/core'
+export default {
+    auth: false,
+    data: () => ({
+      currentCardBackground: Math.floor(Math.random()* 25 + 1), // just for fun :D
+      cardName: "",
+      cardNumber: "",
+      cardMonth: "",
+      cardYear: "",
+      cardCvv: "",
+      minCardYear: new Date().getFullYear(),
+      amexCardMask: "#### ###### #####",
+      otherCardMask: "#### #### #### ####",
+      cardNumberTemp: "",
+      isCardFlipped: false,
+      focusElementStyle: null,
+      isInputFocused: false
+    }),
+    mounted() {
+      this.cardNumberTemp = this.otherCardMask;
+      document.getElementById("cardNumber").focus();
+    },
+    computed: {
+        getCardType () {
+        let number = this.cardNumber;
+        let re = new RegExp("^4");
+        if (number.match(re) != null) return "visa";
 
-const store = useStore();
-const storage = useStorage('orderStorage');
+        re = new RegExp("^(34|37)");
+        if (number.match(re) != null) return "amex";
 
-const phoneEmail = ref(null);
-const name = ref(null);
-const address = ref(null);
-const addressMore = ref(null);
-const postalCode = ref(null);
-const city = ref(null);
+        re = new RegExp("^5[1-5]");
+        if (number.match(re) != null) return "mastercard";
 
+        re = new RegExp("^6011");
+        if (number.match(re) != null) return "discover";
+        
+        re = new RegExp('^9792')
+        if (number.match(re) != null) return 'troy'
 
-function setContact() {
-  store.commit('setContact', phoneEmail.value)
-  storage.setItem('contact', phoneEmail.value)
-  // storage.value.contact = phoneEmail.value
-}
-
-async function saveShippment() {
-  fetch('http://localhost:8000/api/orders/', {
-        method: 'POST',
-        contentType: 'multipart/form-data',
-        headers: {
-            'Authorization': 'Bearer 2|9xwCEKAAvnCUON1fazP027OGZv2R0jqA0pF3FLai91bab14c',
-            'Content-Type': 'application/json',
-            //'X-CSRF-TOKEN': `document.querySelector("meta[property='csrf-token']").getAttribute("content"),`
+        return "visa"; // default type
         },
-        body: JSON.stringify({
-            "contact": phoneEmail.value,
-            "name": name.value,
-            "address": address.value, 
-            "address_details": addressMore.value, 
-            "postal_code": postalCode.value, 
-            "city": city.value,
-            "user_id": 1, // change to user id using auth module
-        })
-    })
-  await navigateTo('/payment');
-}
+            generateCardNumberMask () {
+                return this.getCardType === "amex" ? this.amexCardMask : this.otherCardMask;
+        },
+        minCardMonth () {
+        if (this.cardYear === this.minCardYear) return new Date().getMonth() + 1;
+        return 1;
+        }
+    },
+    watch: {
+        cardYear () {
+        if (this.cardMonth < this.minCardMonth) {
+            this.cardMonth = "";
+        }
+        }
+    },
+    methods: {
+        login(){
+          this.$auth.loginWith('laravelSanctum', {
+            data: {
+              email: 'jo@jo.com',
+              password: '123456'
+            }
+          })
+        },
+
+
+        pay() {
+          console.log('store', store)
+        },
+        flipCard (status) {
+        this.isCardFlipped = status;
+        },
+        // focusInput (e) {
+        // this.isInputFocused = true;
+        // let targetRef = e.target.dataset.ref;
+        // let target = this.$refs[targetRef];
+        // this.focusElementStyle = {
+        //     width: `${target.offsetWidth}px`,
+        //     height: `${target.offsetHeight}px`,
+        //     transform: `translateX(${target.offsetLeft}px) translateY(${target.offsetTop}px)`
+        // }
+        // },
+        blurInput() {
+        let vm = this;
+        setTimeout(() => {
+            if (!vm.isInputFocused) {
+            vm.focusElementStyle = null;
+            }
+        }, 300);
+        vm.isInputFocused = false;
+        }
+    }
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -152,18 +160,17 @@ body {
     box-shadow: 0 30px 60px 0 rgba(90, 116, 148, 0.4);
     border-radius: 10px;
     padding: 35px;
-    padding-top: 30px;
+    padding-top: 180px;
 
     @media screen and (max-width: 480px) {
       padding: 25px;
-      padding-top: 30px;
+      padding-top: 165px;
     }
     @media screen and (max-width: 360px) {
       padding: 15px;
-      padding-top: 30px;
+      padding-top: 165px;
     }
   }
-
 
   &__row {
     display: flex;
@@ -236,16 +243,13 @@ body {
 }
 
 .card-item {
-  font-family: "Source Sans Pro", sans-serif;
   max-width: 430px;
-  height: 210px;
+  height: 270px;
   margin-left: auto;
   margin-right: auto;
   position: relative;
   z-index: 2;
   width: 100%;
-  background-color: #f7f7f7;
-  padding: 1rem;
 
   @media screen and (max-width: 480px) {
     max-width: 310px;
@@ -618,52 +622,15 @@ body {
       margin-bottom: 15px;
     }
   }
-
-  &__title {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-
-  &__totals {
-    position: relative;
-    bottom: -10px;
-    color: rgb(43, 43, 43);
-    
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    list-style-type: none;
-  }
-
-  &__totalsleft {
-    font-weight: 400;
-  }
-
-  &__totalsright {
-    justify-self: end;
-    font-weight: bold;
-  }
-
-  &__total {
-    font-weight: bold;
-    margin-top: 10px;
-    font-size: 1.3rem;
-  }
-
-  &__bottomborder {
-    border-bottom: 0.3px solid #949494;
-  }
 }
+
 .card-list {
-  margin-bottom: 30px;
+  margin-bottom: -130px;
+
+  @media screen and (max-width: 480px) {
+    margin-bottom: -120px;
+  }
 }
-
-//   margin-bottom: -130px;
-
-//   @media screen and (max-width: 480px) {
-//     margin-bottom: -120px;
-//   }
-// }
 
 .card-input {
   margin-bottom: 20px;
@@ -783,24 +750,6 @@ body {
       transform: scale(1.1);
       box-shadow: 0px 17px 20px -6px rgba(36, 52, 70, 0.36);
     }
-  }
-}
-
-
-
-
-
-li {
-  display: grid;
-  grid-template-columns: 5fr 1fr;
-  list-style-type: none;
-  height: 45px;
-  margin-top: 3px;
-  background-color: #f5f5f5;
-
-
-  div {
-    margin-top: 10px;
   }
 }
 </style>

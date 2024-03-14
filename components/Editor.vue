@@ -45,13 +45,11 @@
                             </svg>
                             </div> -->
                             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Sólo te falta un último paso!</h3>
+                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Enviando a imprimir!</h3>
                             <div class="mt-2">
-                                <p class="text-center text-sm text-gray-500">Envíanos el archivo que te vas a descargar.</p>
-                                <p class="text-center text-sm text-gray-500">Mándanoslo por <a href="https://wa.me/message/NXHYFT7HFKQTL1" target="_blank">Whatsapp</a> o <a href="mailto:info@einaskateco.com">Email</a>.</p>
-                                <div class=" px-4 py-3 mb-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                    <button type="button" @click="startDownload()" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 ">Ok!</button>
-                                </div>
+                                <p class="text-center text-sm text-gray-500">Hemos recibido tu diseño.</p>
+                                <p class="text-center text-sm text-gray-500">¡En las próximas 72 horas vamos a enviarte tu tabla personalizada!</p>
+                                <p class="text-center text-sm text-gray-500">Gracias por confiar en nosotros</p>
                             </div>
                             </div>
                         </div>
@@ -97,7 +95,7 @@
         </div>
         
         <div class="options--bottom-right">
-            <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="toggleSvgAlert()" data-modal-target="download-modal" data-modal-toggle="download" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+            <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="startDownload()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
             <!-- <span class="rounded__btn cursor-pointer material-symbols-sharp color-blue rounded__btn-downloadbig" @click="generatePrints()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span> -->
         </div>
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
@@ -712,58 +710,70 @@ function showGeneralOptions() {
     optionsTopZindex.value = 10
 }
 
-function finishEdition(){
-}
-function startDownload(){
+async function startDownload(){
     generatePrints.value = true
-    const svgContent = canvas.toSVG({
-            width: 25000,
-            height: 25000,
-            viewBox: {
-                x: 0,
-                y: 0,
-                width: 25000,
-                height: 25000
-            }
-        }),
-        blob = new Blob([svgContent], {
-          type: "image/svg+xml"
-        })
-    const a = document.createElement("a");
-    if(typeof(a.download) === "string") {
-        let url = window.URL.createObjectURL(blob);
-        a.download = "print.svg";
-        a.href = url
-    }else {
-        navigator.msSaveBlob(blob, 'test.svg')
-    }
+    // const svgContent = canvas.toSVG({
+    //         width: 25000,
+    //         height: 25000,
+    //         viewBox: {
+    //             x: 0,
+    //             y: 0,
+    //             width: 25000,
+    //             height: 25000
+    //         }
+    //     }),
+    //     blob = new Blob([svgContent], {
+    //       type: "image/svg+xml",
+    //       width: 25000,
+    //       height: 25000
+    //     })
+    //     console.log('blob', blob)
+    //     // window.location.hfref = blob;
+    
+    //     let url = window.URL.createObjectURL(blob);    
+    // const a = window.document.createElement("a");
+    // //if(typeof(a.download) === "string") {
+    // a.setAttribute('href', url)    
+    // a.setAttribute('download', url)
+    // //a.download = "print.svg";
+    // //a.href = url
+
+    // // }else {
+    // //     navigator.msSaveBlob(blob, 'test.svg')
+    // // }
       
-    a.target = "_blank";
-    setTimeout(() => {
-        a.click();
-    }, 1000);
+    // a.target = "_blank";
+    // document.body.appendChild(a);
+    // setTimeout(() => {
+    //     a.click();
+    // }, 1000);
+    // document.body.removeChild(a);
     
                 
-    toggleSvgAlert()
+    // toggleSvgAlert()
 
-    // const canvasJSON = canvas.toJSON()
-    // //fetch('http://api.einaskateco.com/designs/', {
-    // fetch('http://localhost:80/api/designs/', {
-    //     method: 'POST',
-    //     // contentType: 'multipart/form-data',
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     // 'Content-Type': 'application/x-www-form-urlencoded',
-    //     },
-    //     body: JSON.stringify({
-    //         "json": JSON.stringify(canvasJSON),
-    //         "svg": canvas.toSVG(),
-    //         "source": 'web',
-    //         "uuid": uuid.value,
-    //         "img_generated": canvas.toDataURL('jpeg')//jpeg
-    //     })
-    // })
+    const canvasJSON = canvas.toJSON()
+    // fetch('https://api.skateboardpersonalizado.com/api/designs/', {
+    fetch('http://localhost:8000/api/designs/', {
+        method: 'POST',
+        contentType: 'multipart/form-data',
+        headers: {
+            'Authorization': 'Bearer 2|9xwCEKAAvnCUON1fazP027OGZv2R0jqA0pF3FLai91bab14c',
+            'Content-Type': 'application/json',
+            //'X-CSRF-TOKEN': `document.querySelector("meta[property='csrf-token']").getAttribute("content"),`
+        },
+        body: JSON.stringify({
+            "name": "vue",
+            "json": JSON.stringify(canvasJSON),
+            // "svg": canvas.toSVG(),
+            "user_id": 1,
+            // "source": 'web',
+            "uuid": uuid.value,
+            // "img_generated": canvas.toDataURL('jpeg')//jpeg
+        })
+    })
     generatePrints.value = false
+    await navigateTo('/shipping');
 }
 
 function toggleSvgAlert() {
@@ -878,7 +888,7 @@ function setBackground() {
             return false
         }
     })
-    console.log('!!!!!!!!!');
+    
     //const imge = new fabric.Image.fromURL('./img/maka-deck-template-svg.png', function(img) {
     const imge = new fabric.Image.fromURL('../img/mockup/2023-instaboard-MOCKUP.png', function(img) {
         //img.scale(1)
@@ -1238,7 +1248,7 @@ onMounted(() => {
 
         var clickElementHorizontalCenter = event.target?.left + (event.target?.width/2)
         var clickElementVerticalCenter = event.target?.top + (event.target?.height/2)
-        if(event.target?.type === 'i-text'){
+        if(event.target?.type === 'i-text' || event.target?.type === 'image'){
             if (clickElementHorizontalCenter > backgroundPositionLeft.value+3000 && clickElementHorizontalCenter < (backgroundPositionLeft.value+3000 + 8000) && clickElementVerticalCenter > 8050 && clickElementVerticalCenter < (10050 + 80)) {
             //if (clickElementLeft > backgroundPositionLeft.value+3000 && clickElementLeft < (backgroundPositionLeft.value+3000 + 8000) && clickElementTop > 8050 && clickElementTop < (10050 + 80)) {
                 canvas.getObjects().forEach(function(o){
@@ -1276,6 +1286,8 @@ onMounted(() => {
             if (clickElementHorizontalCenter > backgroundPositionLeft.value+3000 && clickElementHorizontalCenter < (backgroundPositionLeft.value+3000 + 8000) && clickElementVerticalCenter > 8050 && clickElementVerticalCenter < (10050 + 80)) {
                 canvas.getObjects().forEach(function(o) {
                     if(o.id == selectedObject.value) {
+                        // TO DO : Fix the bin effect 
+                        console.log('delete:: selectedObject', selectedObject);
                         canvas.remove(o);
                         updateLayerList()
                         showGeneralOptions()
