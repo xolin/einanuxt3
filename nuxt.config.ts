@@ -1,13 +1,13 @@
 import { defineNuxtConfig } from 'nuxt/config'
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
-import nuxtSanctumAuth from '../dist/module/'
+// import nuxtSanctumAuth from '../dist/module/'
 
 export default defineNuxtConfig({
   devServer: {
     port: 80,
     host: '0.0.0.0',
   },
-  modules: ['nuxt-gtag', nuxtSanctumAuth],
+  modules: ['nuxt-gtag'],
   nuxtSanctumAuth: {
     token: true, // set true to use jwt-token auth instead of cookie. default is false
     baseUrl: 'http://api.nuxt.dev',
