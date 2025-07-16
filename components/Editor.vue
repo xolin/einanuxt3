@@ -911,11 +911,11 @@ function setBackground() {
 
 function setDeckBackground() {
     const rect = new fabric.Rect({ 
-        top: calculateBackgroundDeckTopOffset() + 70, 
-        left: backgroundPositionLeft.value + 420,
-        width: deckBackgroundWidth.value-120,
+        top: calculateBackgroundDeckTopOffset() + 100, 
+        left: backgroundPositionLeft.value + 450,
+        width: deckBackgroundWidth.value-165,
         //height: 5060,
-         height: deckBackgroundHeight.value-140,
+         height: deckBackgroundHeight.value-220,
         fill: bgDeckColor.value,
         id: 'deckcolor',
         lockMovementX: true,
@@ -932,10 +932,10 @@ function setDeckBackground() {
 function setCanvasMask() {
     // Create a clipPath that follows the skateboard silhouette shape
     // Adjust positioning to better align with the visible deck in the mockup
-    const left = backgroundPositionLeft.value + 420
-    const top = calculateBackgroundDeckTopOffset() + 70
-    const width = deckBackgroundWidth.value - 120
-    const height = deckBackgroundHeight.value - 140
+    const left = backgroundPositionLeft.value + 450
+    const top = calculateBackgroundDeckTopOffset() + 100
+    const width = deckBackgroundWidth.value - 165
+    const height = deckBackgroundHeight.value - 220
     
     // Create skateboard deck shape with rounded ends (simpler approach)
     const centerX = left + width / 2
@@ -969,10 +969,10 @@ function setCanvasMask() {
 function updateCanvasMask() {
     // Update the existing clipPath dimensions when canvas is resized
     if (canvas.clipPath) {
-        const left = backgroundPositionLeft.value + 420
-        const top = calculateBackgroundDeckTopOffset() + 70
-        const width = deckBackgroundWidth.value - 120
-        const height = deckBackgroundHeight.value - 140
+        const left = backgroundPositionLeft.value + 450
+        const top = calculateBackgroundDeckTopOffset() + 100
+        const width = deckBackgroundWidth.value - 165
+        const height = deckBackgroundHeight.value - 220
         
         // Create skateboard deck shape with rounded ends (simpler approach)
         const centerX = left + width / 2
