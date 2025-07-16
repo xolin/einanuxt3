@@ -30,6 +30,7 @@
   "dependencies": {
     "@ckpack/vue-color": "^1.3.0",
     "@nuxtjs/axios": "^5.13.6",
+    "@pablinho/vue-paycard": "^0.7.4",
     "@vueuse/nuxt": "^9.13.0",
     "animate.css": "^4.1.0",
     "core-js": "^3.6.4",
@@ -37,11 +38,15 @@
     "fabric-with-gestures-notupdated": "^1.0.0",
     "mitt": "^3.0.0",
     "nuxt-sanctum-auth": "^0.4.7",
-    "vue-paycard": "^0.7.0",
     "vue3-emoji-picker": "^1.1.7",
     "vuex": "^4.0.2"
   },
   "overrides": {
-    "vue": "latest"
+    "vue": "^3.4.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "vue": "^3.4.0"
+    }
   }
 }
