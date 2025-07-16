@@ -930,13 +930,34 @@ function setDeckBackground() {
 }
 
 function setCanvasMask() {
-    // Create a clipPath to mask the canvas to the deck area only
-    const clipPath = new fabric.Rect({
-        left: backgroundPositionLeft.value + 445,
-        top: calculateBackgroundDeckTopOffset(),
-        width: deckBackgroundWidth.value - 100,
-        height: deckBackgroundHeight.value - 100,
-        absolutePositioned: true
+    // Create a clipPath that follows the skateboard silhouette shape
+    const left = backgroundPositionLeft.value + 445
+    const top = calculateBackgroundDeckTopOffset()
+    const width = deckBackgroundWidth.value - 100
+    const height = deckBackgroundHeight.value - 100
+    
+    // Create skateboard deck shape with rounded ends (simpler approach)
+    const centerX = left + width / 2
+    const radius = width / 2
+    const straightHeight = height - width // Height of straight section
+    
+    // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
+    const pathData = `
+        M ${left + radius} ${top}
+        L ${left + width - radius} ${top}
+        A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
+        L ${left + width} ${top + height - radius}
+        A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
+        L ${left + radius} ${top + height}
+        A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
+        L ${left} ${top + radius}
+        A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+        Z
+    `
+    
+    const clipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
+        absolutePositioned: true,
+        fill: 'transparent'
     })
     
     // Apply the clipPath to the canvas
@@ -947,12 +968,36 @@ function setCanvasMask() {
 function updateCanvasMask() {
     // Update the existing clipPath dimensions when canvas is resized
     if (canvas.clipPath) {
-        canvas.clipPath.set({
-            left: backgroundPositionLeft.value + 445,
-            top: calculateBackgroundDeckTopOffset(),
-            width: deckBackgroundWidth.value - 100,
-            height: deckBackgroundHeight.value - 100
+        const left = backgroundPositionLeft.value + 445
+        const top = calculateBackgroundDeckTopOffset()
+        const width = deckBackgroundWidth.value - 100
+        const height = deckBackgroundHeight.value - 100
+        
+        // Create skateboard deck shape with rounded ends (simpler approach)
+        const centerX = left + width / 2
+        const radius = width / 2
+        const straightHeight = height - width // Height of straight section
+        
+        // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
+        const pathData = `
+            M ${left + radius} ${top}
+            L ${left + width - radius} ${top}
+            A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
+            L ${left + width} ${top + height - radius}
+            A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
+            L ${left + radius} ${top + height}
+            A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
+            L ${left} ${top + radius}
+            A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+            Z
+        `
+        
+        const newClipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
+            absolutePositioned: true,
+            fill: 'transparent'
         })
+        
+        canvas.clipPath = newClipPath
         canvas.renderAll()
     }
 }
