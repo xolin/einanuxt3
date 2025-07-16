@@ -1295,6 +1295,58 @@ onMounted(() => {
     canvas.on('text:editing:exited', function(event) {
         unclearText(event)  
     })
+
+    // Add drag and drop functionality for images
+    if (canvasWrapper.value) {
+        // Prevent default drag behaviors
+        canvasWrapper.value.addEventListener('dragover', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            canvasWrapper.value.style.border = '2px dashed #007bff'
+        })
+
+        canvasWrapper.value.addEventListener('dragleave', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            canvasWrapper.value.style.border = 'none'
+        })
+
+        canvasWrapper.value.addEventListener('drop', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            canvasWrapper.value.style.border = 'none'
+            
+            const files = e.dataTransfer.files
+            if (files && files.length > 0) {
+                const file = files[0]
+                
+                // Check if the file is an image
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader()
+                    reader.onload = async function(e) {
+                        const imageData = e.target.result
+                        
+                        // Get image dimensions
+                        const tempImg = new Image()
+                        const imageDimensions = await new Promise((resolve) => {
+                            tempImg.onload = () => {
+                                const dimensions = {
+                                    height: tempImg.height,
+                                    width: tempImg.width
+                                }
+                                resolve(dimensions)
+                            }
+                            tempImg.src = imageData
+                        })
+                        
+                        // Add the image to the canvas - it will automatically respect the clipPath mask
+                        addImage(imageData, undefined, undefined, imageDimensions.width, imageDimensions.height)
+                    }
+                    reader.readAsDataURL(file)
+                }
+            }
+        })
+    }
 })
 
 </script>
