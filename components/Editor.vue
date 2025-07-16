@@ -334,9 +334,6 @@ function updateLayerList() { // TO DO: Refactor to use a filter function
     canvas.getObjects().forEach(function(o){
         if(o.id !== "background"
             && o.id !== "deckcolor"
-            && o.id !== "opacity1"
-            && o.id !== "opacity2"
-            && o.id !== "opacity3"
             && o.id !== "bin") {
             filteredLayers.push({ id: o.id, type: o.type, opacity: o.opacity })
         }
@@ -932,85 +929,31 @@ function setDeckBackground() {
     canvas.moveTo(rect,2);
 }
 
-function setOpacityLayer() {
-    const rect = new fabric.Rect({
-        id: 'opacity1',
-        excludeFromExport: true,
-        top: 0,
-        left: 0,
-        width: backgroundPositionLeft.value+ 345,
-        height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
-        fill: '#fff',
-        lockMovementX: true,
-        lockMovementY: true,
-        hasControls: false,
-        selectable: false,
-        evented: false,
-        hoverCursor: 'default',
-        opacity: 1
+function setCanvasMask() {
+    // Create a clipPath to mask the canvas to the deck area only
+    const clipPath = new fabric.Rect({
+        left: backgroundPositionLeft.value + 445,
+        top: calculateBackgroundDeckTopOffset(),
+        width: deckBackgroundWidth.value - 100,
+        height: deckBackgroundHeight.value - 100,
+        absolutePositioned: true
     })
-    canvas.moveTo(rect,1)
-    canvas.add(rect)
+    
+    // Apply the clipPath to the canvas
+    canvas.clipPath = clipPath
+    canvas.renderAll()
+}
 
-
-
-    const rect2 = new fabric.Rect({
-        id: 'opacity2',
-        excludeFromExport: true,
-        top: 0,
-        left: backgroundPositionLeft.value + deckBackgroundWidth.value+345,
-        width: backgroundPositionLeft.value+10000,
-        height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
-        fill: '#fff',
-        lockMovementX: true,
-        lockMovementY: true,
-        hasControls: false,
-        selectable: false,
-        evented: false,
-        hoverCursor: 'default',
-        opacity: 1
-    })
-    canvas.moveTo(rect2,2);
-    canvas.add(rect2)
-
-    const rect3 = new fabric.Rect({
-        id: 'opacity3',
-        excludeFromExport: true,
-        top: (deckBackgroundHeight.value-10)+calculateBackgroundDeckTopOffset(),
-        left: 0,
-        width: 40000,
-        height: deckBackgroundHeight.value,
-        fill: '#fff',
-        lockMovementX: true,
-        lockMovementY: true,
-        hasControls: false,
-        selectable: false,
-        evented: false,
-        hoverCursor: 'default',
-        opacity: 1
-    })
-    canvas.moveTo(rect3,3);
-    canvas.add(rect3)
-
-    if (calculateBackgroundDeckTopOffset() > 0) {
-        const rect4 = new fabric.Rect({
-            id: 'opacity4',
-            excludeFromExport: true,
-            top: 0,
-            left: backgroundPositionLeft.value+345,
-            width: deckBackgroundWidth.value,
-            height: calculateBackgroundDeckTopOffset(),
-            fill: '#fff',
-            lockMovementX: true,
-            lockMovementY: true,
-            hasControls: false,
-            selectable: false,
-            evented: false,
-            hoverCursor: 'default',
-            opacity: 1
+function updateCanvasMask() {
+    // Update the existing clipPath dimensions when canvas is resized
+    if (canvas.clipPath) {
+        canvas.clipPath.set({
+            left: backgroundPositionLeft.value + 445,
+            top: calculateBackgroundDeckTopOffset(),
+            width: deckBackgroundWidth.value - 100,
+            height: deckBackgroundHeight.value - 100
         })
-        canvas.moveTo(rect4, 4);
-        canvas.add(rect4)
+        canvas.renderAll()
     }
 }
 
@@ -1085,6 +1028,8 @@ function resize() {
     //backgroundPositionLeft.value = windowWidth - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
     backgroundPositionLeft.value = windowWidth - 1417/2
 
+    // Update the canvas mask after repositioning
+    updateCanvasMask()
 }
 onMounted(() => {
     canvas = new fabric.Canvas(canvasEl.value, {
@@ -1096,7 +1041,7 @@ onMounted(() => {
     resize()
     setBackground()
     setDeckBackground()
-    setOpacityLayer()
+    setCanvasMask()
     createBin()
     makeId()
     
