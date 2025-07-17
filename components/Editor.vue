@@ -910,11 +910,17 @@ function setBackground() {
 }
 
 function setDeckBackground() {
+    // Use consistent positioning that matches the mask exactly
+    const topOffset = calculateBackgroundDeckTopOffset() + 120
+    const leftOffset = backgroundPositionLeft.value + 470
+    const deckWidth = deckBackgroundWidth.value - 190
+    const deckHeight = deckBackgroundHeight.value - 250
+    
     const rect = new fabric.Rect({ 
-        top: calculateBackgroundDeckTopOffset() + 120,  // Match the mask positioning
-        left: backgroundPositionLeft.value + 470,       // Match the mask positioning
-        width: deckBackgroundWidth.value - 190,         // Match the mask positioning
-        height: deckBackgroundHeight.value - 250,       // Match the mask positioning
+        top: topOffset,
+        left: leftOffset,
+        width: deckWidth,
+        height: deckHeight,
         fill: bgDeckColor.value,
         id: 'deckcolor',
         lockMovementX: true,
@@ -930,26 +936,26 @@ function setDeckBackground() {
 
 function setCanvasMask() {
     // Create a clipPath that follows the skateboard silhouette shape
-    // Fine-tuned positioning based on user feedback to eliminate gray areas
-    const left = backgroundPositionLeft.value + 470  // Slightly adjusted from 465
-    const top = calculateBackgroundDeckTopOffset() + 120  // Slightly adjusted from 115
-    const width = deckBackgroundWidth.value - 190  // Slightly adjusted from 185
-    const height = deckBackgroundHeight.value - 250  // Slightly adjusted from 245
+    // Use consistent positioning variables to ensure perfect alignment
+    const topOffset = calculateBackgroundDeckTopOffset() + 120
+    const leftOffset = backgroundPositionLeft.value + 470
+    const deckWidth = deckBackgroundWidth.value - 190
+    const deckHeight = deckBackgroundHeight.value - 250
     
     // Create skateboard deck shape with rounded ends
-    const radius = width / 2
+    const radius = deckWidth / 2
     
     // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
     const pathData = `
-        M ${left + radius} ${top}
-        L ${left + width - radius} ${top}
-        A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
-        L ${left + width} ${top + height - radius}
-        A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
-        L ${left + radius} ${top + height}
-        A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
-        L ${left} ${top + radius}
-        A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+        M ${leftOffset + radius} ${topOffset}
+        L ${leftOffset + deckWidth - radius} ${topOffset}
+        A ${radius} ${radius} 0 0 1 ${leftOffset + deckWidth} ${topOffset + radius}
+        L ${leftOffset + deckWidth} ${topOffset + deckHeight - radius}
+        A ${radius} ${radius} 0 0 1 ${leftOffset + deckWidth - radius} ${topOffset + deckHeight}
+        L ${leftOffset + radius} ${topOffset + deckHeight}
+        A ${radius} ${radius} 0 0 1 ${leftOffset} ${topOffset + deckHeight - radius}
+        L ${leftOffset} ${topOffset + radius}
+        A ${radius} ${radius} 0 0 1 ${leftOffset + radius} ${topOffset}
         Z
     `
     
