@@ -82,18 +82,43 @@
             <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
             <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
             <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
             
-            <EmojiPicker
-                v-if="emojiVisible" 
-                :native="true" 
-                :hide-search="true" 
-                :hide-group-icons="true" 
-                :hide-group-names="true" 
-                :disable-sticky-group-names="true" 
-                :disable-skin-tones="true"
-                @select="onSelectEmoji" 
-            />
+            <div class="emoji-picker-container">
+                <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
+                <div v-if="emojiVisible" class="simple-emoji-picker">
+                    <div class="emoji-categories">
+                        <span v-for="(categoryData, categoryName) in emojiCategories" 
+                              :key="categoryName" 
+                              class="category-tab" 
+                              :class="{ active: activeEmojiCategory === categoryName }"
+                              @click="activeEmojiCategory = categoryName"
+                              :title="categoryName">
+                            {{ categoryData.icon }}
+                        </span>
+                    </div>
+                    <div class="emoji-grid">
+                        <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
+                              :key="emoji" 
+                              class="emoji-option" 
+                              @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
+                    </div>
+                </div>
+                <!-- 
+                <ClientOnly>
+                    <EmojiPicker
+                        v-if="emojiVisible && false" 
+                        class="emoji-picker-dropdown"
+                        :native="true" 
+                        :hide-search="true" 
+                        :hide-group-icons="true" 
+                        :hide-group-names="true" 
+                        :disable-sticky-group-names="true" 
+                        :disable-skin-tones="true"
+                        @select="onSelectEmoji" 
+                    />
+                </ClientOnly>
+                -->
+            </div>
         </div>
         <div hidden>
             <!-- Hidden until release and refactor-->
@@ -139,8 +164,6 @@
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted, computed } from 'vue';
-import EmojiPicker from 'vue3-emoji-picker'
-import 'vue3-emoji-picker/css'
 
 import { useStore } from 'vuex'
 
@@ -194,6 +217,39 @@ const bin = ref(null)
 const colors = ref({ hex: '#026ed9' })
 const textColor = ref({ hex: '#3D94FF' })
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
+
+const emojiCategories = {
+  'Smileys & People': {
+    icon: '😊',
+    emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕']
+  },
+  'Animals & Nature': {
+    icon: '🐶',
+    emojis: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🙊', '🙉', '🙈', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🪲', '🪳', '🦟', '🦗', '🕷️', '🪰', '🪱', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐈‍⬛', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦']
+  },
+  'Food & Drink': {
+    icon: '🍎',
+    emojis: ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥯', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯']
+  },
+  'Activities': {
+    icon: '⚽',
+    emojis: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️‍♀️', '🏋️', '🏋️‍♂️', '🤼‍♀️', '🤼', '🤼‍♂️', '🤸‍♀️', '🤸', '🤸‍♂️', '⛹️‍♀️', '⛹️', '⛹️‍♂️', '🤺', '🤾‍♀️', '🤾', '🤾‍♂️', '🏌️‍♀️', '🏌️', '🏌️‍♂️', '🏇', '🧘‍♀️', '🧘', '🧘‍♂️', '🏄‍♀️', '🏄', '🏄‍♂️', '🏊‍♀️', '🏊', '🏊‍♂️', '🤽‍♀️', '🤽', '🤽‍♂️', '🚣‍♀️', '🚣', '🚣‍♂️', '🧗‍♀️', '🧗', '🧗‍♂️', '🚵‍♀️', '🚵', '🚵‍♂️', '🚴‍♀️', '🚴', '🚴‍♂️']
+  },
+  'Travel & Places': {
+    icon: '✈️',
+    emojis: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🏍️', '🛵', '🚲', '🛴', '🛺', '🚁', '🛸', '✈️', '🛩️', '🛫', '🛬', '🪂', '💺', '🚀', '🛰️', '🚁', '🚂', '🚃', '🚄', '🚅', '🚆', '🚇', '🚈', '🚉', '🚊', '🚝', '🚞', '🚋', '🚌', '🚍', '🚎', '🚐', '🚑', '🚒', '🚓', '🚔', '🚕', '🚖', '🚗', '🚘', '🚙', '🚚', '🛻', '🚛', '🚜', '🏎️', '🏍️', '🛵', '🦽', '🦼', '🛴', '🚲', '🛺', '🚁', '🛸', '🚟', '🚠', '🚡', '🛰️', '🚀', '🛸', '🛰️', '⛵', '🚤', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '⛽', '🚧', '🚨', '🚥', '🚦', '🛑', '🚏']
+  },
+  'Objects': {
+    icon: '💻',
+    emojis: ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️', '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡', '🔋', '🔌', '💡', '🔦', '🕯️', '🪔', '🧯', '🛢️', '💸', '💵', '💴', '💶', '💷', '🪙', '💰', '💳', '💎', '⚖️', '🪜', '🧰', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🪚', '🔩', '⚙️', '🪤', '🧱', '⛓️', '🧲', '🔫', '💣', '🧨', '🪓', '🔪', '🗡️', '⚔️', '🛡️', '🚬', '⚰️', '🪦', '⚱️', '🏺', '🔮', '📿', '🧿', '💈', '⚗️', '🔭', '🔬', '🕳️', '🩹', '🩺', '💊', '💉', '🩸', '🧬', '🦠', '🧫', '🧪', '🌡️', '🧹', '🪠', '🧽', '🧴', '🛎️', '🔑', '🗝️', '🚪', '🪑', '🛋️', '🛏️', '🛌', '🧸', '🪆', '🖼️', '🪞', '🪟', '🛍️', '🛒', '🎁', '🎈', '🎏', '🎀', '🪄', '🪅', '🎊', '🎉', '🪩', '🎎', '🏮', '🎐', '🧧', '✉️', '📩', '📨', '📧', '💌', '📥', '📤', '📦', '🏷️', '🪧', '📪', '📫', '📬', '📭', '📮', '📯', '📜', '📃', '📄', '📑', '🧾', '📊', '📈', '📉', '🗒️', '🗓️', '📆', '📅', '🗑️', '📇', '🗃️', '🗳️', '🗄️', '📋', '📁', '📂', '🗂️', '🗞️', '📰', '📓', '📔', '📒', '📕', '📗', '📘', '📙', '📚', '📖', '🔖', '🧷', '🔗', '📎', '🖇️', '📐', '📏', '🧮', '📌', '📍', '✂️', '🖊️', '🖋️', '✒️', '🖌️', '🖍️', '📝', '✏️', '🔍', '🔎', '🔏', '🔐', '🔒', '🔓']
+  },
+  'Symbols': {
+    icon: '❤️',
+    emojis: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '✴️', '🆚', '💮', '🉐', '㊙️', '㊗️', '🈴', '🈵', '🈹', '🈲', '🅰️', '🅱️', '🆎', '🆑', '🅾️', '🆘', '❌', '⭕', '🛑', '⛔', '📛', '🚫', '💯', '💢', '♨️', '🚷', '🚯', '🚳', '🚱', '🔞', '📵', '🚭', '❗', '❕', '❓', '❔', '‼️', '⁉️', '🔅', '🔆', '〽️', '⚠️', '🚸', '🔱', '⚜️', '🔰', '♻️', '✅', '🈯', '💹', '❇️', '✳️', '❎', '🌐', '💠', 'Ⓜ️', '🌀', '💤', '🏧', '🚾', '♿', '🅿️', '🛗', '🈳', '🈂️', '🛂', '🛃', '🛄', '🛅', '🚹', '🚺', '🚼', '⚧️', '🚻', '🚮', '🎦', '📶', '🈁', '🔣', 'ℹ️', '🔤', '🔡', '🔠', '🆖', '🆗', '🆙', '🆒', '🆕', '🆓', '0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '🔢', '#️⃣', '*️⃣', '⏏️', '▶️', '⏸️', '⏯️', '⏹️', '⏺️', '⏭️', '⏮️', '⏩', '⏪', '⏫', '⏬', '◀️', '🔼', '🔽', '➡️', '⬅️', '⬆️', '⬇️', '↗️', '↘️', '↙️', '↖️', '↕️', '↔️', '↪️', '↩️', '⤴️', '⤵️', '🔀', '🔁', '🔂', '🔄', '🔃', '🎵', '🎶', '➕', '➖', '➗', '✖️', '🟰', '♾️', '💲', '💱', '™️', '©️', '®️', '〰️', '➰', '➿', '🔚', '🔙', '🔛', '🔝', '🔜', '✔️', '☑️', '🔘', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🔺', '🔻', '🔸', '🔹', '🔶', '🔷', '🔳', '🔲', '▪️', '▫️', '◾', '◽', '◼️', '◻️', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜', '🟫', '🔈', '🔇', '🔉', '🔊', '🔔', '🔕', '📣', '📢', '👁️‍🗨️', '💬', '💭', '🗯️', '♠️', '♣️', '♥️', '♦️', '🃏', '🎴', '🀄', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', '🕛', '🕜', '🕝', '🕞', '🕟', '🕠', '🕡', '🕢', '🕣', '🕤', '🕥', '🕦', '🕧']
+  }
+}
+
+const activeEmojiCategory = ref('Smileys & People');
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
     return {
@@ -1653,16 +1709,224 @@ input[type='color'] {
     box-shadow: 0 2px 8px rgba(43, 159, 78, 0.3);
 }
 
-.v3-emoji-picker {
-    position: absolute;
-    top: 50px;
-    left: v-bind((innerWidth/2));
-    /* width: 100%; */
-}
 
 .color-picker-container {
     position: relative;
     display: inline-block;
+}
+
+.emoji-picker-container {
+    position: relative;
+    display: inline-block;
+}
+
+.emoji-picker-container {
+    position: relative;
+    display: inline-block;
+}
+
+.simple-emoji-picker {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    z-index: 1000;
+    width: 320px;
+    max-width: calc(100vw - 20px);
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    max-height: 400px;
+    animation: dropdownSlide 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    flex-direction: column;
+}
+
+.simple-emoji-picker::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 12px solid white;
+    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.15));
+    z-index: 1001;
+}
+
+.emoji-categories {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 8px;
+    border-bottom: 1px solid #e1e8ed;
+    background: #f8fafc;
+    border-radius: 12px 12px 0 0;
+    gap: 2px;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid transparent;
+    user-select: none;
+}
+
+.category-tab:hover {
+    background: #e1e8ed;
+    transform: scale(1.05);
+}
+
+.category-tab.active {
+    background: #1da1f2;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 2px 6px rgba(29, 161, 242, 0.3);
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 280px;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}
+
+.emoji-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emoji-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.emoji-option {
+    font-size: 20px;
+    padding: 6px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.emoji-option:hover {
+    background-color: #f0f0f0;
+}
+
+.emoji-option:active {
+    background-color: #e0e0e0;
+    transform: scale(0.95);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .simple-emoji-picker {
+        width: 280px;
+        max-height: 320px;
+        right: -10px;
+    }
+    
+    .simple-emoji-picker::before {
+        right: 25px;
+    }
+    
+    .emoji-categories {
+        padding: 8px 4px;
+        gap: 1px;
+    }
+    
+    .category-tab {
+        font-size: 14px;
+        min-width: 28px;
+        height: 28px;
+        padding: 4px 6px;
+    }
+    
+    .emoji-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 3px;
+        padding: 8px;
+        max-height: 200px;
+    }
+    
+    .emoji-option {
+        font-size: 18px;
+        padding: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .simple-emoji-picker {
+        width: 240px;
+        max-height: 280px;
+        right: -20px;
+    }
+    
+    .simple-emoji-picker::before {
+        right: 30px;
+    }
+    
+    .emoji-categories {
+        padding: 6px 2px;
+        gap: 1px;
+    }
+    
+    .category-tab {
+        font-size: 12px;
+        min-width: 24px;
+        height: 24px;
+        padding: 2px 4px;
+    }
+    
+    .emoji-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2px;
+        padding: 6px;
+        max-height: 160px;
+    }
+    
+    .emoji-option {
+        font-size: 16px;
+        padding: 3px;
+    }
+}
+
+.emoji-picker-dropdown {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 350px;
+    max-width: 90vw;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .colorpicker {
