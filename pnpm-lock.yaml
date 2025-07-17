@@ -38,9 +38,6 @@ importers:
       mitt:
         specifier: ^3.0.0
         version: 3.0.1
-      nuxt-sanctum-auth:
-        specifier: ^0.4.7
-        version: 0.4.10(magicast@0.3.5)
       vue3-emoji-picker:
         specifier: ^1.1.7
         version: 1.1.8(typescript@5.8.3)
@@ -3558,10 +3555,6 @@ packages:
 
   nuxt-gtag@1.2.1:
     resolution: {integrity: sha512-2ss0HLoSmA4wiu5WDSFuVZBT5T4qH+XFqau614OK3idIYeY88uG2Lrn7Iy/xy3jpSiMM+ux/0ziEIa4n1NGcWA==}
-
-  nuxt-sanctum-auth@0.4.10:
-    resolution: {integrity: sha512-0srlCY5tTRmkaAFXWze+iayv5ylsqsl5v/TBtOMezR54/68tWyaebeabPMysYyfTFSG+esFF5c3TUni7B2HzNQ==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   nuxt@3.10.1:
     resolution: {integrity: sha512-1X1DFTGPbVQFF1tjOWYl3qYc3zQww8htknu3qiP8xNzY1MFnDT3Xisxcf6KDe375tHHui0UpXflseL6evlEoMQ==}
@@ -8928,13 +8921,6 @@ snapshots:
       defu: 6.1.4
       pathe: 1.1.2
       ufo: 1.6.1
-    transitivePeerDependencies:
-      - magicast
-
-  nuxt-sanctum-auth@0.4.10(magicast@0.3.5):
-    dependencies:
-      '@nuxt/kit': 3.17.7(magicast@0.3.5)
-      ofetch: 1.4.1
     transitivePeerDependencies:
       - magicast
 
