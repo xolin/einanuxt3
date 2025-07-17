@@ -31,7 +31,20 @@
     </div>
 
     <!-- Main editor -->
-    <Editor />
+    <div class="p-4">
+      <h2 class="text-lg font-bold mb-4">Skateboard Editor</h2>
+      <p class="mb-4">Loading editor...</p>
+      <Suspense>
+        <template #default>
+          <Editor />
+        </template>
+        <template #fallback>
+          <div class="bg-gray-200 p-8 rounded">
+            <p>Loading editor component...</p>
+          </div>
+        </template>
+      </Suspense>
+    </div>
   </div>
 </template>
 
