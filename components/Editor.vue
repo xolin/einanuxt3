@@ -75,7 +75,7 @@
             <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
             <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
             <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toogleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
+            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
             
             <EmojiPicker
                 v-if="emojiVisible" 
@@ -177,8 +177,8 @@ const lastSelectedObject = ref(null)
 
 const bin = ref(null)
 
-const colors = ref('#026ed9')
-const textColor = ref('3D94FF')
+const colors = ref({ hex: '#026ed9' })
+const textColor = ref({ hex: '#3D94FF' })
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
@@ -334,9 +334,6 @@ function updateLayerList() { // TO DO: Refactor to use a filter function
     canvas.getObjects().forEach(function(o){
         if(o.id !== "background"
             && o.id !== "deckcolor"
-            && o.id !== "opacity1"
-            && o.id !== "opacity2"
-            && o.id !== "opacity3"
             && o.id !== "bin") {
             filteredLayers.push({ id: o.id, type: o.type, opacity: o.opacity })
         }
@@ -629,7 +626,7 @@ function setTextColor() {
 function toggleShowTextColorpicker() {
     canvas.getObjects().forEach(function(o){
         if(o.id == selectedObject.value){
-            textColor.value = o.fill
+            textColor.value = { hex: o.fill }
         }
     });
     textcolorpickerVisible.value == 'visible' ? textcolorpickerVisible.value = 'hidden' : textcolorpickerVisible.value = 'visible'
@@ -676,7 +673,7 @@ function unclearText(e) {
     canvas.renderAll()
 }
 
-function toogleEmoji() {
+function toggleEmoji() {
     emojiVisible.value = !emojiVisible.value
 }
 
@@ -914,11 +911,10 @@ function setBackground() {
 
 function setDeckBackground() {
     const rect = new fabric.Rect({ 
-        top: calculateBackgroundDeckTopOffset(), 
-        left: backgroundPositionLeft.value + 445,
-        width: deckBackgroundWidth.value-100,
-        //height: 5060,
-         height: deckBackgroundHeight.value-100,
+        top: calculateBackgroundDeckTopOffset() + 120,  // Match the mask positioning
+        left: backgroundPositionLeft.value + 470,       // Match the mask positioning
+        width: deckBackgroundWidth.value - 190,         // Match the mask positioning
+        height: deckBackgroundHeight.value - 250,       // Match the mask positioning
         fill: bgDeckColor.value,
         id: 'deckcolor',
         lockMovementX: true,
@@ -932,85 +928,73 @@ function setDeckBackground() {
     canvas.moveTo(rect,2);
 }
 
-function setOpacityLayer() {
-    const rect = new fabric.Rect({
-        id: 'opacity1',
-        excludeFromExport: true,
-        top: 0,
-        left: 0,
-        width: backgroundPositionLeft.value+ 345,
-        height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
-        fill: '#fff',
-        lockMovementX: true,
-        lockMovementY: true,
-        hasControls: false,
-        selectable: false,
-        evented: false,
-        hoverCursor: 'default',
-        opacity: 1
+function setCanvasMask() {
+    // Create a clipPath that follows the skateboard silhouette shape
+    // Fine-tuned positioning based on user feedback to eliminate gray areas
+    const left = backgroundPositionLeft.value + 470  // Slightly adjusted from 465
+    const top = calculateBackgroundDeckTopOffset() + 120  // Slightly adjusted from 115
+    const width = deckBackgroundWidth.value - 190  // Slightly adjusted from 185
+    const height = deckBackgroundHeight.value - 250  // Slightly adjusted from 245
+    
+    // Create skateboard deck shape with rounded ends
+    const radius = width / 2
+    
+    // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
+    const pathData = `
+        M ${left + radius} ${top}
+        L ${left + width - radius} ${top}
+        A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
+        L ${left + width} ${top + height - radius}
+        A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
+        L ${left + radius} ${top + height}
+        A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
+        L ${left} ${top + radius}
+        A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+        Z
+    `
+    
+    const clipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
+        absolutePositioned: true,
+        fill: 'transparent'
     })
-    canvas.moveTo(rect,1)
-    canvas.add(rect)
+    
+    // Apply the clipPath to the canvas
+    canvas.clipPath = clipPath
+    canvas.renderAll()
+}
 
-
-
-    const rect2 = new fabric.Rect({
-        id: 'opacity2',
-        excludeFromExport: true,
-        top: 0,
-        left: backgroundPositionLeft.value + deckBackgroundWidth.value+345,
-        width: backgroundPositionLeft.value+10000,
-        height: deckBackgroundHeight.value + calculateBackgroundDeckTopOffset(),
-        fill: '#fff',
-        lockMovementX: true,
-        lockMovementY: true,
-        hasControls: false,
-        selectable: false,
-        evented: false,
-        hoverCursor: 'default',
-        opacity: 1
-    })
-    canvas.moveTo(rect2,2);
-    canvas.add(rect2)
-
-    const rect3 = new fabric.Rect({
-        id: 'opacity3',
-        excludeFromExport: true,
-        top: (deckBackgroundHeight.value-10)+calculateBackgroundDeckTopOffset(),
-        left: 0,
-        width: 40000,
-        height: deckBackgroundHeight.value,
-        fill: '#fff',
-        lockMovementX: true,
-        lockMovementY: true,
-        hasControls: false,
-        selectable: false,
-        evented: false,
-        hoverCursor: 'default',
-        opacity: 1
-    })
-    canvas.moveTo(rect3,3);
-    canvas.add(rect3)
-
-    if (calculateBackgroundDeckTopOffset() > 0) {
-        const rect4 = new fabric.Rect({
-            id: 'opacity4',
-            excludeFromExport: true,
-            top: 0,
-            left: backgroundPositionLeft.value+345,
-            width: deckBackgroundWidth.value,
-            height: calculateBackgroundDeckTopOffset(),
-            fill: '#fff',
-            lockMovementX: true,
-            lockMovementY: true,
-            hasControls: false,
-            selectable: false,
-            evented: false,
-            hoverCursor: 'default',
-            opacity: 1
+function updateCanvasMask() {
+    // Update the existing clipPath dimensions when canvas is resized
+    if (canvas.clipPath) {
+        const left = backgroundPositionLeft.value + 470  // Match setCanvasMask
+        const top = calculateBackgroundDeckTopOffset() + 120  // Match setCanvasMask
+        const width = deckBackgroundWidth.value - 190  // Match setCanvasMask
+        const height = deckBackgroundHeight.value - 250  // Match setCanvasMask
+        
+        // Create skateboard deck shape with rounded ends
+        const radius = width / 2
+        
+        // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
+        const pathData = `
+            M ${left + radius} ${top}
+            L ${left + width - radius} ${top}
+            A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
+            L ${left + width} ${top + height - radius}
+            A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
+            L ${left + radius} ${top + height}
+            A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
+            L ${left} ${top + radius}
+            A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+            Z
+        `
+        
+        const newClipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
+            absolutePositioned: true,
+            fill: 'transparent'
         })
-        canvas.moveTo(rect4, 4);
-        canvas.add(rect4)
+        
+        canvas.clipPath = newClipPath
+        canvas.renderAll()
     }
 }
 
@@ -1085,6 +1069,8 @@ function resize() {
     //backgroundPositionLeft.value = windowWidth - deckBackgroundWidth.value/2  //window.innerWidth/2 - deckBackgroundWidth.value/2
     backgroundPositionLeft.value = windowWidth - 1417/2
 
+    // Update the canvas mask after repositioning
+    updateCanvasMask()
 }
 onMounted(() => {
     canvas = new fabric.Canvas(canvasEl.value, {
@@ -1096,7 +1082,7 @@ onMounted(() => {
     resize()
     setBackground()
     setDeckBackground()
-    setOpacityLayer()
+    setCanvasMask()
     createBin()
     makeId()
     
@@ -1304,6 +1290,58 @@ onMounted(() => {
     canvas.on('text:editing:exited', function(event) {
         unclearText(event)  
     })
+
+    // Add drag and drop functionality for images
+    if (canvasWrapper.value) {
+        // Prevent default drag behaviors
+        canvasWrapper.value.addEventListener('dragover', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            canvasWrapper.value.style.border = '2px dashed #007bff'
+        })
+
+        canvasWrapper.value.addEventListener('dragleave', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            canvasWrapper.value.style.border = 'none'
+        })
+
+        canvasWrapper.value.addEventListener('drop', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            canvasWrapper.value.style.border = 'none'
+            
+            const files = e.dataTransfer.files
+            if (files && files.length > 0) {
+                const file = files[0]
+                
+                // Check if the file is an image
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader()
+                    reader.onload = async function(e) {
+                        const imageData = e.target.result
+                        
+                        // Get image dimensions
+                        const tempImg = new Image()
+                        const imageDimensions = await new Promise((resolve) => {
+                            tempImg.onload = () => {
+                                const dimensions = {
+                                    height: tempImg.height,
+                                    width: tempImg.width
+                                }
+                                resolve(dimensions)
+                            }
+                            tempImg.src = imageData
+                        })
+                        
+                        // Add the image to the canvas - it will automatically respect the clipPath mask
+                        addImage(imageData, undefined, undefined, imageDimensions.width, imageDimensions.height)
+                    }
+                    reader.readAsDataURL(file)
+                }
+            }
+        })
+    }
 })
 
 </script>
