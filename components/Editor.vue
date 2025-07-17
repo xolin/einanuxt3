@@ -75,7 +75,7 @@
             <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
             <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
             <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toogleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
+            <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
             
             <EmojiPicker
                 v-if="emojiVisible" 
@@ -673,7 +673,7 @@ function unclearText(e) {
     canvas.renderAll()
 }
 
-function toogleEmoji() {
+function toggleEmoji() {
     emojiVisible.value = !emojiVisible.value
 }
 
@@ -911,11 +911,10 @@ function setBackground() {
 
 function setDeckBackground() {
     const rect = new fabric.Rect({ 
-        top: calculateBackgroundDeckTopOffset() + 115, 
-        left: backgroundPositionLeft.value + 465,
-        width: deckBackgroundWidth.value-185,
-        //height: 5060,
-         height: deckBackgroundHeight.value-245,
+        top: calculateBackgroundDeckTopOffset() + 120,  // Match the mask positioning
+        left: backgroundPositionLeft.value + 470,       // Match the mask positioning
+        width: deckBackgroundWidth.value - 190,         // Match the mask positioning
+        height: deckBackgroundHeight.value - 250,       // Match the mask positioning
         fill: bgDeckColor.value,
         id: 'deckcolor',
         lockMovementX: true,
@@ -930,18 +929,31 @@ function setDeckBackground() {
 }
 
 function setCanvasMask() {
-    // Get the exact same positioning as the deck color rectangle
-    const left = backgroundPositionLeft.value + 465
-    const top = calculateBackgroundDeckTopOffset() + 115
-    const width = deckBackgroundWidth.value - 185
-    const height = deckBackgroundHeight.value - 245
+    // Create a clipPath that follows the skateboard silhouette shape
+    // Fine-tuned positioning based on user feedback to eliminate gray areas
+    const left = backgroundPositionLeft.value + 470  // Slightly adjusted from 465
+    const top = calculateBackgroundDeckTopOffset() + 120  // Slightly adjusted from 115
+    const width = deckBackgroundWidth.value - 190  // Slightly adjusted from 185
+    const height = deckBackgroundHeight.value - 250  // Slightly adjusted from 245
     
-    // Create a simple rectangular clipPath to match the deck color rectangle exactly
-    const clipPath = new fabric.Rect({
-        left: left,
-        top: top,
-        width: width,
-        height: height,
+    // Create skateboard deck shape with rounded ends
+    const radius = width / 2
+    
+    // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
+    const pathData = `
+        M ${left + radius} ${top}
+        L ${left + width - radius} ${top}
+        A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
+        L ${left + width} ${top + height - radius}
+        A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
+        L ${left + radius} ${top + height}
+        A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
+        L ${left} ${top + radius}
+        A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+        Z
+    `
+    
+    const clipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
         absolutePositioned: true,
         fill: 'transparent'
     })
@@ -954,17 +966,29 @@ function setCanvasMask() {
 function updateCanvasMask() {
     // Update the existing clipPath dimensions when canvas is resized
     if (canvas.clipPath) {
-        const left = backgroundPositionLeft.value + 465
-        const top = calculateBackgroundDeckTopOffset() + 115
-        const width = deckBackgroundWidth.value - 185
-        const height = deckBackgroundHeight.value - 245
+        const left = backgroundPositionLeft.value + 470  // Match setCanvasMask
+        const top = calculateBackgroundDeckTopOffset() + 120  // Match setCanvasMask
+        const width = deckBackgroundWidth.value - 190  // Match setCanvasMask
+        const height = deckBackgroundHeight.value - 250  // Match setCanvasMask
         
-        // Create a simple rectangular clipPath to match the deck color rectangle exactly
-        const newClipPath = new fabric.Rect({
-            left: left,
-            top: top,
-            width: width,
-            height: height,
+        // Create skateboard deck shape with rounded ends
+        const radius = width / 2
+        
+        // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
+        const pathData = `
+            M ${left + radius} ${top}
+            L ${left + width - radius} ${top}
+            A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
+            L ${left + width} ${top + height - radius}
+            A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
+            L ${left + radius} ${top + height}
+            A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
+            L ${left} ${top + radius}
+            A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
+            Z
+        `
+        
+        const newClipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
             absolutePositioned: true,
             fill: 'transparent'
         })
