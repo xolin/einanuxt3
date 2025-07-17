@@ -8,7 +8,21 @@ export default defineNuxtConfig({
     host: '0.0.0.0',
     https: false,
   },
-  modules: ['nuxt-gtag'],
+  modules: ['nuxt-gtag', '@sidebase/nuxt-auth'],
+  
+  auth: {
+    baseURL: process.env.AUTH_ORIGIN,
+    provider: {
+      type: 'authjs'
+    }
+  },
+  
+  runtimeConfig: {
+    authSecret: process.env.AUTH_SECRET || 'your-secret-key-here',
+    public: {
+      authUrl: process.env.AUTH_ORIGIN || 'http://localhost:3000'
+    }
+  },
   
   gtag: { id: 'G-6QYKDDGTZK' },
   pages: true,

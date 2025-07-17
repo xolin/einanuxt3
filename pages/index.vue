@@ -35,10 +35,13 @@
             <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 bg-white lg:bg-transparent text-black p-4 lg:p-0 z-20" id="nav-content">
                 <ul class="list-reset lg:flex justify-end flex-1 items-center">
                     <li class="mr-3">
-                        <a class="inline-block py-2 px-4 text-black font-bold no-underline" href="#">Home</a>
+                        <a class="inline-block py-2 px-4 text-black font-bold no-underline" href="/">Inicio</a>
                     </li>
                     <li class="mr-3">
-                        <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Features</a>
+                        <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#features">Características</a>
+                    </li>
+                    <li class="mr-3">
+                        <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="/Lagin">Iniciar Sesión</a>
                     </li>
                     <!-- <li class="mr-3">
                         <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">Reviews</a>
@@ -75,9 +78,28 @@
             </div>
             
             <p class="leading-normal text-2xl mb-8">
-              ¡Diseña la tabla perfecta!
+              ¡Diseña la tabla perfecta para tu estilo!
               <!-- Sub-hero message, not too long and not too short. Make it just right! -->
             </p>
+            
+            <!-- How it works section -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-6">
+              <h3 class="text-xl font-bold mb-4">¿Cómo funciona?</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div class="text-center">
+                  <div class="text-3xl mb-2">🎨</div>
+                  <p><strong>1. Diseña</strong><br>Usa nuestro editor para personalizar tu tabla</p>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl mb-2">💳</div>
+                  <p><strong>2. Paga</strong><br>Confirma tu pedido de forma segura</p>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl mb-2">🚚</div>
+                  <p><strong>3. Recibe</strong><br>Tu tabla personalizada en casa</p>
+                </div>
+              </div>
+            </div>
               <a href="/editor" class="mx-auto">
                 <button class="lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
                   ¡Empieza ahora!
@@ -109,10 +131,10 @@
         </g>
     </svg>
     </div>
-    <section class="bg-white border-b py-8">
+    <section id="features" class="bg-white border-b py-8">
         <div class="container max-w-5xl mx-auto m-8">
             <h2 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-                Features
+                ¿Por qué elegir Custom Decks?
             </h2>
             <div class="w-full mb-4">
                 <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
@@ -126,7 +148,10 @@
                         Diseña tu nueva tabla con pocos pasos desde tu smartphone!
                         <br />
                         <br />
-                        Añade imagenes, texto y emoticonos.
+                        ✓ Añade imágenes personalizadas<br>
+                        ✓ Inserta texto y frases<br>
+                        ✓ Usa emoticonos divertidos<br>
+                        ✓ Vista previa en tiempo real
                     </p>
                 </div>
                 <div class="w-full sm:w-1/2 p-6">
@@ -140,13 +165,16 @@
           <div class="w-full sm:w-1/2 p-6 mt-6">
             <div class="align-middle">
               <h3 class="text-3xl text-gray-800 font-bold leading-none mb-3">
-                Envíos a toda España
+                Envíos rápidos y seguros
               </h3>
               <p class="text-gray-600 mb-8">
-                Podemos enviar tu tabla con tu diseño a cualquier parte de españa. Puedes escoger blablabla
+                Enviamos tu tabla personalizada a toda España de forma rápida y segura.
                 <br />
                 <br />
-                
+                ✓ Envío gratuito en pedidos +50€<br>
+                ✓ Entrega en 3-5 días laborables<br>
+                ✓ Embalaje resistente y protegido<br>
+                ✓ Seguimiento del pedido online
               </p>
             </div>
           </div>
