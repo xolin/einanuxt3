@@ -171,6 +171,39 @@
         </div>
     </section>
     
+    <!-- New UX Components -->
+    <!-- Loading Spinner -->
+    <LoadingSpinner 
+      :is-visible="loadingState.isVisible"
+      :message="loadingState.message"
+      :show-progress="loadingState.showProgress"
+      :progress="loadingState.progress"
+    />
+    
+    <!-- Confirmation Toast -->
+    <ConfirmationToast 
+      :is-visible="toastState.isVisible"
+      :type="toastState.type"
+      :title="toastState.title"
+      :message="toastState.message"
+      @close="hideToast"
+    />
+    
+    <!-- Empty State Guidance -->
+    <EmptyStateGuidance 
+      :is-visible="showEmptyState"
+      @action="handleEmptyStateAction"
+      @close="hideEmptyState"
+      @dismiss="dismissEmptyState"
+    />
+    
+    <!-- Contextual Hints -->
+    <ContextualHints 
+      ref="contextualHints"
+      :hints="customHints"
+      @dismiss="onHintDismiss"
+    />
+    
     <!-- Help Panel -->
     <HelpPanel />
     
@@ -179,9 +212,15 @@
 </template>
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
-import { ref, shallowRef, onMounted, computed } from 'vue';
+import { ref, shallowRef, onMounted, computed, nextTick, watch } from 'vue';
 
 import { useStore } from 'vuex'
+
+// Import new UX components
+import LoadingSpinner from './UX/LoadingSpinner.vue'
+import ConfirmationToast from './UX/ConfirmationToast.vue'
+import EmptyStateGuidance from './UX/EmptyStateGuidance.vue'
+import ContextualHints from './UX/ContextualHints.vue'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -266,6 +305,107 @@ const emojiCategories = {
 }
 
 const activeEmojiCategory = ref('Smileys & People');
+
+// UX Enhancement States
+const loadingState = ref({
+  isVisible: false,
+  message: '',
+  showProgress: false,
+  progress: 0
+})
+
+const toastState = ref({
+  isVisible: false,
+  type: 'success',
+  title: '',
+  message: ''
+})
+
+const showEmptyState = ref(true)
+const contextualHints = ref(null)
+const customHints = ref({})
+
+// UX Enhancement Methods
+const showLoading = (message, showProgress = false) => {
+  loadingState.value = {
+    isVisible: true,
+    message,
+    showProgress,
+    progress: 0
+  }
+}
+
+const hideLoading = () => {
+  loadingState.value.isVisible = false
+}
+
+const updateProgress = (progress) => {
+  loadingState.value.progress = progress
+}
+
+const showToast = (type, message, title = '') => {
+  toastState.value = {
+    isVisible: true,
+    type,
+    title,
+    message
+  }
+}
+
+const hideToast = () => {
+  toastState.value.isVisible = false
+}
+
+const hideEmptyState = () => {
+  showEmptyState.value = false
+}
+
+const dismissEmptyState = () => {
+  showEmptyState.value = false
+  // Store user preference to not show again
+  localStorage.setItem('dismissedEmptyState', 'true')
+}
+
+const handleEmptyStateAction = (action) => {
+  hideEmptyState()
+  
+  // Show contextual hint after action
+  setTimeout(() => {
+    switch (action) {
+      case 'add-text':
+        addText()
+        contextualHints.value?.showHint('firstAction')
+        break
+      case 'change-color':
+        toggleShowColorpicker()
+        contextualHints.value?.showHint('colorChanged')
+        break
+      case 'add-emoji':
+        toggleEmoji()
+        contextualHints.value?.showHint('emojiAdded')
+        break
+      case 'upload-image':
+        document.querySelector('input[type="file"]')?.click()
+        break
+    }
+  }, 100)
+}
+
+const onHintDismiss = () => {
+  // Track hint dismissals for analytics
+}
+
+const checkIfCanvasEmpty = () => {
+  if (!canvas) return true
+  const objects = canvas.getObjects()
+  return objects.length === 0
+}
+
+const updateEmptyStateVisibility = () => {
+  const isEmpty = checkIfCanvasEmpty()
+  const dismissed = localStorage.getItem('dismissedEmptyState') === 'true'
+  showEmptyState.value = isEmpty && !dismissed
+}
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
     return {
@@ -452,8 +592,13 @@ $bus.$on('fontfamilyChange', (font) =>{
 async function uploadFile(event) {
     const input = event.target;
     if(input.files && input.files[0]) {
+        // Show loading state
+        showLoading('Subiendo imagen...', true)
+        updateProgress(10)
+        
         const reader = new FileReader();
         reader.onload = async function(e) {
+            updateProgress(50)
             img.value = e.target.result;
             
             //const photoUrl = URL.createObjectURL(input.files[0]);
@@ -461,6 +606,7 @@ async function uploadFile(event) {
             const tempImg = new Image();
             const imageDimensions = await new Promise((resolve) => {
                 tempImg.onload = () => {
+                    updateProgress(80)
                     const dimensions = {
                         height: tempImg.height,
                         width: tempImg.width
@@ -469,7 +615,20 @@ async function uploadFile(event) {
                 }
                 tempImg.src = img.value;
             })
+            
             addImage(img.value, undefined, undefined, imageDimensions.width, imageDimensions.height)
+            updateProgress(100)
+            
+            // Hide loading and show success toast
+            setTimeout(() => {
+                hideLoading()
+                showToast('success', 'La imagen se ha añadido correctamente a tu diseño', '¡Imagen subida!')
+                
+                // Show contextual hint
+                setTimeout(() => {
+                    contextualHints.value?.showHint('imageUploaded')
+                }, 500)
+            }, 200)
         }
         reader.readAsDataURL(input.files[0]);
     }
@@ -555,6 +714,14 @@ function addText() {
     canvas.renderAll();
     // canvas.sendBackwards(txt);
     updateLayerList()
+    
+    // UX Enhancement: Update empty state and show contextual hint
+    updateEmptyStateVisibility()
+    showToast('success', 'Haz clic en el texto para editarlo o arrástralo para moverlo', '¡Texto añadido!')
+    
+    setTimeout(() => {
+        contextualHints.value?.showHint('textAdded')
+    }, 500)
 }
 
 function addImage(image, top, left, width, height, scale) {
@@ -684,6 +851,14 @@ function onSelectEmoji(emoji) {
     canvas.renderAll();
     updateLayerList()
     hideEmojis()
+    
+    // UX Enhancement: Update empty state and show contextual hint
+    updateEmptyStateVisibility()
+    showToast('success', 'Puedes arrastrarlo para moverlo o redimensionarlo desde las esquinas', '¡Emoji añadido!')
+    
+    setTimeout(() => {
+        contextualHints.value?.showHint('emojiAdded')
+    }, 500)
 }
 
 function onDeckColorChange(event) {
@@ -696,6 +871,11 @@ function onDeckColorChange(event) {
         }
     })
     canvas.renderAll();
+    
+    // UX Enhancement: Show contextual hint about what to do next
+    setTimeout(() => {
+        contextualHints.value?.showHint('colorChanged')
+    }, 300)
 }
 
 function onTextColorChange(event) {
@@ -818,6 +998,10 @@ function showGeneralOptions() {
 }
 
 async function startDownload(){
+    // Show loading state
+    showLoading('Preparando tu diseño para descarga...', true)
+    updateProgress(20)
+    
     generatePrints.value = true
     // const svgContent = canvas.toSVG({
     //         width: 25000,
@@ -859,26 +1043,52 @@ async function startDownload(){
                 
     // toggleSvgAlert()
 
+    updateProgress(50)
     const canvasJSON = canvas.toJSON()
-    // fetch('https://api.skateboardpersonalizado.com/api/designs/', {
-    fetch('http://localhost:8000/api/designs/', {
-        method: 'POST',
-        contentType: 'multipart/form-data',
-        headers: {
-            'Authorization': 'Bearer 2|9xwCEKAAvnCUON1fazP027OGZv2R0jqA0pF3FLai91bab14c',
-            'Content-Type': 'application/json',
-            //'X-CSRF-TOKEN': `document.querySelector("meta[property='csrf-token']").getAttribute("content"),`
-        },
-        body: JSON.stringify({
-            "name": "vue",
-            "json": JSON.stringify(canvasJSON),
-            // "svg": canvas.toSVG(),
-            "user_id": 1,
-            // "source": 'web',
-            "uuid": uuid.value,
-            // "img_generated": canvas.toDataURL('jpeg')//jpeg
+    
+    try {
+        updateProgress(70)
+        // fetch('https://api.skateboardpersonalizado.com/api/designs/', {
+        const response = await fetch('http://localhost:8000/api/designs/', {
+            method: 'POST',
+            contentType: 'multipart/form-data',
+            headers: {
+                'Authorization': 'Bearer 2|9xwCEKAAvnCUON1fazP027OGZv2R0jqA0pF3FLai91bab14c',
+                'Content-Type': 'application/json',
+                //'X-CSRF-TOKEN': `document.querySelector("meta[property='csrf-token']").getAttribute("content"),`
+            },
+            body: JSON.stringify({
+                "name": "vue",
+                "json": JSON.stringify(canvasJSON),
+                // "svg": canvas.toSVG(),
+                "user_id": 1,
+                // "source": 'web',
+                "uuid": uuid.value,
+                // "img_generated": canvas.toDataURL('jpeg')//jpeg
+            })
         })
-    })
+        
+        updateProgress(100)
+        
+        if (response.ok) {
+            // Hide loading and show success
+            setTimeout(() => {
+                hideLoading()
+                showToast('success', 'Tu diseño ha sido enviado correctamente. ¡Continúa al proceso de envío!', '¡Diseño guardado!')
+                
+                setTimeout(() => {
+                    contextualHints.value?.showHint('readyToDownload')
+                }, 500)
+            }, 300)
+        } else {
+            throw new Error('Error al enviar el diseño')
+        }
+        
+    } catch (error) {
+        hideLoading()
+        showToast('error', 'Ha ocurrido un error al procesar tu diseño. Por favor, inténtalo de nuevo.', 'Error al descargar')
+    }
+    
     generatePrints.value = false
     await navigateTo('/shipping');
 }
@@ -1458,6 +1668,28 @@ onMounted(() => {
             }
         })
     }
+    
+    // UX Enhancement: Add canvas event listeners for better user experience
+    canvas.on('object:added', function(event) {
+        updateEmptyStateVisibility()
+        updateLayerList()
+    })
+    
+    canvas.on('object:removed', function(event) {
+        updateEmptyStateVisibility()
+        updateLayerList()
+    })
+    
+    canvas.on('selection:created', function(event) {
+        setTimeout(() => {
+            contextualHints.value?.showHint('objectSelected')
+        }, 500)
+    })
+    
+    // Check initial empty state
+    setTimeout(() => {
+        updateEmptyStateVisibility()
+    }, 1000)
 })
 
 </script>
