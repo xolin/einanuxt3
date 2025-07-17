@@ -37,7 +37,6 @@
     "defu": "^6.1.4",
     "fabric-with-gestures-notupdated": "^1.0.0",
     "mitt": "^3.0.0",
-    "nuxt-sanctum-auth": "^0.4.7",
     "vue3-emoji-picker": "^1.1.7",
     "vuex": "^4.0.2"
   },

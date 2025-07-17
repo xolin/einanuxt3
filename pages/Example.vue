@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { definePageMeta, useNuxtApp } from '#imports'
+import { definePageMeta } from '#imports'
 
 definePageMeta({
   middleware: ['guest']
@@ -12,14 +12,15 @@ const form = ref({
 })
 const error = ref('')
 
-const { $sanctumAuth } = useNuxtApp()
-
 const login = async () => {
   try {
-    await $sanctumAuth.login(form.value)
-  } catch (e: any) {
+    // Simple login logic - you can replace this with your preferred auth method
+    console.log('Login attempt with:', form.value)
+    // Example: await $fetch('/api/login', { method: 'POST', body: form.value })
+    error.value = ''
+  } catch (e) {
     console.log(e?.message)
-    error.value = e?.message
+    error.value = e?.message || 'Login failed'
   }
 }
 </script>
