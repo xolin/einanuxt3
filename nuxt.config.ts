@@ -2,27 +2,13 @@ import { defineNuxtConfig } from 'nuxt/config'
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-17',
+  compatibilityDate: '2024-04-03',
   devServer: {
     port: 80,
     host: '0.0.0.0',
     https: false,
   },
-  modules: ['nuxt-gtag', '@sidebase/nuxt-auth'],
-  
-  auth: {
-    baseURL: process.env.AUTH_ORIGIN,
-    provider: {
-      type: 'authjs'
-    }
-  },
-  
-  runtimeConfig: {
-    authSecret: process.env.AUTH_SECRET || 'your-secret-key-here',
-    public: {
-      authUrl: process.env.AUTH_ORIGIN || 'http://localhost:3000'
-    }
-  },
+  modules: ['nuxt-gtag'],
   
   gtag: { id: 'G-6QYKDDGTZK' },
   pages: true,

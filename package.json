@@ -30,7 +30,6 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "@pablinho/vue-paycard": "^0.7.4",
-    "@sidebase/nuxt-auth": "^1.0.0",
     "@vueuse/nuxt": "^9.13.0",
     "animate.css": "^4.1.0",
     "core-js": "^3.6.4",
