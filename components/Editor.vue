@@ -178,7 +178,7 @@ const lastSelectedObject = ref(null)
 const bin = ref(null)
 
 const colors = ref({ hex: '#026ed9' })
-const textColor = ref('3D94FF')
+const textColor = ref({ hex: '#3D94FF' })
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
@@ -626,7 +626,7 @@ function setTextColor() {
 function toggleShowTextColorpicker() {
     canvas.getObjects().forEach(function(o){
         if(o.id == selectedObject.value){
-            textColor.value = o.fill
+            textColor.value = { hex: o.fill }
         }
     });
     textcolorpickerVisible.value == 'visible' ? textcolorpickerVisible.value = 'hidden' : textcolorpickerVisible.value = 'visible'
@@ -930,33 +930,18 @@ function setDeckBackground() {
 }
 
 function setCanvasMask() {
-    // Create a clipPath that follows the skateboard silhouette shape
-    // Fine-tuned positioning to eliminate gray areas between deck and mask
+    // Get the exact same positioning as the deck color rectangle
     const left = backgroundPositionLeft.value + 465
     const top = calculateBackgroundDeckTopOffset() + 115
     const width = deckBackgroundWidth.value - 185
     const height = deckBackgroundHeight.value - 245
     
-    // Create skateboard deck shape with rounded ends (simpler approach)
-    const centerX = left + width / 2
-    const radius = width / 2
-    const straightHeight = height - width // Height of straight section
-    
-    // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
-    const pathData = `
-        M ${left + radius} ${top}
-        L ${left + width - radius} ${top}
-        A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
-        L ${left + width} ${top + height - radius}
-        A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
-        L ${left + radius} ${top + height}
-        A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
-        L ${left} ${top + radius}
-        A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
-        Z
-    `
-    
-    const clipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
+    // Create a simple rectangular clipPath to match the deck color rectangle exactly
+    const clipPath = new fabric.Rect({
+        left: left,
+        top: top,
+        width: width,
+        height: height,
         absolutePositioned: true,
         fill: 'transparent'
     })
@@ -974,26 +959,12 @@ function updateCanvasMask() {
         const width = deckBackgroundWidth.value - 185
         const height = deckBackgroundHeight.value - 245
         
-        // Create skateboard deck shape with rounded ends (simpler approach)
-        const centerX = left + width / 2
-        const radius = width / 2
-        const straightHeight = height - width // Height of straight section
-        
-        // Create a path that represents a skateboard deck shape (rounded rectangle with circular ends)
-        const pathData = `
-            M ${left + radius} ${top}
-            L ${left + width - radius} ${top}
-            A ${radius} ${radius} 0 0 1 ${left + width} ${top + radius}
-            L ${left + width} ${top + height - radius}
-            A ${radius} ${radius} 0 0 1 ${left + width - radius} ${top + height}
-            L ${left + radius} ${top + height}
-            A ${radius} ${radius} 0 0 1 ${left} ${top + height - radius}
-            L ${left} ${top + radius}
-            A ${radius} ${radius} 0 0 1 ${left + radius} ${top}
-            Z
-        `
-        
-        const newClipPath = new fabric.Path(pathData.replace(/\s+/g, ' ').trim(), {
+        // Create a simple rectangular clipPath to match the deck color rectangle exactly
+        const newClipPath = new fabric.Rect({
+            left: left,
+            top: top,
+            width: width,
+            height: height,
             absolutePositioned: true,
             fill: 'transparent'
         })
