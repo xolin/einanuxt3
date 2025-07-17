@@ -25,7 +25,7 @@
     />
     
     <TextFormatting 
-      :selected-text="getSelectedTextObject()"
+      :selected-text="selectedTextObject"
       :has-selected-text="hasSelectedText"
       @update-font-family="updateFontFamily"
       @update-font-size="updateFontSize"
@@ -233,6 +233,17 @@
       />
     </div>
 
+    <!-- Mobile Toolbar for mobile devices -->
+    <MobileToolbar 
+      v-if="isMobile"
+      :active-color-picker="activeColorPicker"
+      :emoji-picker-visible="emojiVisible"
+      :can-undo="canUndo"
+      :can-redo="canRedo"
+      :is-generating-download="downloadInProgress"
+      @tool-action="handleToolbarAction"
+    />
+
     <!-- Phase 3: Template Gallery -->
     <TemplateGallery 
       :is-visible="showTemplateGallery"
@@ -291,6 +302,7 @@
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted, computed, nextTick, watch } from 'vue';
+import { useNuxtApp } from '#app'
 
 import { useStore } from 'vuex'
 
@@ -300,6 +312,7 @@ import ConfirmationToast from './UX/ConfirmationToast.vue'
 import EmptyStateGuidance from './UX/EmptyStateGuidance.vue'
 import ContextualHints from './UX/ContextualHints.vue'
 import OrganizedToolbar from './UX/OrganizedToolbar.vue'
+import MobileToolbar from './UX/MobileToolbar.vue'
 import TemplateGallery from './UX/TemplateGallery.vue'
 import SkateboardPreview from './UX/SkateboardPreview.vue'
 
@@ -308,6 +321,10 @@ import DesignManager from './UX/DesignManager.vue'
 import EnhancedLayerManager from './UX/EnhancedLayerManager.vue'
 import TextFormatting from './UX/TextFormatting.vue'
 import ShareDesign from './UX/ShareDesign.vue'
+
+// Additional UI Components
+import HelpPanel from './HelpPanel.vue'
+import WelcomeModal from './WelcomeModal.vue'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -706,6 +723,8 @@ async function uploadFile(event) {
 }
 
 function canvasEv() {
+    if(!canvas) return
+    
     if(canvas.getActiveObject()) {
         if(canvas.getActiveObject().get('type') === 'i-text'){
             positionBtn(canvas.getActiveObject())
@@ -1143,7 +1162,7 @@ async function startDownload(){
     }
     
     generatePrints.value = false
-    await navigateTo('/shipping');
+    // await navigateTo('/shipping'); // Commented out since no shipping page needed
 }
 
 function toggleSvgAlert() {
@@ -1400,6 +1419,8 @@ function isMobileDeviceCheck() {
 }
 
 function resize() {
+    if (!canvasWrapper.value || !canvas) return
+    
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
     const scale          = containerWidth / canvas.getWidth();
@@ -1478,6 +1499,11 @@ onMounted(() => {
 
     canvas.on('selection:created', function(event) {
         console.log('selection:created => event', event);
+        
+        // Update selected text object for TextFormatting component
+        selectedTextObject.value = getSelectedTextObject()
+        hasSelectedText.value = selectedTextObject.value !== null
+        
         if(event.selected[0].type === 'i-text'){
             activeTextColor.value = event.selected[0].fill
             colorpickerVisible.value = 'hidden'
@@ -1520,6 +1546,11 @@ onMounted(() => {
 
     canvas.on('selection:cleared', function() {
         console.log('aaa', lastSelectedObject.value);
+        
+        // Clear selected text object
+        selectedTextObject.value = null
+        hasSelectedText.value = false
+        
         if(lastSelectedObject.value){
             console.log('bbbb', lastSelectedObject.value);
             lastSelectedObject.value.opacity = 1
@@ -2140,6 +2171,7 @@ function renameLayer(data) {
 
 // Text Formatting Methods
 function getSelectedTextObject() {
+    if (!canvas) return null
     const activeObj = canvas.getActiveObject()
     return activeObj && activeObj.type === 'i-text' ? activeObj : null
 }
