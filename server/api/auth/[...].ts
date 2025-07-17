@@ -4,7 +4,8 @@ import { NuxtAuthHandler } from '#auth'
 export default NuxtAuthHandler({
   secret: useRuntimeConfig().authSecret,
   providers: [
-    CredentialsProvider({
+    // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
+    CredentialsProvider.default({
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
