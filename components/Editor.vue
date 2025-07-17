@@ -60,11 +60,18 @@
             </div>
         </div>
         <div class="options--top">
-            <Chrome v-model="colors" class="colorpicker" @update:modelValue="setDeckColor()" />
+            <div class="color-picker-container">
+                <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
+                </span>
+                <input 
+                    v-if="colorpickerVisible === 'visible'" 
+                    type="color" 
+                    :value="colors.hex" 
+                    @input="onDeckColorChange($event)"
+                    class="colorpicker" 
+                />
+            </div>
             <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
-            
-            <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
-            </span>
             <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
             <!-- <div class="inline-block colorPickerWrapper colorPickerBgDeck" >    
                 <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
@@ -102,8 +109,16 @@
             
         </div> -->
         <div class="textedit--top">
-            <span class="rounded__btn material-symbols-sharp rounded__btn-pt5 rounded__btn--activecolor" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
-            <Chrome v-model="textColor" class="textcolorpicker" @update:modelValue="setTextColor()" />
+            <div class="text-color-picker-container">
+                <span class="rounded__btn material-symbols-sharp rounded__btn-pt5 rounded__btn--activecolor" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
+                <input 
+                    v-if="textcolorpickerVisible === 'visible'" 
+                    type="color" 
+                    class="textcolorpicker"
+                    :value="textColor.hex" 
+                    @input="onTextColorChange($event)"
+                />
+            </div>
             
             <!-- <div class="inline-block colorPickerWrapper">
                 <input type="color" @input="fontColorChange($event)" />
@@ -126,7 +141,6 @@ import { fabric } from 'fabric-with-gestures-notupdated';
 import { ref, shallowRef, onMounted, computed } from 'vue';
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
-import { Chrome } from '@ckpack/vue-color';
 
 import { useStore } from 'vuex'
 
@@ -598,6 +612,30 @@ function onSelectEmoji(emoji) {
     canvas.renderAll();
     updateLayerList()
     hideEmojis()
+}
+
+function onDeckColorChange(event) {
+    const newColor = event.target.value
+    colors.value.hex = newColor
+    bgDeckColor.value = newColor
+    canvas.getObjects().forEach(function(o){
+        if(o.id == 'deckcolor'){
+            o.set('fill', newColor)
+        }
+    })
+    canvas.renderAll();
+}
+
+function onTextColorChange(event) {
+    const newColor = event.target.value
+    textColor.value.hex = newColor
+    canvas.getObjects().forEach(function(o){
+        if(o.id == selectedObject.value){
+            o.set('fill', newColor)
+        }
+    })
+    activeTextColor.value = newColor
+    canvas.renderAll();
 }
 
 function setDeckColor() {
@@ -1611,6 +1649,8 @@ input[type='color'] {
 
 .rounded__btn-active {
     background: #2b9f4e !important;
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(43, 159, 78, 0.3);
 }
 
 .v3-emoji-picker {
@@ -1620,27 +1660,113 @@ input[type='color'] {
     /* width: 100%; */
 }
 
+.color-picker-container {
+    position: relative;
+    display: inline-block;
+}
+
 .colorpicker {
     position: absolute;
-    top: 50px;
-    width: 25%;
-    min-width: 200px;
-    visibility: v-bind(colorpickerVisible);
+    top: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 32px;
+    z-index: 1000;
+    border: 2px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: dropdownSlide 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: top center;
+    background: transparent;
+}
+
+.colorpicker::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 12px solid white;
+    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.15));
+    z-index: 1001;
+}
+
+.text-color-picker-container {
+    position: relative;
+    display: inline-block;
 }
 
 .textcolorpicker {
     position: absolute;
     top: 50px;
-    left: v-bind((innerWidth/2));
-    visibility: v-bind(textcolorpickerVisible);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 32px;
+    z-index: 1000;
+    border: 2px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: dropdownSlide 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: top center;
+    background: transparent;
 }
 
-.vc-chrome-fields-wrap, .vc-chrome-alpha-wrap { /* Hide Hex and alpha selector color picker */
-    display: none;
+.textcolorpicker::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 12px solid white;
+    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.15));
+    z-index: 1001;
 }
 
-.vc-chrome-hue-wrap {
-    margin-top: 11px;
+@keyframes dropdownSlide {
+    0% {
+        transform: translateX(-50%) translateY(-10px) scaleY(0.3);
+        opacity: 0;
+        transform-origin: top center;
+    }
+    60% {
+        transform: translateX(-50%) translateY(-3px) scaleY(0.9);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateX(-50%) translateY(0) scaleY(1);
+        opacity: 1;
+        transform-origin: top center;
+    }
+}
+
+
+
+/* Optional: fade out animation when closing */
+.colorpicker-exit, .textcolorpicker-exit {
+    animation: dropdownSlideOut 0.2s ease-in-out;
+}
+
+@keyframes dropdownSlideOut {
+    0% {
+        transform: translateY(0) scaleY(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10px) scaleY(0.5);
+        opacity: 0;
+    }
 }
 
 .color-green {
