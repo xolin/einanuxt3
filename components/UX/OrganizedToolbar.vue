@@ -87,6 +87,13 @@
               <span class="tool-label">Imagen</span>
             </button>
           </Tooltip>
+          
+          <Tooltip text="Explorar plantillas pre-diseñadas" shortcut="P" position="bottom">
+            <button class="tool-btn template-btn" @click="$emit('tool-action', 'template-gallery')">
+              <span class="material-symbols-sharp">dashboard_customize</span>
+              <span class="tool-label">Plantillas</span>
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>
@@ -385,6 +392,29 @@ onMounted(() => {
 
 .tool-btn.active .tool-label {
   color: #3b82f6;
+}
+
+.template-btn {
+  background: linear-gradient(135deg, #f3f4f6, #ffffff);
+  border-color: #8b5cf6 !important;
+}
+
+.template-btn:hover {
+  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+  border-color: #7c3aed !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
+}
+
+.template-btn .material-symbols-sharp {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.template-btn .tool-label {
+  color: #7c3aed;
+  font-weight: 600;
 }
 
 .zoom-btn {

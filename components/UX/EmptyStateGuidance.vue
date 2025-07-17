@@ -55,6 +55,16 @@
           <span class="action-label">Subir Imagen</span>
           <span class="action-description">Usa tu propia foto o logo</span>
         </button>
+        
+        <button 
+          @click="$emit('action', 'browse-templates')" 
+          class="quick-action-btn template-action"
+          title="Explorar plantillas pre-diseñadas"
+        >
+          <span class="action-icon">🎨</span>
+          <span class="action-label">Usar Plantilla</span>
+          <span class="action-description">Comienza con un diseño pre-hecho</span>
+        </button>
       </div>
       
       <div class="tips-section">
@@ -207,6 +217,18 @@ const emit = defineEmits(['action', 'close', 'dismiss'])
   border-color: #3b82f6;
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+.template-action:hover {
+  border-color: #8b5cf6;
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+.template-action .action-icon {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.75rem;
 }
 
 .action-icon {
