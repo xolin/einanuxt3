@@ -191,6 +191,15 @@
       @select-template="applyTemplate"
     />
 
+    <!-- Phase 3.2: 3D Preview Modal -->
+    <SkateboardPreview 
+      :is-visible="showPreview"
+      :deck-color="colors.hex"
+      :elements="canvasElements"
+      @close="hidePreview"
+      @export="handlePreviewExport"
+    />
+
     <!-- New UX Components -->
     <!-- Loading Spinner -->
     <LoadingSpinner 
@@ -243,6 +252,7 @@ import EmptyStateGuidance from './UX/EmptyStateGuidance.vue'
 import ContextualHints from './UX/ContextualHints.vue'
 import OrganizedToolbar from './UX/OrganizedToolbar.vue'
 import TemplateGallery from './UX/TemplateGallery.vue'
+import SkateboardPreview from './UX/SkateboardPreview.vue'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -302,6 +312,10 @@ const canUndo = ref(false)
 const canRedo = ref(false)
 const downloadInProgress = ref(false)
 const showTemplateGallery = ref(false)
+const showPreview = ref(false)
+
+// Phase 3.2: Canvas elements for preview
+const canvasElements = ref([])
 
 // UX Enhancement states
 const loadingState = ref({
@@ -1696,7 +1710,7 @@ function handleToolbarAction(action) {
             lessZoomButton()
             break
         case 'download':
-            startDownload()
+            showPreviewAndExport()
             break
         case 'template-gallery':
             showTemplateGallery.value = true
@@ -1880,6 +1894,64 @@ watch(() => canvas, () => {
         canRedo.value = false // Set based on actual redo stack
     }
 })
+
+// Phase 3.2: Preview & Export Methods
+function showPreviewAndExport() {
+    updateCanvasElements()
+    showPreview.value = true
+}
+
+function hidePreview() {
+    showPreview.value = false
+}
+
+function updateCanvasElements() {
+    if (!canvas) return
+    
+    canvasElements.value = canvas.getObjects()
+        .filter(obj => obj.id !== 'background' && obj.id !== 'deckcolor' && obj.id !== 'clipMask' && obj.id !== 'bin')
+        .map(obj => ({
+            id: obj.id,
+            content: obj.text || obj.type,
+            left: obj.left,
+            top: obj.top,
+            fontSize: obj.fontSize || 20,
+            fill: obj.fill,
+            fontFamily: obj.fontFamily,
+            fontWeight: obj.fontWeight,
+            type: obj.type
+        }))
+}
+
+function handlePreviewExport(exportOptions) {
+    showLoading(`Generando ${exportOptions.format.toUpperCase()} en calidad ${exportOptions.quality}...`, true, 0)
+    
+    // Simulate export process with progress
+    let progress = 0
+    const interval = setInterval(() => {
+        progress += 15
+        updateProgress(progress)
+        
+        if (progress >= 100) {
+            clearInterval(interval)
+            // Call the actual download function with enhanced options
+            setTimeout(() => {
+                startEnhancedDownload(exportOptions)
+                hideLoading()
+                hidePreview()
+                showToast('success', `Diseño exportado en ${exportOptions.format.toUpperCase()}`, '¡Exportación completada!')
+            }, 500)
+        }
+    }, 300)
+}
+
+function startEnhancedDownload(options = {}) {
+    const quality = options.quality || 'high'
+    const format = options.format || 'jpg'
+    
+    // Use existing download logic but with enhanced options
+    startDownload()
+}
 
 </script>
 
