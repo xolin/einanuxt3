@@ -9,8 +9,12 @@
             <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
                 layers
             </span>
-            <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
-            <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
+            <Tooltip text="Acercar vista" shortcut="+" position="top">
+                <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
+            </Tooltip>
+            <Tooltip text="Alejar vista" shortcut="-" position="top">
+                <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
+            </Tooltip>
             <div id="download-modal" class="hidden relative z-10 overflow-x-hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" tabindex="-1" aria-hidden="true">
             <!--
                 Background backdrop, show/hide based on modal state.
@@ -61,8 +65,10 @@
         </div>
         <div class="options--top">
             <div class="color-picker-container">
-                <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
-                </span>
+                <Tooltip text="Color de fondo de la tabla" shortcut="C" position="bottom">
+                    <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
+                    </span>
+                </Tooltip>
                 <input 
                     v-if="colorpickerVisible === 'visible'" 
                     type="color" 
@@ -71,20 +77,20 @@
                     class="colorpicker" 
                 />
             </div>
-            <!-- <input type="range" id="zoom" name="zoom" value="0.065" min="0.045" max="0.075" step="0.010" @change="changeZoom(value)"> -->
-            <!-- <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" /> -->
-            <!-- <div class="inline-block colorPickerWrapper colorPickerBgDeck" >    
-                <svg src="/img/icon/insta-board-icon-skateboard-deck-background-color.svg" class="btn-add-color"> </svg>
-                <input type="color" value="#6697CC" @input="bgDeckColorChange($event)" />
-            </div> -->            
             
-                
-            <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
+            <Tooltip text="Subir imagen personalizada" shortcut="I" position="bottom">
+                <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
+            </Tooltip>
             <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
-            <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
+            
+            <Tooltip text="Añadir texto editable" shortcut="T" position="bottom">
+                <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
+            </Tooltip>
             
             <div class="emoji-picker-container">
-                <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
+                <Tooltip text="Explorar colección de emojis" shortcut="E" position="bottom">
+                    <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
+                </Tooltip>
                 <div v-if="emojiVisible" class="simple-emoji-picker">
                     <div class="emoji-categories">
                         <span v-for="(categoryData, categoryName) in emojiCategories" 
@@ -127,7 +133,9 @@
         </div>
         
         <div class="options--bottom-right">
-            <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="startDownload()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+            <Tooltip text="Descargar diseño finalizado" shortcut="D" position="top">
+                <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="startDownload()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+            </Tooltip>
             <!-- <span class="rounded__btn cursor-pointer material-symbols-sharp color-blue rounded__btn-downloadbig" @click="generatePrints()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span> -->
         </div>
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
@@ -135,7 +143,9 @@
         </div> -->
         <div class="textedit--top">
             <div class="text-color-picker-container">
-                <span class="rounded__btn material-symbols-sharp rounded__btn-pt5 rounded__btn--activecolor" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
+                <Tooltip text="Color del texto seleccionado" shortcut="Shift+C" position="bottom">
+                    <span class="rounded__btn material-symbols-sharp rounded__btn-pt5 rounded__btn--activecolor" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
+                </Tooltip>
                 <input 
                     v-if="textcolorpickerVisible === 'visible'" 
                     type="color" 
@@ -160,6 +170,12 @@
             ></fontfamilytool>
         </div>
     </section>
+    
+    <!-- Help Panel -->
+    <HelpPanel />
+    
+    <!-- Welcome Modal for new users -->
+    <WelcomeModal />
 </template>
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
