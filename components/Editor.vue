@@ -1,6 +1,55 @@
 <template>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />            
+    <!-- Phase 4: Advanced Features & Polish Components -->
+    <DesignManager 
+      :canvas-data="getCanvasData()" 
+      @load-design="loadDesign"
+      @design-saved="onDesignSaved"
+      @share-design="shareDesign"
+      ref="designManager"
+    />
+    
+    <EnhancedLayerManager 
+      :layers="enhancedLayersList" 
+      :selected-layer="selectedObject"
+      @select-layer="selectLayer"
+      @toggle-visibility="toggleLayerVisibility"
+      @toggle-lock="toggleLayerLock"
+      @delete-layer="deleteLayer"
+      @duplicate-layer="duplicateLayer"
+      @reorder-layers="reorderLayers"
+      @update-layer-opacity="updateLayerOpacity"
+      @rename-layer="renameLayer"
+      ref="enhancedLayerManager"
+    />
+    
+    <TextFormatting 
+      :selected-text="getSelectedTextObject()"
+      :has-selected-text="hasSelectedText"
+      @update-font-family="updateFontFamily"
+      @update-font-size="updateFontSize"
+      @update-font-weight="updateFontWeight"
+      @update-text-style="updateTextStyle"
+      @update-text-align="updateTextAlign"
+      @update-line-height="updateLineHeight"
+      @update-letter-spacing="updateLetterSpacing"
+      @update-text-color="updateTextColor"
+      @update-text-shadow="updateTextShadow"
+      @update-text-transform="updateTextTransform"
+      @reset-formatting="resetTextFormatting"
+      @copy-formatting="copyTextFormatting"
+      @paste-formatting="pasteTextFormatting"
+      ref="textFormatting"
+    />
+    
+    <ShareDesign 
+      :is-visible="showShareModal"
+      :design="currentDesignForSharing"
+      :canvas-ref="canvasEl"
+      @close="closeShareModal"
+    />
+    
     <!-- <section class="fixed pl-200"> -->
     <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
@@ -254,6 +303,12 @@ import OrganizedToolbar from './UX/OrganizedToolbar.vue'
 import TemplateGallery from './UX/TemplateGallery.vue'
 import SkateboardPreview from './UX/SkateboardPreview.vue'
 
+// Phase 4: Advanced Features & Polish Components
+import DesignManager from './UX/DesignManager.vue'
+import EnhancedLayerManager from './UX/EnhancedLayerManager.vue'
+import TextFormatting from './UX/TextFormatting.vue'
+import ShareDesign from './UX/ShareDesign.vue'
+
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
 let canvas = null;
@@ -385,6 +440,25 @@ const emojiCategories = {
 }
 
 const activeEmojiCategory = ref('Smileys & People');
+
+// Phase 4: Advanced Features & Polish state
+const showShareModal = ref(false)
+const currentDesignForSharing = ref(null)
+const hasSelectedText = ref(false)
+const selectedTextObject = ref(null)
+const designManager = ref(null)
+const enhancedLayerManager = ref(null)
+const textFormatting = ref(null)
+
+// Enhanced layers list with additional properties
+const enhancedLayersList = computed(() => {
+  return layersList.value.map(layer => ({
+    ...layer,
+    name: layer.name || getDefaultLayerName(layer.type),
+    locked: false,
+    zIndex: 0
+  }))
+})
 
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
     return {
@@ -1951,6 +2025,347 @@ function startEnhancedDownload(options = {}) {
     
     // Use existing download logic but with enhanced options
     startDownload()
+}
+
+// Phase 4: Advanced Features & Polish Methods
+
+// Design Management Methods
+function getCanvasData() {
+    return canvas ? canvas.toJSON(['id']) : null
+}
+
+function loadDesign(designData) {
+    if (!canvas || !designData) return
+    
+    showLoading('Cargando diseño...', true, 0)
+    updateProgress(30)
+    
+    canvas.loadFromJSON(designData, () => {
+        updateProgress(70)
+        canvas.renderAll()
+        updateLayerList()
+        updateProgress(100)
+        
+        setTimeout(() => {
+            hideLoading()
+            showToast('success', 'Diseño cargado correctamente', '¡Listo!')
+        }, 500)
+    })
+}
+
+function onDesignSaved(design) {
+    showToast('success', `Diseño "${design.name}" guardado correctamente`, '¡Guardado!')
+}
+
+function shareDesign(design) {
+    currentDesignForSharing.value = design
+    showShareModal.value = true
+}
+
+function closeShareModal() {
+    showShareModal.value = false
+    currentDesignForSharing.value = null
+}
+
+// Enhanced Layer Management Methods
+function selectLayer(layerId) {
+    const obj = canvas.getObjects().find(o => o.id === layerId)
+    if (obj) {
+        canvas.setActiveObject(obj)
+        canvas.renderAll()
+    }
+}
+
+function toggleLayerVisibility(layerId) {
+    toggleHideObjectFromList(layerId, 'toggle')
+}
+
+function toggleLayerLock(layerId) {
+    const obj = canvas.getObjects().find(o => o.id === layerId)
+    if (obj) {
+        obj.selectable = !obj.selectable
+        obj.evented = !obj.evented
+        canvas.renderAll()
+        updateLayerList()
+    }
+}
+
+function deleteLayer(layerId) {
+    removeObject(layerId)
+}
+
+function duplicateLayer(layerId) {
+    const obj = canvas.getObjects().find(o => o.id === layerId)
+    if (obj) {
+        obj.clone(cloned => {
+            cloned.set({
+                left: obj.left + 20,
+                top: obj.top + 20,
+                id: obj.type + Math.random().toString(16).slice(2)
+            })
+            canvas.add(cloned)
+            canvas.renderAll()
+            updateLayerList()
+        })
+    }
+}
+
+function reorderLayers(moveData) {
+    const objects = canvas.getObjects()
+    const objToMove = objects[moveData.from]
+    
+    // Remove and reinsert at new position
+    canvas.remove(objToMove)
+    canvas.insertAt(objToMove, moveData.to)
+    canvas.renderAll()
+    updateLayerList()
+}
+
+function updateLayerOpacity(data) {
+    const obj = canvas.getObjects().find(o => o.id === data.layerId)
+    if (obj) {
+        obj.set('opacity', data.opacity)
+        canvas.renderAll()
+        updateLayerList()
+    }
+}
+
+function renameLayer(data) {
+    const obj = canvas.getObjects().find(o => o.id === data.layerId)
+    if (obj) {
+        obj.name = data.name
+        updateLayerList()
+    }
+}
+
+// Text Formatting Methods
+function getSelectedTextObject() {
+    const activeObj = canvas.getActiveObject()
+    return activeObj && activeObj.type === 'i-text' ? activeObj : null
+}
+
+function updateFontFamily(fontFamily) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fontFamily', fontFamily)
+        canvas.renderAll()
+    }
+}
+
+function updateFontSize(fontSize) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fontSize', fontSize)
+        canvas.renderAll()
+    }
+}
+
+function updateFontWeight(fontWeight) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fontWeight', fontWeight)
+        canvas.renderAll()
+    }
+}
+
+function updateTextStyle(styles) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        if (styles.bold !== undefined) {
+            activeObj.set('fontWeight', styles.bold ? 'bold' : 'normal')
+        }
+        if (styles.italic !== undefined) {
+            activeObj.set('fontStyle', styles.italic ? 'italic' : 'normal')
+        }
+        if (styles.underline !== undefined) {
+            activeObj.set('underline', styles.underline)
+        }
+        canvas.renderAll()
+    }
+}
+
+function updateTextAlign(textAlign) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('textAlign', textAlign)
+        canvas.renderAll()
+    }
+}
+
+function updateLineHeight(lineHeight) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('lineHeight', lineHeight)
+        canvas.renderAll()
+    }
+}
+
+function updateLetterSpacing(charSpacing) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('charSpacing', charSpacing * 1000) // Fabric.js uses different scale
+        canvas.renderAll()
+    }
+}
+
+function updateTextColor(color) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fill', color)
+        canvas.renderAll()
+    }
+}
+
+function updateTextShadow(shadow) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        if (shadow) {
+            activeObj.set('shadow', new fabric.Shadow({
+                color: shadow.color,
+                blur: shadow.blur,
+                offsetX: shadow.offsetX,
+                offsetY: shadow.offsetY
+            }))
+        } else {
+            activeObj.set('shadow', null)
+        }
+        canvas.renderAll()
+    }
+}
+
+function updateTextTransform(textTransform) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        let transformedText = activeObj.text
+        
+        switch (textTransform) {
+            case 'uppercase':
+                transformedText = activeObj.text.toUpperCase()
+                break
+            case 'lowercase':
+                transformedText = activeObj.text.toLowerCase()
+                break
+            case 'capitalize':
+                transformedText = activeObj.text.replace(/\b\w/g, l => l.toUpperCase())
+                break
+            case 'none':
+            default:
+                // Keep original text
+                break
+        }
+        
+        activeObj.set('text', transformedText)
+        canvas.renderAll()
+    }
+}
+
+function resetTextFormatting() {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set({
+            fontFamily: 'Arial',
+            fontSize: 18,
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            underline: false,
+            textAlign: 'left',
+            lineHeight: 1.2,
+            charSpacing: 0,
+            shadow: null
+        })
+        canvas.renderAll()
+    }
+}
+
+function copyTextFormatting(format) {
+    // Format is already stored in the TextFormatting component
+}
+
+function pasteTextFormatting(format) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj && format) {
+        activeObj.set({
+            fontFamily: format.fontFamily,
+            fontSize: format.fontSize,
+            fontWeight: format.fontWeight,
+            fontStyle: format.italic ? 'italic' : 'normal',
+            underline: format.underline,
+            textAlign: format.textAlign,
+            lineHeight: format.lineHeight,
+            charSpacing: format.letterSpacing * 1000,
+            fill: format.color
+        })
+        
+        if (format.shadow) {
+            activeObj.set('shadow', new fabric.Shadow({
+                color: format.shadow.color,
+                blur: format.shadow.blur,
+                offsetX: format.shadow.offsetX,
+                offsetY: format.shadow.offsetY
+            }))
+        }
+        
+        canvas.renderAll()
+    }
+}
+
+function getDefaultLayerName(type) {
+    const names = {
+        'i-text': 'Texto',
+        image: 'Imagen',
+        smiley: 'Emoji',
+        rect: 'Rectángulo',
+        circle: 'Círculo',
+        triangle: 'Triángulo'
+    }
+    return names[type] || 'Capa'
+}
+
+// Auto-save functionality
+function setupAutoSave() {
+    if (designManager.value) {
+        designManager.value.setupAutoSave()
+    }
+}
+
+// Update text selection state
+function updateTextSelection() {
+    const activeObj = canvas.getActiveObject()
+    hasSelectedText.value = activeObj && activeObj.type === 'i-text'
+    selectedTextObject.value = hasSelectedText.value ? activeObj : null
+}
+
+// Enhanced canvas event handlers for Phase 4
+const originalSelectionCreated = canvas?.on ? true : false
+
+if (canvas) {
+    canvas.on('selection:created', (e) => {
+        updateTextSelection()
+        updateLayerList()
+    })
+    
+    canvas.on('selection:updated', (e) => {
+        updateTextSelection()
+    })
+    
+    canvas.on('selection:cleared', (e) => {
+        hasSelectedText.value = false
+        selectedTextObject.value = null
+    })
+    
+    canvas.on('object:added', (e) => {
+        updateLayerList()
+        setupAutoSave()
+    })
+    
+    canvas.on('object:removed', (e) => {
+        updateLayerList()
+        setupAutoSave()
+    })
+    
+    canvas.on('object:modified', (e) => {
+        setupAutoSave()
+    })
 }
 
 </script>

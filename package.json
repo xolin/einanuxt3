@@ -37,6 +37,7 @@
     "fabric-with-gestures-notupdated": "^1.0.0",
     "mitt": "^3.0.0",
     "vue3-emoji-picker": "^1.1.7",
+    "vuedraggable": "^4.1.0",
     "vuex": "^4.0.2"
   },
   "overrides": {
