@@ -88,7 +88,7 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div class="text-center">
                   <div class="text-3xl mb-2">🎨</div>
-                  <p><strong>1. Diseña</strong><br>Usa nuestro editor para personalizar tu tabla</p>
+                  <p><strong>1. Diseña</strong><br>Usa nuestro editor intuitivo con herramientas fáciles de usar</p>
                 </div>
                 <div class="text-center">
                   <div class="text-3xl mb-2">💳</div>
@@ -97,6 +97,18 @@
                 <div class="text-center">
                   <div class="text-3xl mb-2">🚚</div>
                   <p><strong>3. Recibe</strong><br>Tu tabla personalizada en casa</p>
+                </div>
+              </div>
+              
+              <!-- Quick preview of tools -->
+              <div class="mt-4 pt-4 border-t border-white/20">
+                <p class="text-center text-sm text-white/80 mb-3">Herramientas disponibles:</p>
+                <div class="flex justify-center items-center space-x-4 text-2xl">
+                  <span title="Colores" class="bg-white/20 p-2 rounded">🎨</span>
+                  <span title="Texto" class="bg-white/20 p-2 rounded">📝</span>
+                  <span title="Imágenes" class="bg-white/20 p-2 rounded">🖼️</span>
+                  <span title="Emojis" class="bg-white/20 p-2 rounded">😊</span>
+                  <span title="Descargar" class="bg-white/20 p-2 rounded">⬇️</span>
                 </div>
               </div>
             </div>
@@ -145,13 +157,15 @@
                         Fácil de diseñar
                     </h3>
                     <p class="text-gray-600 mb-8">
-                        Diseña tu nueva tabla con pocos pasos desde tu smartphone!
+                        Nuestro editor web te permite crear diseños únicos con facilidad:
                         <br />
                         <br />
-                        ✓ Añade imágenes personalizadas<br>
-                        ✓ Inserta texto y frases<br>
-                        ✓ Usa emoticonos divertidos<br>
-                        ✓ Vista previa en tiempo real
+                        ✓ <strong>Colores ilimitados:</strong> Elige cualquier color para el fondo<br>
+                        ✓ <strong>Texto personalizable:</strong> Añade frases, nombres o mensajes<br>
+                        ✓ <strong>Imágenes propias:</strong> Sube fotos, logos o ilustraciones<br>
+                        ✓ <strong>Colección de emojis:</strong> Cientos de emojis organizados por categorías<br>
+                        ✓ <strong>Vista previa en tiempo real:</strong> Ve tu diseño mientras lo creas<br>
+                        ✓ <strong>Descarga inmediata:</strong> Obtén tu diseño listo para imprimir
                     </p>
                 </div>
                 <div class="w-full sm:w-1/2 p-6">
