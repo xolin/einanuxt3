@@ -61,7 +61,7 @@
                       </div>
                       <div class="text-center mt-6">
                         <button
-                        @click="handleSignin"
+                        @click="signin"
                           class="bg-gray-900 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full"
                           type="button"
                           style="transition: all 0.15s ease 0s;"
@@ -73,6 +73,7 @@
                     <div>
                         Is user logged in?
                         <span>{{ loggedIn ? 'yes' : 'no' }}</span>
+                        <p v-if="$auth.loggedIn">You are logged in</p>
                     </div>
                     <div v-if="loggedIn">
                         What is users name?
@@ -101,49 +102,81 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
 
+  import { useRouter } from 'vue-router'
+  import { ref } from 'vue'
+  const { user, loggedIn, auth } = useAuth()
+  
   const router = useRouter()
-  const { data, signIn, signOut, status } = useAuth()
-  
-  const user = computed(() => data.value?.user)
-  const loggedIn = computed(() => status.value === 'authenticated')
-  
+  const errors = ref([])
   const email = ref('')
   const password = ref('')
-  const loading = ref(false)
-  const error = ref('')
-
-  const signin = async () => {
-    if (loading.value) return
-    
-    loading.value = true
-    error.value = ''
-    
+  
+  async function signin() {
     try {
-      const result = await signIn('credentials', {
-        email: email.value,
-        password: password.value,
-        redirect: false
-      })
+      // Simple login logic - replace with your preferred auth method
+      console.log('Login attempt:', { email: email.value, password: password.value })
+      // Example: await $fetch('/api/login', { method: 'POST', body: { email: email.value, password: password.value } })
       
-      if (result?.error) {
-        error.value = 'Login failed. Please check your credentials.'
-      } else {
-        await router.push('/editor')
-      }
-    } catch (err) {
-      console.error('Login error:', err)
-      error.value = 'Login failed. Please check your credentials.'
-    } finally {
-      loading.value = false
+      // Simulate successful login
+      await router.push('/dashboard')
+    } catch (error) {
+      console.log('Login error:', error)
+      errors.value = error.errors || ['Login failed']
     }
   }
+  
 
-  const signout = async () => {
-    await signOut({ redirect: false })
-    await router.push('/')
-  }
-  </script>
+
+
+//   function signin(){
+    
+//       this.error = null
+
+//       return this.$auth
+//         .loginWith('laravelSanctum', {
+//           data: {
+//             email: 'test@test.com',
+//             password: '12345678'
+//           }
+//         })
+//         .catch((e) => {
+//           this.error = e.response ? e.response.data : e.toString()
+//         })
+    
+//   }
+
+    // function signin() {
+    // $this.$auth.loginWith('laravelSanctum', {
+    //     data: {
+    //         email: 'jo@jo.com',
+    //         password: '123456'
+    //     }
+    //     })
+    // }
+//    import { FetchError } from 'ofetch';
+//    const { login } = useSanctumAuth();
+
+//     interface MyCustomUser {
+//         id: number;
+//         login: string;
+//     }
+
+// const user = useSanctumUser<MyCustomUser>();
+
+//   async function signin(){
+//         const userCredentials = {
+//             email: 'jo@jo.com',
+//             password: '123456',
+//         };
+        
+
+//         try{
+//             await login(userCredentials);
+//         } catch (error:any) {
+//             console.log(error.response)
+//             console.log(error)
+//         }
+//     }
+    </script>
   
