@@ -2898,25 +2898,31 @@ function showMobileToast(message) {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 1;
+        z-index: 50;
         background-color: #f5f5f5;
         padding: 1rem;
+        padding-bottom: 100px; /* Space for mobile toolbar toggle */
         overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .canvas {
         position: relative !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100% !important;
+        width: auto !important;
         height: auto !important;
-        max-width: 100% !important;
-        max-height: calc(100vh - 8rem) !important;
+        max-width: calc(100vw - 2rem) !important;
+        max-height: calc(100vh - 120px) !important;
         margin: 0 auto !important;
         display: block !important;
         border: 1px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Ensure canvas maintains aspect ratio */
+        object-fit: contain;
     }
 }
 
