@@ -2,7 +2,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2025-07-18',
   devServer: {
     port: 80,
     host: '0.0.0.0',
@@ -55,6 +55,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'node-server',
+    compatibilityDate: '2025-07-18',
     esbuild: {
       options: {
         target: 'esnext'
