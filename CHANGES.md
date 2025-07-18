@@ -23,14 +23,24 @@ Updated the "Fondo" (deck color) button to open the native color picker directly
 - Updated all emit calls to use 'tool-action' instead of 'action' for consistency
 - Fixed event emission compatibility with Editor component
 
+### 4. EmptyStateGuidance.vue (`/components/UX/EmptyStateGuidance.vue`)
+- Updated "Elegir Color" button to emit 'deck-color' instead of 'change-color'
+- Improved consistency with main toolbar actions
+
+### 5. Editor.vue - EmptyStateGuidance Handler
+- Added 'deck-color' case to `handleEmptyStateAction` function
+- Function now closes empty state popup and opens native color picker
+- Seamless transition from empty state to color selection
+
 ## How It Works Now
 
 1. **Desktop**: User clicks "Fondo" button in OrganizedToolbar
 2. **Mobile**: User clicks "Color Fondo" button in MobileToolbar  
-3. **Both**: Action triggers `handleToolbarAction('deck-color')`
-4. **Native picker**: Function calls `deckColorInput.value.click()` to open native color picker
-5. **Color change**: User selects color, `handleDeckColorChange` is called automatically
-6. **Canvas update**: Deck background color is updated immediately
+3. **Empty State**: User clicks "Elegir Color" button in EmptyStateGuidance popup
+4. **All Cases**: Action triggers the native color picker directly
+5. **Empty State**: Popup closes automatically when "Elegir Color" is clicked
+6. **Color Selection**: User selects color from native picker
+7. **Canvas Update**: Deck background color updates immediately
 
 ## Benefits
 - ✅ **Faster UX**: No intermediate UI step - direct access to color picker
@@ -42,6 +52,7 @@ Updated the "Fondo" (deck color) button to open the native color picker directly
 ## Testing
 - Start dev server: `npm run dev`
 - Navigate to: `http://localhost:3001/editor`
-- Click "Fondo" button - native color picker should open directly
-- Select a color - deck background should change immediately
-- Test on both desktop and mobile viewport
+- **Test 1**: Click "Fondo" button - native color picker should open directly
+- **Test 2**: On empty canvas, click "Elegir Color" in empty state popup - popup should close and native color picker should open
+- **Test 3**: Select a color - deck background should change immediately
+- **Test 4**: Test on both desktop and mobile viewport

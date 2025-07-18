@@ -2028,6 +2028,13 @@ function handleEmptyStateAction(action) {
         case 'add-emoji':
             toggleEmoji()
             break
+        case 'deck-color':
+            // Close empty state popup and open native color picker
+            hideEmptyState()
+            if (deckColorInput.value) {
+                deckColorInput.value.click()
+            }
+            break
     }
 }
 
