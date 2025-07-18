@@ -56,7 +56,7 @@ const props = defineProps({
   },
   position: {
     type: String,
-    default: 'top-right',
+    default: 'bottom-right',
     validator: value => ['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center'].includes(value)
   },
   closable: {
