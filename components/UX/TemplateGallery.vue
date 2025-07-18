@@ -34,7 +34,7 @@
             :class="{ selected: selectedTemplate?.id === template.id }"
           >
             <div class="template-preview">
-              <div class="skateboard-preview" :style="{ backgroundColor: template.deckColor }">
+              <div class="skateboard-preview" :style="{ '--deck-color': template.deckColor }">
                 <div 
                   v-for="element in template.elements" 
                   :key="element.id"
@@ -454,10 +454,66 @@ watch(activeCategory, () => {
 .skateboard-preview {
   width: 60px;
   height: 120px;
-  border-radius: 30px;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+  
+  /* Popsicle skateboard shape - more realistic curved shape */
+  background: var(--deck-color, #333);
+  border-radius: 25px 25px 15px 15px;
+  
+  /* Create the authentic popsicle shape with CSS clip-path */
+  clip-path: polygon(
+    25% 0%,     /* top left curve start */
+    75% 0%,     /* top right curve start */
+    90% 5%,     /* top right curve */
+    95% 12%,    /* nose right edge */
+    95% 35%,    /* transition to middle */
+    88% 45%,    /* right side curve inward */
+    88% 55%,    /* right side curve outward */
+    95% 65%,    /* transition to tail */
+    95% 88%,    /* tail right edge */
+    85% 95%,    /* tail right curve */
+    75% 98%,    /* tail bottom right */
+    60% 100%,   /* tail bottom center-right */
+    40% 100%,   /* tail bottom center-left */
+    25% 98%,    /* tail bottom left */
+    15% 95%,    /* tail left curve */
+    5% 88%,     /* tail left edge */
+    5% 65%,     /* transition to middle */
+    12% 55%,    /* left side curve outward */
+    12% 45%,    /* left side curve inward */
+    5% 35%,     /* transition to nose */
+    5% 12%,     /* nose left edge */
+    10% 5%,     /* top left curve */
+    25% 0%      /* close the shape */
+  );
+}
+
+.skateboard-preview::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  z-index: 1;
+}
+
+.skateboard-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 25px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  z-index: 1;
 }
 
 .preview-element {

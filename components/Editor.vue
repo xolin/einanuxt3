@@ -24,25 +24,6 @@
       ref="enhancedLayerManager"
     />
     
-    <TextFormatting 
-      :selected-text="selectedTextObject"
-      :has-selected-text="hasSelectedText"
-      @update-font-family="updateFontFamily"
-      @update-font-size="updateFontSize"
-      @update-font-weight="updateFontWeight"
-      @update-text-style="updateTextStyle"
-      @update-text-align="updateTextAlign"
-      @update-line-height="updateLineHeight"
-      @update-letter-spacing="updateLetterSpacing"
-      @update-text-color="updateTextColor"
-      @update-text-shadow="updateTextShadow"
-      @update-text-transform="updateTextTransform"
-      @reset-formatting="resetTextFormatting"
-      @copy-formatting="copyTextFormatting"
-      @paste-formatting="pasteTextFormatting"
-      ref="textFormatting"
-    />
-    
     <ShareDesign 
       :is-visible="showShareModal"
       :design="currentDesignForSharing"
@@ -58,12 +39,6 @@
             <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
                 layers
             </span>
-            <Tooltip text="Acercar vista" shortcut="+" position="top">
-                <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
-            </Tooltip>
-            <Tooltip text="Alejar vista" shortcut="-" position="top">
-                <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
-            </Tooltip>
             <div id="download-modal" class="hidden relative z-10 overflow-x-hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" tabindex="-1" aria-hidden="true">
             <!--
                 Background backdrop, show/hide based on modal state.
@@ -112,67 +87,29 @@
                 </div>
             </div>
         </div>
-        <div class="options--top">
-            <div class="color-picker-container">
-                <Tooltip text="Color de fondo de la tabla" shortcut="C" position="bottom">
-                    <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
-                    </span>
-                </Tooltip>
-                <input 
-                    v-if="colorpickerVisible === 'visible'" 
-                    type="color" 
-                    :value="colors.hex" 
-                    @input="onDeckColorChange($event)"
-                    class="colorpicker" 
-                />
+        <!-- File input for upload functionality -->
+        <input ref="file" type="file" accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
+        
+        <!-- Hidden color picker for deck color -->
+        <input ref="deckColorInput" type="color" :value="colors.hex" class="hidden" @input="handleDeckColorChange($event.target.value)" />
+        
+        <!-- Emoji picker (positioned by CSS) -->
+        <div v-if="emojiVisible" class="simple-emoji-picker">
+            <div class="emoji-categories">
+                <span v-for="(categoryData, categoryName) in emojiCategories" 
+                      :key="categoryName" 
+                      class="category-tab" 
+                      :class="{ active: activeEmojiCategory === categoryName }"
+                      @click="activeEmojiCategory = categoryName"
+                      :title="categoryName">
+                    {{ categoryData.icon }}
+                </span>
             </div>
-            
-            <Tooltip text="Subir imagen personalizada" shortcut="I" position="bottom">
-                <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
-            </Tooltip>
-            <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
-            
-            <Tooltip text="Añadir texto editable" shortcut="T" position="bottom">
-                <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            </Tooltip>
-            
-            <div class="emoji-picker-container">
-                <Tooltip text="Explorar colección de emojis" shortcut="E" position="bottom">
-                    <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
-                </Tooltip>
-                <div v-if="emojiVisible" class="simple-emoji-picker">
-                    <div class="emoji-categories">
-                        <span v-for="(categoryData, categoryName) in emojiCategories" 
-                              :key="categoryName" 
-                              class="category-tab" 
-                              :class="{ active: activeEmojiCategory === categoryName }"
-                              @click="activeEmojiCategory = categoryName"
-                              :title="categoryName">
-                            {{ categoryData.icon }}
-                        </span>
-                    </div>
-                    <div class="emoji-grid">
-                        <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
-                              :key="emoji" 
-                              class="emoji-option" 
-                              @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
-                    </div>
-                </div>
-                <!-- 
-                <ClientOnly>
-                    <EmojiPicker
-                        v-if="emojiVisible && false" 
-                        class="emoji-picker-dropdown"
-                        :native="true" 
-                        :hide-search="true" 
-                        :hide-group-icons="true" 
-                        :hide-group-names="true" 
-                        :disable-sticky-group-names="true" 
-                        :disable-skin-tones="true"
-                        @select="onSelectEmoji" 
-                    />
-                </ClientOnly>
-                -->
+            <div class="emoji-grid">
+                <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
+                      :key="emoji" 
+                      class="emoji-option" 
+                      @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
             </div>
         </div>
         <div hidden>
@@ -191,22 +128,7 @@
             
         </div> -->
         <div class="textedit--top">
-            <div class="text-color-picker-container">
-                <Tooltip text="Color del texto seleccionado" shortcut="Shift+C" position="bottom">
-                    <span class="rounded__btn material-symbols-sharp rounded__btn-pt5 rounded__btn--activecolor" :class="textcolorpickerVisibleClassObject" @click="toggleShowTextColorpicker()" v-html="textcolorpickerVisibleIconComputed"></span>
-                </Tooltip>
-                <input 
-                    v-if="textcolorpickerVisible === 'visible'" 
-                    type="color" 
-                    class="textcolorpicker"
-                    :value="textColor.hex" 
-                    @input="onTextColorChange($event)"
-                />
-            </div>
-            
-            <!-- <div class="inline-block colorPickerWrapper">
-                <input type="color" @input="fontColorChange($event)" />
-            </div> -->
+            <!-- Text editing options moved to OrganizedToolbar -->
         </div>
         <div class="objectmove--top" @click="confirmPostion()">
             <img src="/img/icon/Eo_circle_green_checkmark.svg " class="btn-add-color" />
@@ -229,7 +151,24 @@
         :can-redo="canRedo"
         :is-generating-download="downloadInProgress"
         :is-mobile="isMobile"
+        :has-selected-text="hasSelectedText"
+        :selected-font="selectedFont"
+        :font-size="fontSize"
+        :font-weight="fontWeight"
+        :is-bold="isBold"
+        :is-italic="isItalic"
+        :is-underline="isUnderline"
+        :text-align="textAlign"
+        :deck-color="colors.hex"
+        :text-color="textColor.hex"
         @tool-action="handleToolbarAction"
+        @deck-color-change="handleDeckColorChange"
+        @text-color-change="handleTextColorChange"
+        @font-change="handleFontChange"
+        @font-size-change="handleFontSizeChange"
+        @font-weight-change="handleFontWeightChange"
+        @text-style-change="handleTextStyleChange"
+        @text-align-change="handleTextAlignChange"
       />
     </div>
 
@@ -241,7 +180,24 @@
       :can-undo="canUndo"
       :can-redo="canRedo"
       :is-generating-download="downloadInProgress"
+      :has-selected-text="hasSelectedText"
+      :selected-font="selectedFont"
+      :font-size="fontSize"
+      :font-weight="fontWeight"
+      :is-bold="isBold"
+      :is-italic="isItalic"
+      :is-underline="isUnderline"
+      :text-align="textAlign"
+      :deck-color="colors.hex"
+      :text-color="textColor.hex"
       @tool-action="handleToolbarAction"
+      @deck-color-change="handleDeckColorChange"
+      @text-color-change="handleTextColorChange"
+      @font-change="handleFontChange"
+      @font-size-change="handleFontSizeChange"
+      @font-weight-change="handleFontWeightChange"
+      @text-style-change="handleTextStyleChange"
+      @text-align-change="handleTextAlignChange"
     />
 
     <!-- Phase 3: Template Gallery -->
@@ -293,6 +249,21 @@
       @dismiss="onHintDismiss"
     />-->
     
+    <!-- Layers Button - Separate from Help Button -->
+    <div class="layers-button-container">
+      <Tooltip text="Administrar capas" shortcut="L" position="left">
+        <button
+          @click="toggleLayersList"
+          class="fixed top-32 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
+          :class="{ 'right-80': layersListVisible }"
+        >
+          <span class="material-symbols-sharp text-xl">
+            layers
+          </span>
+        </button>
+      </Tooltip>
+    </div>
+
     <!-- Help Panel -->
     <HelpPanel />
     
@@ -328,6 +299,7 @@ import WelcomeModal from './WelcomeModal.vue'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
+const deckColorInput = ref(null);
 let canvas = null;
 const isMobileDevice = ref(null);
 const uuid = ref(null);
@@ -466,6 +438,15 @@ const selectedTextObject = ref(null)
 const designManager = ref(null)
 const enhancedLayerManager = ref(null)
 const textFormatting = ref(null)
+
+// Typography state
+const selectedFont = ref('Arial, sans-serif')
+const fontSize = ref(18)
+const fontWeight = ref('400')
+const isBold = ref(false)
+const isItalic = ref(false)
+const isUnderline = ref(false)
+const textAlign = ref('left')
 
 // Enhanced layers list with additional properties
 const enhancedLayersList = computed(() => {
@@ -1778,17 +1759,102 @@ onMounted(() => {
 
 // Phase 3: Enhanced UI Methods
 
+// Handle new toolbar events
+function handleDeckColorChange(color) {
+    colors.value.hex = color
+    bgDeckColor.value = color
+    canvas.getObjects().forEach(function(o){
+        if(o.id == 'deckcolor'){
+            o.set('fill', color)
+        }
+    })
+    canvas.renderAll()
+}
+
+function handleTextColorChange(color) {
+    textColor.value.hex = color
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fill', color)
+        canvas.renderAll()
+    }
+}
+
+function handleFontChange(fontFamily) {
+    selectedFont.value = fontFamily
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fontFamily', fontFamily)
+        canvas.renderAll()
+    }
+}
+
+function handleFontSizeChange(action) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        let newSize = fontSize.value
+        if (action === 'increase') {
+            newSize = Math.min(fontSize.value + 2, 200)
+        } else if (action === 'decrease') {
+            newSize = Math.max(fontSize.value - 2, 8)
+        } else if (typeof action === 'number') {
+            newSize = Math.max(8, Math.min(200, action))
+        }
+        
+        fontSize.value = newSize
+        activeObj.set('fontSize', newSize)
+        canvas.renderAll()
+    }
+}
+
+function handleFontWeightChange(weight) {
+    fontWeight.value = weight
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('fontWeight', weight)
+        isBold.value = weight === 'bold' || parseInt(weight) >= 600
+        canvas.renderAll()
+    }
+}
+
+function handleTextStyleChange(style) {
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        if (style === 'bold') {
+            isBold.value = !isBold.value
+            activeObj.set('fontWeight', isBold.value ? 'bold' : 'normal')
+        } else if (style === 'italic') {
+            isItalic.value = !isItalic.value
+            activeObj.set('fontStyle', isItalic.value ? 'italic' : 'normal')
+        } else if (style === 'underline') {
+            isUnderline.value = !isUnderline.value
+            activeObj.set('underline', isUnderline.value)
+        }
+        canvas.renderAll()
+    }
+}
+
+function handleTextAlignChange(align) {
+    textAlign.value = align
+    const activeObj = getSelectedTextObject()
+    if (activeObj) {
+        activeObj.set('textAlign', align)
+        canvas.renderAll()
+    }
+}
+
 // Handle toolbar actions from OrganizedToolbar
 function handleToolbarAction(action) {
     switch (action) {
         case 'deck-color':
-            activeColorPicker.value = activeColorPicker.value === 'deck' ? null : 'deck'
-            toggleShowColorpicker()
+            // Open native color picker directly
+            if (deckColorInput.value) {
+                deckColorInput.value.click()
+            }
             break
         case 'text-color':
-            if (selectedObject.value) {
+            if (hasSelectedText.value) {
                 activeColorPicker.value = activeColorPicker.value === 'text' ? null : 'text'
-                toggleShowTextColorpicker()
             } else {
                 showToast('warning', 'Primero selecciona un texto para cambiar su color', 'Selecciona un texto')
             }
@@ -1961,6 +2027,13 @@ function handleEmptyStateAction(action) {
             break
         case 'add-emoji':
             toggleEmoji()
+            break
+        case 'deck-color':
+            // Close empty state popup and open native color picker
+            hideEmptyState()
+            if (deckColorInput.value) {
+                deckColorInput.value.click()
+            }
             break
     }
 }
@@ -2365,6 +2438,18 @@ function updateTextSelection() {
     const activeObj = canvas.getActiveObject()
     hasSelectedText.value = activeObj && activeObj.type === 'i-text'
     selectedTextObject.value = hasSelectedText.value ? activeObj : null
+    
+    // Update typography state when text is selected
+    if (hasSelectedText.value && activeObj) {
+        selectedFont.value = activeObj.fontFamily || 'Arial, sans-serif'
+        fontSize.value = activeObj.fontSize || 18
+        fontWeight.value = activeObj.fontWeight || '400'
+        isBold.value = activeObj.fontWeight === 'bold' || parseInt(activeObj.fontWeight) >= 600
+        isItalic.value = activeObj.fontStyle === 'italic'
+        isUnderline.value = activeObj.underline || false
+        textAlign.value = activeObj.textAlign || 'left'
+        textColor.value.hex = activeObj.fill || '#000000'
+    }
 }
 
 // Enhanced canvas event handlers for Phase 4
@@ -2425,7 +2510,6 @@ if (canvas) {
 }
 
 /* Hide old toolbar elements when organized toolbar is active */
-.organized-toolbar-container ~ .options--top,
 .organized-toolbar-container ~ .options--bottom-right,
 .organized-toolbar-container ~ .textedit--top {
     display: none;
@@ -2926,75 +3010,6 @@ input[type='color'] {
     overflow: hidden;
 }
 
-.colorpicker {
-    position: absolute;
-    top: 95px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 45px;
-    height: 32px;
-    z-index: 1000;
-    border: 2px solid white;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    animation: dropdownSlide 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-origin: top center;
-    background: transparent;
-}
-
-.colorpicker::before {
-    content: '';
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 12px solid white;
-    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.15));
-    z-index: 1001;
-}
-
-.text-color-picker-container {
-    position: relative;
-    display: inline-block;
-}
-
-.textcolorpicker {
-    position: absolute;
-    top: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 45px;
-    height: 32px;
-    z-index: 1000;
-    border: 2px solid white;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    animation: dropdownSlide 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-origin: top center;
-    background: transparent;
-}
-
-.textcolorpicker::before {
-    content: '';
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 12px solid white;
-    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.15));
-    z-index: 1001;
-}
-
 @keyframes dropdownSlide {
     0% {
         transform: translateX(-50%) translateY(-10px) scaleY(0.3);
@@ -3011,8 +3026,6 @@ input[type='color'] {
         transform-origin: top center;
     }
 }
-
-
 
 /* Optional: fade out animation when closing */
 .colorpicker-exit, .textcolorpicker-exit {

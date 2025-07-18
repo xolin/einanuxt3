@@ -23,7 +23,7 @@
       <div class="preview-content">
         <div class="skateboard-3d-container">
           <div class="skateboard-3d" :class="`view-${activeView}`">
-            <div class="skateboard-deck" :style="{ backgroundColor: deckColor }">
+            <div class="skateboard-deck" :style="{ '--deck-color': deckColor }">
               <!-- Preview elements from canvas -->
               <div 
                 v-for="element in previewElements" 
@@ -296,19 +296,83 @@ const exportDesign = () => {
 .view-top .skateboard-deck {
   width: 200px;
   height: 320px;
-  border-radius: 100px;
   position: relative;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   transform: perspective(800px) rotateX(0deg);
+  /* Popsicle skateboard shape */
+  border-radius: 60px 60px 30px 30px;
+  background: linear-gradient(to bottom, 
+    var(--deck-color, #026ed9) 0%, 
+    var(--deck-color, #026ed9) 15%, 
+    var(--deck-color, #026ed9) 85%, 
+    var(--deck-color, #026ed9) 100%);
+}
+
+.view-top .skateboard-deck::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 80px;
+  background: var(--deck-color, #026ed9);
+  border-radius: 50px 50px 20px 20px;
+  z-index: 1;
+}
+
+.view-top .skateboard-deck::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 50px;
+  background: var(--deck-color, #026ed9);
+  border-radius: 20px 20px 40px 40px;
+  z-index: 1;
 }
 
 .view-bottom .skateboard-deck {
   width: 200px;
   height: 320px;
-  border-radius: 100px;
   position: relative;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   transform: perspective(800px) rotateY(180deg);
+  /* Popsicle skateboard shape */
+  border-radius: 60px 60px 30px 30px;
+  background: linear-gradient(to bottom, 
+    var(--deck-color, #026ed9) 0%, 
+    var(--deck-color, #026ed9) 15%, 
+    var(--deck-color, #026ed9) 85%, 
+    var(--deck-color, #026ed9) 100%);
+}
+
+.view-bottom .skateboard-deck::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 80px;
+  background: var(--deck-color, #026ed9);
+  border-radius: 50px 50px 20px 20px;
+  z-index: 1;
+}
+
+.view-bottom .skateboard-deck::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 50px;
+  background: var(--deck-color, #026ed9);
+  border-radius: 20px 20px 40px 40px;
+  z-index: 1;
 }
 
 .view-side .skateboard-deck {
@@ -323,10 +387,42 @@ const exportDesign = () => {
 .view-perspective .skateboard-deck {
   width: 200px;
   height: 320px;
-  border-radius: 100px;
   position: relative;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
   transform: perspective(800px) rotateX(15deg) rotateY(-10deg);
+  /* Popsicle skateboard shape */
+  border-radius: 60px 60px 30px 30px;
+  background: linear-gradient(to bottom, 
+    var(--deck-color, #026ed9) 0%, 
+    var(--deck-color, #026ed9) 15%, 
+    var(--deck-color, #026ed9) 85%, 
+    var(--deck-color, #026ed9) 100%);
+}
+
+.view-perspective .skateboard-deck::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 80px;
+  background: var(--deck-color, #026ed9);
+  border-radius: 50px 50px 20px 20px;
+  z-index: 1;
+}
+
+.view-perspective .skateboard-deck::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 50px;
+  background: var(--deck-color, #026ed9);
+  border-radius: 20px 20px 40px 40px;
+  z-index: 1;
 }
 
 .skateboard-deck {

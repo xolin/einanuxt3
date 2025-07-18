@@ -27,7 +27,7 @@
         </button>
         
         <button 
-          @click="$emit('action', 'change-color')" 
+          @click="$emit('action', 'deck-color')" 
           class="quick-action-btn"
           title="Cambiar color de fondo"
         >
