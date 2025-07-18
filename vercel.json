@@ -1,12 +1,2 @@
 {
-    "settings": {
-      "createdAt": 1670303239826,
-      "devCommand": "npm run dev",
-      "installCommand": "npm run install",
-      "buildCommand": "npm run generate",
-      "outputDirectory": "/dist",
-      "rootDirectory": "./",
-      "directoryListing": true,
-      "nodeVersion": "18.x"
-    }
-  }
+}
