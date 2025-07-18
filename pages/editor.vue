@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- User welcome header -->
-    <div class="bg-gray-800 text-white py-4 px-6">
+    <!-- <div class="bg-gray-800 text-white py-4 px-6">
       <div class="container mx-auto flex justify-between items-center">
         <div>
           <h1 class="text-xl font-bold">Editor de Tablas</h1>
@@ -18,22 +18,19 @@
           </a>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Help section -->
-    <div class="bg-blue-50 border-b border-blue-200 py-3 px-6">
+    <!-- <div class="bg-blue-50 border-b border-blue-200 py-3 px-6">
       <div class="container mx-auto">
         <p class="text-blue-800 text-sm">
           💡 <strong>Ayuda:</strong> Arrastra elementos al canvas, usa el panel derecho para propiedades.
           <a href="#tutorial" class="text-blue-600 underline ml-2">Ver tutorial completo</a>
         </p>
       </div>
-    </div>
+    </div> -->
 
     <!-- Main editor -->
     <div class="p-4">
-      <h2 class="text-lg font-bold mb-4">Skateboard Editor</h2>
-      <p class="mb-4">Loading editor...</p>
       <Suspense>
         <template #default>
           <Editor />

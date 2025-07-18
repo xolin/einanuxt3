@@ -32,7 +32,7 @@
     />
     
     <!-- <section class="fixed pl-200"> -->
-    <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
+    <!-- <LayersList v-if="layersListVisible" :layers="layersList"></LayersList> -->
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
         <div class="options--bottom-left">
@@ -118,12 +118,12 @@
             <button id="redo" ref="redoButton" type="button" v-bind="redoDisabled" @click="redo()">Redo</button>
         </div>
         
-        <div class="options--bottom-right">
+        <!-- <div class="options--bottom-right">
             <Tooltip text="Descargar diseño finalizado" shortcut="D" position="top">
                 <span class="rounded__btn cursor-pointer material-symbols-sharp color-green rounded__btn-downloadbig" @click="startDownload()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
             </Tooltip>
-            <!-- <span class="rounded__btn cursor-pointer material-symbols-sharp color-blue rounded__btn-downloadbig" @click="generatePrints()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span> -->
-        </div>
+            <span class="rounded__btn cursor-pointer material-symbols-sharp color-blue rounded__btn-downloadbig" @click="generatePrints()" :class="downloadVisibleClassObject" v-html="downloadVisibleIconComputed"></span>
+        </div> -->
         <!-- <div class="options--top-right cursor-pointer" @click="toggleLayersList()" v-if="layersList.length>0">
             
         </div> -->
