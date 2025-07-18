@@ -112,67 +112,35 @@
                 </div>
             </div>
         </div>
-        <div class="options--top">
-            <div class="color-picker-container">
-                <Tooltip text="Color de fondo de la tabla" shortcut="C" position="bottom">
-                    <span class="rounded__btn material-symbols-sharp" :class="colorpickerVisibleClassObject" @click="toggleShowColorpicker()" v-html="colorpickerVisibleIconComputed">
-                    </span>
-                </Tooltip>
-                <input 
-                    v-if="colorpickerVisible === 'visible'" 
-                    type="color" 
-                    :value="colors.hex" 
-                    @input="onDeckColorChange($event)"
-                    class="colorpicker" 
-                />
+        <!-- File input for upload functionality -->
+        <input ref="file" type="file" accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
+        
+        <!-- Color picker input (positioned by CSS) -->
+        <input 
+            v-if="colorpickerVisible === 'visible'" 
+            type="color" 
+            :value="colors.hex" 
+            @input="onDeckColorChange($event)"
+            class="colorpicker" 
+        />
+        
+        <!-- Emoji picker (positioned by CSS) -->
+        <div v-if="emojiVisible" class="simple-emoji-picker">
+            <div class="emoji-categories">
+                <span v-for="(categoryData, categoryName) in emojiCategories" 
+                      :key="categoryName" 
+                      class="category-tab" 
+                      :class="{ active: activeEmojiCategory === categoryName }"
+                      @click="activeEmojiCategory = categoryName"
+                      :title="categoryName">
+                    {{ categoryData.icon }}
+                </span>
             </div>
-            
-            <Tooltip text="Subir imagen personalizada" shortcut="I" position="bottom">
-                <span class="rounded__btn material-symbols-sharp" @click="$refs.file.click()">add_photo_alternate</span>
-            </Tooltip>
-            <input ref="file" type="file"  accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
-            
-            <Tooltip text="Añadir texto editable" shortcut="T" position="bottom">
-                <span class="rounded__btn material-symbols-sharp" @click="addText()">text_fields</span>
-            </Tooltip>
-            
-            <div class="emoji-picker-container">
-                <Tooltip text="Explorar colección de emojis" shortcut="E" position="bottom">
-                    <span class="rounded__btn material-symbols-sharp" :class="emojipickerVisibleClassObject" @click="toggleEmoji()" v-html="emojipickerVisibleIconComputed"></span>
-                </Tooltip>
-                <div v-if="emojiVisible" class="simple-emoji-picker">
-                    <div class="emoji-categories">
-                        <span v-for="(categoryData, categoryName) in emojiCategories" 
-                              :key="categoryName" 
-                              class="category-tab" 
-                              :class="{ active: activeEmojiCategory === categoryName }"
-                              @click="activeEmojiCategory = categoryName"
-                              :title="categoryName">
-                            {{ categoryData.icon }}
-                        </span>
-                    </div>
-                    <div class="emoji-grid">
-                        <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
-                              :key="emoji" 
-                              class="emoji-option" 
-                              @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
-                    </div>
-                </div>
-                <!-- 
-                <ClientOnly>
-                    <EmojiPicker
-                        v-if="emojiVisible && false" 
-                        class="emoji-picker-dropdown"
-                        :native="true" 
-                        :hide-search="true" 
-                        :hide-group-icons="true" 
-                        :hide-group-names="true" 
-                        :disable-sticky-group-names="true" 
-                        :disable-skin-tones="true"
-                        @select="onSelectEmoji" 
-                    />
-                </ClientOnly>
-                -->
+            <div class="emoji-grid">
+                <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
+                      :key="emoji" 
+                      class="emoji-option" 
+                      @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
             </div>
         </div>
         <div hidden>
@@ -293,6 +261,21 @@
       @dismiss="onHintDismiss"
     />-->
     
+    <!-- Layers Button - Separate from Help Button -->
+    <div class="layers-button-container">
+      <Tooltip text="Administrar capas" shortcut="L" position="left">
+        <button
+          @click="toggleLayersList"
+          class="fixed top-32 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
+          :class="{ 'right-80': layersListVisible }"
+        >
+          <span class="material-symbols-sharp text-xl">
+            layers
+          </span>
+        </button>
+      </Tooltip>
+    </div>
+
     <!-- Help Panel -->
     <HelpPanel />
     
@@ -2425,7 +2408,6 @@ if (canvas) {
 }
 
 /* Hide old toolbar elements when organized toolbar is active */
-.organized-toolbar-container ~ .options--top,
 .organized-toolbar-container ~ .options--bottom-right,
 .organized-toolbar-container ~ .textedit--top {
     display: none;

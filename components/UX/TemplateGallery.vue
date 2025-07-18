@@ -34,7 +34,7 @@
             :class="{ selected: selectedTemplate?.id === template.id }"
           >
             <div class="template-preview">
-              <div class="skateboard-preview" :style="{ backgroundColor: template.deckColor }">
+              <div class="skateboard-preview" :style="{ '--deck-color': template.deckColor }">
                 <div 
                   v-for="element in template.elements" 
                   :key="element.id"
@@ -454,10 +454,43 @@ watch(activeCategory, () => {
 .skateboard-preview {
   width: 60px;
   height: 120px;
-  border-radius: 30px;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+  /* Popsicle skateboard shape */
+  border-radius: 20px 20px 8px 8px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    transparent 15%, 
+    var(--deck-color, #333) 15%, 
+    var(--deck-color, #333) 95%, 
+    transparent 95%);
+}
+
+.skateboard-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45px;
+  height: 25px;
+  background: var(--deck-color, #333);
+  border-radius: 15px 15px 8px 8px;
+  z-index: 1;
+}
+
+.skateboard-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35px;
+  height: 15px;
+  background: var(--deck-color, #333);
+  border-radius: 8px 8px 10px 10px;
+  z-index: 1;
 }
 
 .preview-element {
