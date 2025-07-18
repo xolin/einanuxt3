@@ -1,0 +1,160 @@
+{
+  "name": "Custom Decks - Diseñador de Tablas",
+  "short_name": "Custom Decks",
+  "description": "Diseña tu tabla de skate personalizada desde tu móvil",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["design", "entertainment", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile-1.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "platform": "mobile",
+      "label": "Editor de diseño móvil"
+    },
+    {
+      "src": "/screenshot-mobile-2.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "platform": "mobile",
+      "label": "Herramientas de diseño"
+    },
+    {
+      "src": "/screenshot-desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Editor de escritorio"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo diseño",
+      "short_name": "Nuevo",
+      "description": "Crear un nuevo diseño de tabla",
+      "url": "/editor?new=true",
+      "icons": [
+        {
+          "src": "/shortcut-new.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mis diseños",
+      "short_name": "Diseños",
+      "description": "Ver mis diseños guardados",
+      "url": "/editor?tab=designs",
+      "icons": [
+        {
+          "src": "/shortcut-designs.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Plantillas",
+      "short_name": "Plantillas",
+      "description": "Explorar plantillas prediseñadas",
+      "url": "/editor?tab=templates",
+      "icons": [
+        {
+          "src": "/shortcut-templates.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://einanuxt3.vercel.app/manifest.json"
+    }
+  ],
+  "prefer_related_applications": false,
+  "protocol_handlers": [
+    {
+      "protocol": "web+customdecks",
+      "url": "/editor?design=%s"
+    }
+  ],
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "features": [
+    "offline-support",
+    "mobile-optimized",
+    "touch-gestures",
+    "camera-integration",
+    "haptic-feedback"
+  ],
+  "permissions": [
+    "camera",
+    "storage",
+    "notifications"
+  ]
+}

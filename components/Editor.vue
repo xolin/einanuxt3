@@ -1,6 +1,35 @@
 <template>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />            
+    
+    <!-- Phase 5: Mobile Components -->
+    <MobileOnboarding 
+      :is-visible="showMobileOnboarding"
+      @close="closeMobileOnboarding"
+      @complete="completeMobileOnboarding"
+      @skip="skipMobileOnboarding"
+    />
+    
+    <MobileToolbar 
+      :is-visible="showMobileToolbar && isMobile"
+      :selected-tool="selectedTool"
+      @tool-select="handleMobileToolSelect"
+      @action="handleMobileAction"
+      @toggle-toolbar="toggleMobileToolbar"
+      class="mobile-only"
+    />
+    
+    <MobileShareModal 
+      :is-visible="showMobileShareModal"
+      :design-image="currentDesignImage"
+      :design-name="currentDesignName"
+      :design-id="currentDesignId"
+      @close="closeMobileShareModal"
+      @download="handleMobileDownload"
+      @share="handleMobileShare"
+      @save="handleMobileSave"
+    />
+    
     <!-- Phase 4: Advanced Features & Polish Components -->
     <DesignManager 
       :canvas-data="getCanvasData()" 
@@ -8,6 +37,7 @@
       @design-saved="onDesignSaved"
       @share-design="shareDesign"
       ref="designManager"
+      :class="{ 'desktop-only': isMobile }"
     />
     
     <EnhancedLayerManager 
@@ -22,10 +52,11 @@
       @update-layer-opacity="updateLayerOpacity"
       @rename-layer="renameLayer"
       ref="enhancedLayerManager"
+      :class="{ 'desktop-only': isMobile }"
     />
     
     <ShareDesign 
-      :is-visible="showShareModal"
+      :is-visible="showShareModal && !isMobile"
       :design="currentDesignForSharing"
       :canvas-ref="canvasEl"
       @close="closeShareModal"
@@ -277,13 +308,23 @@ import { useNuxtApp } from '#app'
 
 import { useStore } from 'vuex'
 
+// Phase 5: Mobile Optimization Composables
+import { useMobile } from '~/composables/useMobile'
+import { useTouchGestures } from '~/composables/useTouchGestures'
+import { useCamera } from '~/composables/useCamera'
+import { useOfflineMode } from '~/composables/useOfflineMode'
+
+// Phase 5: Mobile Components
+import MobileOnboarding from './MobileOnboarding.vue'
+import MobileToolbar from './MobileToolbar.vue'
+import MobileShareModal from './MobileShareModal.vue'
+
 // Import new UX components
 import LoadingSpinner from './UX/LoadingSpinner.vue'
 import ConfirmationToast from './UX/ConfirmationToast.vue'
 import EmptyStateGuidance from './UX/EmptyStateGuidance.vue'
 import ContextualHints from './UX/ContextualHints.vue'
 import OrganizedToolbar from './UX/OrganizedToolbar.vue'
-import MobileToolbar from './UX/MobileToolbar.vue'
 import TemplateGallery from './UX/TemplateGallery.vue'
 import SkateboardPreview from './UX/SkateboardPreview.vue'
 
@@ -296,6 +337,21 @@ import ShareDesign from './UX/ShareDesign.vue'
 // Additional UI Components
 import HelpPanel from './HelpPanel.vue'
 import WelcomeModal from './WelcomeModal.vue'
+
+// Phase 5: Mobile Optimization Setup
+const { isMobile, isTouch, screenSize, orientation } = useMobile()
+const { lightHaptic, mediumHaptic, strongHaptic, setupGestureDetection, onGesture } = useTouchGestures()
+const { isSupported: isCameraSupported, getImageFromDevice } = useCamera()
+const { isOnline, isOfflineEnabled, cacheDesign, addToSyncQueue } = useOfflineMode()
+
+// Mobile-specific reactive variables
+const showMobileOnboarding = ref(false)
+const showMobileToolbar = ref(true)
+const showMobileShareModal = ref(false)
+const selectedTool = ref('text')
+const currentDesignImage = ref('')
+const currentDesignName = ref('')
+const currentDesignId = ref('')
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
@@ -350,7 +406,6 @@ const textColor = ref({ hex: '#3D94FF' })
 const fontFamilyAvailable = ref(['Caveat', 'Sevillana', 'Moon Dance', 'Anton', 'Pacifico', 'Exo 2', 'Crimson Text' ]);
 
 // Phase 3: Enhanced UI state
-const isMobile = ref(false)
 const activeColorPicker = ref(null) // 'deck' or 'text' when color picker is active
 const canUndo = ref(false)
 const canRedo = ref(false)
@@ -2058,10 +2113,18 @@ function detectMobile() {
     isMobile.value = window.innerWidth <= 768
 }
 
-// Initialize mobile detection
+// Initialize mobile detection and features
 onMounted(() => {
     detectMobile()
+    initializeMobileFeatures()
     window.addEventListener('resize', detectMobile)
+    
+    // Initialize mobile features after a short delay to ensure components are ready
+    setTimeout(() => {
+        if (isMobile.value) {
+            initializeMobileFeatures()
+        }
+    }, 100)
 })
 
 // Update undo/redo states - these should be connected to actual undo/redo functionality
@@ -2483,6 +2546,297 @@ if (canvas) {
     canvas.on('object:modified', (e) => {
         setupAutoSave()
     })
+}
+
+// Phase 5: Mobile Optimization Functions
+function initializeMobileFeatures() {
+    // Show onboarding for first-time mobile users
+    if (isMobile.value && !localStorage.getItem('mobile_onboarding_completed')) {
+        showMobileOnboarding.value = true
+    }
+    
+    // Setup gesture detection for canvas
+    if (canvasEl.value && isTouch.value) {
+        setupGestureDetection(canvasEl.value)
+    }
+    
+    // Setup mobile-specific event handlers
+    onGesture('swipe', handleCanvasSwipe)
+    onGesture('pinch', handleCanvasPinch)
+    
+    // Adjust canvas for mobile
+    if (isMobile.value) {
+        adjustCanvasForMobile()
+    }
+}
+
+function handleMobileToolSelect(tool) {
+    selectedTool.value = tool
+    lightHaptic()
+    
+    // Handle different tool selections
+    switch (tool) {
+        case 'text':
+            addText()
+            break
+        case 'color':
+            if (deckColorInput.value) {
+                deckColorInput.value.click()
+            }
+            break
+        case 'image':
+            if (isCameraSupported.value) {
+                handleMobileImageUpload()
+            } else {
+                if (file.value) {
+                    file.value.click()
+                }
+            }
+            break
+        case 'emoji':
+            toggleEmojiPicker()
+            break
+        case 'shapes':
+            // Future: Add shape tools
+            break
+        case 'filters':
+            // Future: Add filter tools
+            break
+        case 'layers':
+            // Show mobile-friendly layer manager
+            break
+        case 'templates':
+            // Show template gallery
+            break
+        default:
+            break
+    }
+}
+
+function handleMobileAction(action) {
+    mediumHaptic()
+    
+    switch (action) {
+        case 'undo':
+            undo()
+            break
+        case 'redo':
+            redo()
+            break
+        case 'save':
+            handleMobileSave()
+            break
+        case 'download':
+            handleMobileDownload()
+            break
+        default:
+            break
+    }
+}
+
+async function handleMobileImageUpload() {
+    try {
+        const imageDataUrl = await getImageFromDevice()
+        if (imageDataUrl) {
+            fabric.Image.fromURL(imageDataUrl, (img) => {
+                // Scale image for mobile canvas
+                const maxWidth = canvas.getWidth() * 0.4
+                const maxHeight = canvas.getHeight() * 0.4
+                
+                if (img.width > maxWidth || img.height > maxHeight) {
+                    const scale = Math.min(maxWidth / img.width, maxHeight / img.height)
+                    img.scale(scale)
+                }
+                
+                img.set({
+                    left: canvas.getWidth() / 2,
+                    top: canvas.getHeight() / 2,
+                    originX: 'center',
+                    originY: 'center'
+                })
+                
+                canvas.add(img)
+                canvas.setActiveObject(img)
+                canvas.renderAll()
+                
+                updateLayersList()
+                mediumHaptic()
+            })
+        }
+    } catch (error) {
+        console.error('Error uploading image:', error)
+    }
+}
+
+function handleMobileSave() {
+    const designData = {
+        id: uuid.value || Date.now().toString(),
+        name: currentDesignName.value || 'Mi Diseño',
+        canvas: canvas.toJSON(),
+        timestamp: Date.now(),
+        mobile: true
+    }
+    
+    if (isOnline.value) {
+        // Save to server
+        saveDesign(designData)
+    } else {
+        // Cache locally and add to sync queue
+        cacheDesign(designData)
+        addToSyncQueue({
+            type: 'save_design',
+            data: designData
+        })
+    }
+    
+    strongHaptic()
+}
+
+function handleMobileDownload() {
+    // Generate high-quality image for mobile
+    const dataURL = canvas.toDataURL({
+        format: 'png',
+        quality: 0.9,
+        multiplier: 2 // Higher resolution for mobile
+    })
+    
+    currentDesignImage.value = dataURL
+    currentDesignName.value = 'Mi Diseño de Tabla'
+    currentDesignId.value = uuid.value || Date.now().toString()
+    
+    // Show mobile share modal instead of direct download
+    showMobileShareModal.value = true
+    mediumHaptic()
+}
+
+function handleMobileShare(shareData) {
+    if (navigator.share) {
+        navigator.share({
+            title: shareData.name || 'Mi Diseño de Tabla',
+            text: 'Mira mi diseño de tabla personalizada',
+            url: shareData.url
+        })
+    }
+}
+
+function handleCanvasSwipe(data) {
+    // Handle swipe gestures on canvas
+    if (data.direction === 'up') {
+        // Zoom in
+        const zoom = canvas.getZoom()
+        canvas.setZoom(Math.min(zoom * 1.1, 3))
+    } else if (data.direction === 'down') {
+        // Zoom out
+        const zoom = canvas.getZoom()
+        canvas.setZoom(Math.max(zoom * 0.9, 0.1))
+    } else if (data.direction === 'left') {
+        // Pan left
+        const vpt = canvas.viewportTransform
+        vpt[4] -= 50
+        canvas.renderAll()
+    } else if (data.direction === 'right') {
+        // Pan right
+        const vpt = canvas.viewportTransform
+        vpt[4] += 50
+        canvas.renderAll()
+    }
+    
+    lightHaptic()
+}
+
+function handleCanvasPinch(data) {
+    // Handle pinch-to-zoom
+    if (data.scale > 1) {
+        const zoom = canvas.getZoom()
+        canvas.setZoom(Math.min(zoom * 1.1, 3))
+    } else {
+        const zoom = canvas.getZoom()
+        canvas.setZoom(Math.max(zoom * 0.9, 0.1))
+    }
+    
+    lightHaptic()
+}
+
+function adjustCanvasForMobile() {
+    if (!canvas) return
+    
+    // Adjust canvas size for mobile
+    const container = canvasWrapper.value
+    if (container) {
+        const containerWidth = container.clientWidth
+        const containerHeight = container.clientHeight
+        
+        // Scale canvas to fit mobile screen
+        const scale = Math.min(containerWidth / 800, containerHeight / 600)
+        canvas.setZoom(scale)
+        
+        // Center canvas
+        const vpt = canvas.viewportTransform
+        vpt[4] = (containerWidth - 800 * scale) / 2
+        vpt[5] = (containerHeight - 600 * scale) / 2
+        
+        canvas.renderAll()
+    }
+    
+    // Enable touch interaction
+    canvas.allowTouchScrolling = true
+}
+
+function toggleMobileToolbar() {
+    showMobileToolbar.value = !showMobileToolbar.value
+}
+
+function closeMobileOnboarding() {
+    showMobileOnboarding.value = false
+}
+
+function completeMobileOnboarding() {
+    localStorage.setItem('mobile_onboarding_completed', 'true')
+    showMobileOnboarding.value = false
+    strongHaptic()
+}
+
+function skipMobileOnboarding() {
+    localStorage.setItem('mobile_onboarding_completed', 'true')
+    showMobileOnboarding.value = false
+}
+
+function closeMobileShareModal() {
+    showMobileShareModal.value = false
+}
+
+// Watch for orientation changes
+watch(orientation, (newOrientation) => {
+    if (isMobile.value) {
+        nextTick(() => {
+            adjustCanvasForMobile()
+        })
+    }
+})
+
+// Watch for online/offline changes
+watch(isOnline, (online) => {
+    if (online) {
+        // Show reconnection message
+        showMobileToast('Conexión restaurada - Sincronizando cambios...')
+    } else {
+        // Show offline message
+        showMobileToast('Trabajando sin conexión - Los cambios se guardarán localmente')
+    }
+})
+
+function showMobileToast(message) {
+    // Simple toast notification for mobile
+    const toast = document.createElement('div')
+    toast.className = 'fixed top-4 left-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-center'
+    toast.textContent = message
+    document.body.appendChild(toast)
+    
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast)
+        }
+    }, 3000)
 }
 
 </script>

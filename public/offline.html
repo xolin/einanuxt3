@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin conexión - Custom Decks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .offline-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .offline-description {
+            font-size: 18px;
+            margin-bottom: 32px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .offline-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .offline-btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .offline-btn.primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .offline-btn.primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .offline-btn.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid white;
+        }
+
+        .offline-btn.secondary:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .offline-features {
+            margin-top: 40px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            text-align: left;
+        }
+
+        .offline-features h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: #10b981;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .connection-status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.online {
+            background: #10b981;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .offline-animation {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .wifi-icon {
+            position: relative;
+            display: inline-block;
+        }
+
+        .wifi-waves {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+        }
+
+        .wifi-wave {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: wifiWave 2s ease-in-out infinite;
+        }
+
+        .wifi-wave:nth-child(1) {
+            width: 20px;
+            height: 20px;
+            top: 40px;
+            left: 40px;
+        }
+
+        .wifi-wave:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            top: 30px;
+            left: 30px;
+            animation-delay: 0.5s;
+        }
+
+        .wifi-wave:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 20px;
+            left: 20px;
+            animation-delay: 1s;
+        }
+
+        @keyframes wifiWave {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .offline-icon {
+                font-size: 60px;
+            }
+
+            .offline-title {
+                font-size: 24px;
+            }
+
+            .offline-description {
+                font-size: 16px;
+            }
+
+            .offline-actions {
+                flex-direction: column;
+            }
+
+            .offline-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .offline-features {
+                background: rgba(0, 0, 0, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-animation">
+            <div class="offline-icon">📱</div>
+            <div class="wifi-waves">
+                <div class="wifi-wave"></div>
+                <div class="wifi-wave"></div>
+                <div class="wifi-wave"></div>
+            </div>
+        </div>
+        
+        <h1 class="offline-title">Sin conexión</h1>
+        <p class="offline-description">
+            No hay conexión a internet, pero puedes seguir diseñando. 
+            Tus cambios se sincronizarán cuando vuelvas a conectarte.
+        </p>
+        
+        <div class="offline-actions">
+            <button class="offline-btn primary" onclick="checkConnection()">
+                Reintentar conexión
+            </button>
+            <a href="/editor" class="offline-btn secondary">
+                Continuar diseñando
+            </a>
+        </div>
+        
+        <div class="offline-features">
+            <h3>Disponible sin conexión:</h3>
+            <ul class="feature-list">
+                <li>Crear y editar diseños</li>
+                <li>Añadir texto y colores</li>
+                <li>Usar herramientas básicas</li>
+                <li>Guardar diseños localmente</li>
+                <li>Cargar diseños guardados</li>
+            </ul>
+        </div>
+        
+        <div class="connection-status">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="statusText">Sin conexión</span>
+        </div>
+    </div>
+
+    <script>
+        // Check connection status
+        function updateConnectionStatus() {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            if (navigator.onLine) {
+                statusIndicator.classList.add('online');
+                statusText.textContent = 'Conectado - Redirigiendo...';
+                
+                // Redirect to main app when online
+                setTimeout(() => {
+                    window.location.href = '/editor';
+                }, 2000);
+            } else {
+                statusIndicator.classList.remove('online');
+                statusText.textContent = 'Sin conexión';
+            }
+        }
+
+        // Check connection manually
+        function checkConnection() {
+            if (navigator.onLine) {
+                window.location.href = '/editor';
+            } else {
+                // Show feedback
+                const btn = document.querySelector('.offline-btn.primary');
+                const originalText = btn.textContent;
+                btn.textContent = 'Aún sin conexión...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Listen for connection changes
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Initial status check
+        updateConnectionStatus();
+
+        // Periodic connection check
+        setInterval(updateConnectionStatus, 5000);
+
+        // Register service worker if available
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('SW registered:', registration);
+                })
+                .catch(error => {
+                    console.log('SW registration failed:', error);
+                });
+        }
+    </script>
+</body>
+</html>
