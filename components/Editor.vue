@@ -287,11 +287,11 @@
     />
     
     <!-- Contextual Hints -->
-    <ContextualHints 
+    <!--<ContextualHints 
       ref="contextualHints"
       :hints="customHints"
       @dismiss="onHintDismiss"
-    />
+    />-->
     
     <!-- Help Panel -->
     <HelpPanel />
