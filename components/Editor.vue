@@ -55,7 +55,7 @@
     
     <!-- <section class="fixed pl-200"> -->
     <!-- <LayersList v-if="layersListVisible" :layers="layersList"></LayersList> -->
-    <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed top-12 " @click="canvasEv()">
+    <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed" :class="{ 'top-12': !isMobile, 'top-0': isMobile }" @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
         <div class="options--bottom-left">
             <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
@@ -1500,10 +1500,21 @@ function resize() {
     updateCanvasMask()
 }
 onMounted(() => {
+    // Initialize mobile detection first
+    detectMobile()
+    window.addEventListener('resize', detectMobile)
+    
     canvas = new fabric.Canvas(canvasEl.value, {
         width: 500, height:630
     });
-    canvas.setZoom(0.06);
+    
+    // Set appropriate zoom level based on device
+    if (isMobile.value) {
+        canvas.setZoom(0.4); // Much larger zoom for mobile
+    } else {
+        canvas.setZoom(0.06); // Original zoom for desktop
+    }
+    
     canvas.renderAll()
     isMobileDeviceCheck()
     resize()
@@ -1512,6 +1523,14 @@ onMounted(() => {
     setCanvasMask()
     createBin()
     makeId()
+    
+    // Initialize mobile features after canvas is ready
+    // setTimeout(() => {
+        if (isMobile.value) {
+            adjustCanvasForMobile()
+            initializeMobileFeatures()
+        }
+    // }, 100)
     
     var line9 = new fabric.Line([
         backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
@@ -2105,18 +2124,7 @@ function detectMobile() {
 }
 
 // Initialize mobile detection and features
-onMounted(() => {
-    detectMobile()
-    initializeMobileFeatures()
-    window.addEventListener('resize', detectMobile)
-    
-    // Initialize mobile features after a short delay to ensure components are ready
-    setTimeout(() => {
-        if (isMobile.value) {
-            initializeMobileFeatures()
-        }
-    }, 100)
-})
+// REMOVED: Duplicate onMounted hook - mobile detection is already handled in first onMounted
 
 // Update undo/redo states - these should be connected to actual undo/redo functionality
 // watch(() => canvas, () => {
@@ -2753,24 +2761,25 @@ function adjustCanvasForMobile() {
     
     // Adjust canvas size for mobile
     const container = canvasWrapper.value
-    if (container) {
-        const containerWidth = container.clientWidth
-        const containerHeight = container.clientHeight
+    if (container && isMobile.value) {
+        const containerWidth = window.innerWidth - 32 // Account for padding
+        const containerHeight = window.innerHeight - 160 // Account for toolbars
         
-        // Scale canvas to fit mobile screen
-        const scale = Math.min(containerWidth / 800, containerHeight / 600)
+        // Set canvas dimensions
+        canvas.setWidth(containerWidth)
+        canvas.setHeight(containerHeight)
+        
+        // Scale canvas to fit mobile screen while maintaining aspect ratio
+        const scale = Math.min(containerWidth / 500, containerHeight / 630) * 0.8
         canvas.setZoom(scale)
         
         // Center canvas
         const vpt = canvas.viewportTransform
-        vpt[4] = (containerWidth - 800 * scale) / 2
-        vpt[5] = (containerHeight - 600 * scale) / 2
+        vpt[4] = (containerWidth - 500 * scale) / 2
+        vpt[5] = (containerHeight - 630 * scale) / 2
         
         canvas.renderAll()
     }
-    
-    // Enable touch interaction
-    canvas.allowTouchScrolling = true
 }
 
 function toggleMobileToolbar() {
@@ -2879,6 +2888,36 @@ function showMobileToast(message) {
 
 .canvas {
     top: -50px !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .canvas__wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        background-color: #f5f5f5;
+        padding: 1rem;
+        overflow: hidden;
+    }
+    
+    .canvas {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: calc(100vh - 8rem) !important;
+        margin: 0 auto !important;
+        display: block !important;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 }
 
 /* Popover */
