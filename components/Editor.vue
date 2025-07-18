@@ -10,15 +10,6 @@
       @skip="skipMobileOnboarding"
     />
     
-    <MobileToolbar 
-      :is-visible="showMobileToolbar && isMobile"
-      :selected-tool="selectedTool"
-      @tool-select="handleMobileToolSelect"
-      @action="handleMobileAction"
-      @toggle-toolbar="toggleMobileToolbar"
-      class="mobile-only"
-    />
-    
     <MobileShareModal 
       :is-visible="showMobileShareModal"
       :design-image="currentDesignImage"
@@ -303,7 +294,7 @@
 </template>
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
-import { ref, shallowRef, onMounted, computed, nextTick, watch } from 'vue';
+import { ref, shallowRef, onMounted, computed } from 'vue';
 import { useNuxtApp } from '#app'
 
 import { useStore } from 'vuex'
@@ -316,7 +307,6 @@ import { useOfflineMode } from '~/composables/useOfflineMode'
 
 // Phase 5: Mobile Components
 import MobileOnboarding from './MobileOnboarding.vue'
-import MobileToolbar from './MobileToolbar.vue'
 import MobileShareModal from './MobileShareModal.vue'
 
 // Import new UX components
@@ -325,6 +315,7 @@ import ConfirmationToast from './UX/ConfirmationToast.vue'
 import EmptyStateGuidance from './UX/EmptyStateGuidance.vue'
 import ContextualHints from './UX/ContextualHints.vue'
 import OrganizedToolbar from './UX/OrganizedToolbar.vue'
+import MobileToolbar from './UX/MobileToolbar.vue'
 import TemplateGallery from './UX/TemplateGallery.vue'
 import SkateboardPreview from './UX/SkateboardPreview.vue'
 
@@ -339,7 +330,7 @@ import HelpPanel from './HelpPanel.vue'
 import WelcomeModal from './WelcomeModal.vue'
 
 // Phase 5: Mobile Optimization Setup
-const { isMobile, isTouch, screenSize, orientation } = useMobile()
+const { isMobile, isTouch, screenSize } = useMobile()
 const { lightHaptic, mediumHaptic, strongHaptic, setupGestureDetection, onGesture } = useTouchGestures()
 const { isSupported: isCameraSupported, getImageFromDevice } = useCamera()
 const { isOnline, isOfflineEnabled, cacheDesign, addToSyncQueue } = useOfflineMode()
@@ -2128,13 +2119,13 @@ onMounted(() => {
 })
 
 // Update undo/redo states - these should be connected to actual undo/redo functionality
-watch(() => canvas, () => {
-    if (canvas) {
-        // This is a simplified version - you'd need to implement proper undo/redo tracking
-        canUndo.value = false // Set based on actual undo stack
-        canRedo.value = false // Set based on actual redo stack
-    }
-})
+// watch(() => canvas, () => {
+//     if (canvas) {
+//         // This is a simplified version - you'd need to implement proper undo/redo tracking
+//         canUndo.value = false // Set based on actual undo stack
+//         canRedo.value = false // Set based on actual redo stack
+//     }
+// })
 
 // Phase 3.2: Preview & Export Methods
 function showPreviewAndExport() {
@@ -2805,25 +2796,25 @@ function closeMobileShareModal() {
     showMobileShareModal.value = false
 }
 
-// Watch for orientation changes
-watch(orientation, (newOrientation) => {
-    if (isMobile.value) {
-        nextTick(() => {
-            adjustCanvasForMobile()
-        })
-    }
-})
+// Watch for orientation changes (simplified)
+// watch(orientation, (newOrientation) => {
+//     if (isMobile.value) {
+//         nextTick(() => {
+//             adjustCanvasForMobile()
+//         })
+//     }
+// })
 
-// Watch for online/offline changes
-watch(isOnline, (online) => {
-    if (online) {
-        // Show reconnection message
-        showMobileToast('Conexión restaurada - Sincronizando cambios...')
-    } else {
-        // Show offline message
-        showMobileToast('Trabajando sin conexión - Los cambios se guardarán localmente')
-    }
-})
+// Watch for online/offline changes (simplified)
+// watch(isOnline, (online) => {
+//     if (online) {
+//         // Show reconnection message
+//         showMobileToast('Conexión restaurada - Sincronizando cambios...')
+//     } else {
+//         // Show offline message
+//         showMobileToast('Trabajando sin conexión - Los cambios se guardarán localmente')
+//     }
+// })
 
 function showMobileToast(message) {
     // Simple toast notification for mobile

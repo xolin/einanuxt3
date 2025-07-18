@@ -48,6 +48,7 @@ export default defineNuxtConfig({
     server: {
       hmr: {
         port: 24678,
+        overlay: false
       }
     },
     optimizeDeps: {
