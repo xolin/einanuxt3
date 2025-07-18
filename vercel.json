@@ -1,6 +1,4 @@
 {
-  "projectId": "prj_tMIq8jKGD4Rw33D1OxhHz4TXjbzz",
-  "orgId": "team_PPnAS5s0HqKNOPHQDr4fSF6n",
   "buildCommand": "npm run generate",
   "outputDirectory": ".output/public",
   "devCommand": "npm run dev",
