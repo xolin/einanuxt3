@@ -20,25 +20,43 @@
       >
         <div class="tool-group">
           <Tooltip text="Color de fondo de la tabla" shortcut="C" position="bottom">
-            <button 
-              class="tool-btn" 
-              :class="{ 'active': activeColorPicker === 'deck' }"
-              @click="$emit('tool-action', 'deck-color')"
-            >
-              <span class="material-symbols-sharp">palette</span>
-              <span class="tool-label">Fondo</span>
-            </button>
+            <div class="color-picker-container">
+              <button 
+                class="tool-btn" 
+                :class="{ 'active': activeColorPicker === 'deck' }"
+                @click="$emit('tool-action', 'deck-color')"
+              >
+                <span class="material-symbols-sharp">palette</span>
+                <span class="tool-label">Fondo</span>
+              </button>
+              <input 
+                v-if="activeColorPicker === 'deck'" 
+                type="color" 
+                :value="deckColor" 
+                @input="$emit('deck-color-change', $event.target.value)"
+                class="inline-color-picker" 
+              />
+            </div>
           </Tooltip>
           
           <Tooltip text="Color del texto seleccionado" shortcut="Shift+C" position="bottom">
-            <button 
-              class="tool-btn" 
-              :class="{ 'active': activeColorPicker === 'text' }"
-              @click="$emit('tool-action', 'text-color')"
-            >
-              <span class="material-symbols-sharp">format_color_text</span>
-              <span class="tool-label">Texto</span>
-            </button>
+            <div class="color-picker-container">
+              <button 
+                class="tool-btn" 
+                :class="{ 'active': activeColorPicker === 'text' }"
+                @click="$emit('tool-action', 'text-color')"
+              >
+                <span class="material-symbols-sharp">format_color_text</span>
+                <span class="tool-label">Texto</span>
+              </button>
+              <input 
+                v-if="activeColorPicker === 'text'" 
+                type="color" 
+                :value="textColor" 
+                @input="$emit('text-color-change', $event.target.value)"
+                class="inline-color-picker" 
+              />
+            </div>
           </Tooltip>
         </div>
       </div>
@@ -94,6 +112,155 @@
               <span class="tool-label">Plantillas</span>
             </button>
           </Tooltip>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typography Section -->
+    <div class="toolbar-section" id="typography-section" v-if="hasSelectedText">
+      <div class="section-header">
+        <span class="section-icon">📝</span>
+        <span class="section-title">Tipografía</span>
+        <button 
+          v-if="isMobile" 
+          @click="toggleSection('typography')"
+          class="section-toggle"
+          :class="{ 'active': expandedSections.includes('typography') }"
+        >
+          <span class="material-symbols-sharp">expand_more</span>
+        </button>
+      </div>
+      <div 
+        class="section-content typography-content"
+        :class="{ 'collapsed': isMobile && !expandedSections.includes('typography') }"
+      >
+        <div class="tool-group typography-group">
+          <!-- Font Family Selector -->
+          <Tooltip text="Cambiar fuente" position="bottom">
+            <div class="typography-control">
+              <select 
+                :value="selectedFont" 
+                @change="$emit('font-change', $event.target.value)"
+                class="font-selector"
+              >
+                <option v-for="font in fontOptions" :key="font.value" :value="font.value">
+                  {{ font.name }}
+                </option>
+              </select>
+            </div>
+          </Tooltip>
+          
+          <!-- Font Size Controls -->
+          <Tooltip text="Tamaño de fuente" position="bottom">
+            <div class="typography-control size-control">
+              <button 
+                class="size-btn" 
+                @click="$emit('font-size-change', 'decrease')"
+                :disabled="fontSize <= 8"
+              >
+                <span class="material-symbols-sharp">remove</span>
+              </button>
+              <input 
+                type="number" 
+                :value="fontSize" 
+                @change="$emit('font-size-change', parseInt($event.target.value))"
+                class="size-input"
+                min="8"
+                max="200"
+              />
+              <button 
+                class="size-btn" 
+                @click="$emit('font-size-change', 'increase')"
+                :disabled="fontSize >= 200"
+              >
+                <span class="material-symbols-sharp">add</span>
+              </button>
+            </div>
+          </Tooltip>
+          
+          <!-- Font Weight -->
+          <Tooltip text="Peso de fuente" position="bottom">
+            <div class="typography-control">
+              <select 
+                :value="fontWeight" 
+                @change="$emit('font-weight-change', $event.target.value)"
+                class="weight-selector"
+              >
+                <option value="300">Ligera</option>
+                <option value="400">Normal</option>
+                <option value="500">Media</option>
+                <option value="600">Semi-negrita</option>
+                <option value="700">Negrita</option>
+                <option value="800">Extra-negrita</option>
+              </select>
+            </div>
+          </Tooltip>
+          
+          <!-- Text Style Toggles -->
+          <div class="style-toggles">
+            <Tooltip text="Negrita" position="bottom">
+              <button 
+                class="style-btn" 
+                :class="{ 'active': isBold }"
+                @click="$emit('text-style-change', 'bold')"
+              >
+                <span class="material-symbols-sharp">format_bold</span>
+              </button>
+            </Tooltip>
+            
+            <Tooltip text="Cursiva" position="bottom">
+              <button 
+                class="style-btn" 
+                :class="{ 'active': isItalic }"
+                @click="$emit('text-style-change', 'italic')"
+              >
+                <span class="material-symbols-sharp">format_italic</span>
+              </button>
+            </Tooltip>
+            
+            <Tooltip text="Subrayado" position="bottom">
+              <button 
+                class="style-btn" 
+                :class="{ 'active': isUnderline }"
+                @click="$emit('text-style-change', 'underline')"
+              >
+                <span class="material-symbols-sharp">format_underlined</span>
+              </button>
+            </Tooltip>
+          </div>
+          
+          <!-- Text Alignment -->
+          <div class="alignment-controls">
+            <Tooltip text="Alinear izquierda" position="bottom">
+              <button 
+                class="align-btn" 
+                :class="{ 'active': textAlign === 'left' }"
+                @click="$emit('text-align-change', 'left')"
+              >
+                <span class="material-symbols-sharp">format_align_left</span>
+              </button>
+            </Tooltip>
+            
+            <Tooltip text="Centrar" position="bottom">
+              <button 
+                class="align-btn" 
+                :class="{ 'active': textAlign === 'center' }"
+                @click="$emit('text-align-change', 'center')"
+              >
+                <span class="material-symbols-sharp">format_align_center</span>
+              </button>
+            </Tooltip>
+            
+            <Tooltip text="Alinear derecha" position="bottom">
+              <button 
+                class="align-btn" 
+                :class="{ 'active': textAlign === 'right' }"
+                @click="$emit('text-align-change', 'right')"
+              >
+                <span class="material-symbols-sharp">format_align_right</span>
+              </button>
+            </Tooltip>
+          </div>
         </div>
       </div>
     </div>
@@ -202,12 +369,77 @@ const props = defineProps({
   isMobile: {
     type: Boolean,
     default: false
+  },
+  // Typography props
+  hasSelectedText: {
+    type: Boolean,
+    default: false
+  },
+  selectedFont: {
+    type: String,
+    default: 'Arial'
+  },
+  fontSize: {
+    type: Number,
+    default: 18
+  },
+  fontWeight: {
+    type: String,
+    default: '400'
+  },
+  isBold: {
+    type: Boolean,
+    default: false
+  },
+  isItalic: {
+    type: Boolean,
+    default: false
+  },
+  isUnderline: {
+    type: Boolean,
+    default: false
+  },
+  textAlign: {
+    type: String,
+    default: 'left'
+  },
+  deckColor: {
+    type: String,
+    default: '#026ed9'
+  },
+  textColor: {
+    type: String,
+    default: '#000000'
   }
 })
 
-const emit = defineEmits(['tool-action'])
+const emit = defineEmits([
+  'tool-action',
+  'deck-color-change',
+  'text-color-change',
+  'font-change',
+  'font-size-change',
+  'font-weight-change',
+  'text-style-change',
+  'text-align-change'
+])
 
-const expandedSections = ref(['colors', 'content', 'actions'])
+const expandedSections = ref(['colors', 'content', 'typography', 'actions'])
+
+const fontOptions = ref([
+  { name: 'Arial', value: 'Arial, sans-serif' },
+  { name: 'Helvetica', value: 'Helvetica, sans-serif' },
+  { name: 'Times New Roman', value: 'Times New Roman, serif' },
+  { name: 'Georgia', value: 'Georgia, serif' },
+  { name: 'Verdana', value: 'Verdana, sans-serif' },
+  { name: 'Courier New', value: 'Courier New, monospace' },
+  { name: 'Impact', value: 'Impact, sans-serif' },
+  { name: 'Comic Sans MS', value: 'Comic Sans MS, cursive' },
+  { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' },
+  { name: 'Palatino', value: 'Palatino, serif' },
+  { name: 'Caveat', value: 'Caveat, cursive' },
+  { name: 'Pacifico', value: 'Pacifico, cursive' }
+])
 
 const toggleSection = (sectionName) => {
   const index = expandedSections.value.indexOf(sectionName)
@@ -561,5 +793,191 @@ onMounted(() => {
 .section-toggle:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+}
+
+/* Typography Section Styles */
+.typography-content {
+  min-width: 400px;
+}
+
+.typography-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.typography-control {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.font-selector,
+.weight-selector {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.75rem;
+  color: #374151;
+  min-width: 80px;
+}
+
+.font-selector:focus,
+.weight-selector:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 0.25rem;
+}
+
+.size-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.size-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+.size-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.size-btn .material-symbols-sharp {
+  font-size: 14px;
+}
+
+.size-input {
+  width: 40px;
+  padding: 0.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.75rem;
+  background: white;
+}
+
+.size-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.style-toggles,
+.alignment-controls {
+  display: flex;
+  gap: 0.25rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 0.25rem;
+}
+
+.style-btn,
+.align-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.style-btn:hover,
+.align-btn:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+.style-btn.active,
+.align-btn.active {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.style-btn .material-symbols-sharp,
+.align-btn .material-symbols-sharp {
+  font-size: 16px;
+}
+
+/* Color Picker Styles */
+.color-picker-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-color-picker {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.inline-color-picker:hover {
+  border-color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.inline-color-picker:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Mobile Typography Styles */
+@media (max-width: 768px) {
+  .typography-content {
+    min-width: auto;
+  }
+  
+  .typography-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .typography-control {
+    justify-content: space-between;
+  }
+  
+  .font-selector,
+  .weight-selector {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .style-toggles,
+  .alignment-controls {
+    justify-content: center;
+  }
 }
 </style>
