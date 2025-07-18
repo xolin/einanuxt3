@@ -39,12 +39,6 @@
             <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
                 layers
             </span>
-            <Tooltip text="Acercar vista" shortcut="+" position="top">
-                <span class="rounded__btn material-symbols-sharp" @click="moreZoomButton">zoom_in</span>
-            </Tooltip>
-            <Tooltip text="Alejar vista" shortcut="-" position="top">
-                <span class="rounded__btn material-symbols-sharp" @click="lessZoomButton">zoom_out</span>
-            </Tooltip>
             <div id="download-modal" class="hidden relative z-10 overflow-x-hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" tabindex="-1" aria-hidden="true">
             <!--
                 Background backdrop, show/hide based on modal state.
@@ -95,6 +89,9 @@
         </div>
         <!-- File input for upload functionality -->
         <input ref="file" type="file" accept="image/*;capture=camera" class="hidden" @change="uploadFile($event)" />
+        
+        <!-- Hidden color picker for deck color -->
+        <input ref="deckColorInput" type="color" :value="colors.hex" class="hidden" @input="handleDeckColorChange($event.target.value)" />
         
         <!-- Emoji picker (positioned by CSS) -->
         <div v-if="emojiVisible" class="simple-emoji-picker">
@@ -302,6 +299,7 @@ import WelcomeModal from './WelcomeModal.vue'
 
 const canvasWrapper = ref(null);
 const canvasEl = ref(null);
+const deckColorInput = ref(null);
 let canvas = null;
 const isMobileDevice = ref(null);
 const uuid = ref(null);
@@ -1849,7 +1847,10 @@ function handleTextAlignChange(align) {
 function handleToolbarAction(action) {
     switch (action) {
         case 'deck-color':
-            activeColorPicker.value = activeColorPicker.value === 'deck' ? null : 'deck'
+            // Open native color picker directly
+            if (deckColorInput.value) {
+                deckColorInput.value.click()
+            }
             break
         case 'text-color':
             if (hasSelectedText.value) {

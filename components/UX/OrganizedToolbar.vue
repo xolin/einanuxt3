@@ -20,23 +20,13 @@
       >
         <div class="tool-group">
           <Tooltip text="Color de fondo de la tabla" shortcut="C" position="bottom">
-            <div class="color-picker-container">
-              <button 
-                class="tool-btn" 
-                :class="{ 'active': activeColorPicker === 'deck' }"
-                @click="$emit('tool-action', 'deck-color')"
-              >
-                <span class="material-symbols-sharp">palette</span>
-                <span class="tool-label">Fondo</span>
-              </button>
-              <input 
-                v-if="activeColorPicker === 'deck'" 
-                type="color" 
-                :value="deckColor" 
-                @input="$emit('deck-color-change', $event.target.value)"
-                class="inline-color-picker" 
-              />
-            </div>
+            <button 
+              class="tool-btn" 
+              @click="$emit('tool-action', 'deck-color')"
+            >
+              <span class="material-symbols-sharp">palette</span>
+              <span class="tool-label">Fondo</span>
+            </button>
           </Tooltip>
           
           <Tooltip text="Color del texto seleccionado" shortcut="Shift+C" position="bottom">

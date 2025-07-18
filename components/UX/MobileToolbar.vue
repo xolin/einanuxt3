@@ -37,7 +37,7 @@
             </button>
             
             <button 
-              @click="handleAction('change-color')"
+              @click="handleAction('deck-color')"
               class="mobile-tool-btn primary"
             >
               <span class="material-symbols-sharp">palette</span>
@@ -99,7 +99,7 @@
           <div class="action-tools">
             <div class="action-row">
               <button 
-                @click="$emit('action', 'undo')"
+                @click="$emit('tool-action', 'undo')"
                 :disabled="!canUndo"
                 class="action-btn"
               >
@@ -108,7 +108,7 @@
               </button>
               
               <button 
-                @click="$emit('action', 'redo')"
+                @click="$emit('tool-action', 'redo')"
                 :disabled="!canRedo"
                 class="action-btn"
               >
@@ -120,11 +120,11 @@
             <div class="zoom-controls">
               <label class="control-label">Zoom:</label>
               <div class="zoom-buttons">
-                <button @click="$emit('action', 'zoom-out')" class="zoom-btn">
+                <button @click="$emit('tool-action', 'zoom-out')" class="zoom-btn">
                   <span class="material-symbols-sharp">zoom_out</span>
                 </button>
                 <span class="zoom-level">{{ zoomLevel }}%</span>
-                <button @click="$emit('action', 'zoom-in')" class="zoom-btn">
+                <button @click="$emit('tool-action', 'zoom-in')" class="zoom-btn">
                   <span class="material-symbols-sharp">zoom_in</span>
                 </button>
               </div>
@@ -135,7 +135,7 @@
         <!-- Download Section -->
         <div class="mobile-section">
           <button 
-            @click="$emit('action', 'download')"
+            @click="$emit('tool-action', 'download')"
             class="download-btn"
             :disabled="isGeneratingDownload"
           >
@@ -198,7 +198,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['action', 'color-change'])
+const emit = defineEmits(['tool-action', 'color-change'])
 
 const isToolbarVisible = ref(false)
 const expandedSections = ref(['colors', 'actions'])
@@ -217,7 +217,7 @@ const toggleSection = (sectionName) => {
 }
 
 const handleAction = (action) => {
-  emit('action', action)
+  emit('tool-action', action)
   // Keep toolbar open for quick actions but close for major actions
   if (['add-text', 'upload-image'].includes(action)) {
     setTimeout(() => {
