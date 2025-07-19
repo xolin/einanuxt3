@@ -34,7 +34,6 @@
       ref="enhancedLayerManager" 
       :layers="enhancedLayersList"
       :selected-layer="selectedObject"
-      :class="{ 'desktop-only': isMobile }"
       @select-layer="selectLayer"
       @toggle-visibility="toggleLayerVisibility"
       @toggle-lock="toggleLayerLock"
@@ -2212,10 +2211,45 @@ function handleEmptyStateAction(action) {
             toggleEmoji()
             break
         case 'deck-color':
-            // Close empty state popup and open native color picker
+            // Close empty state popup and open color picker
             hideEmptyState()
-            if (deckColorInput.value) {
-                deckColorInput.value.click()
+            // Use the same mobile color picker logic as toolbar actions
+            if (isMobile.value) {
+                // Create and show a visible color input for mobile
+                const mobileColorInput = document.createElement('input')
+                mobileColorInput.type = 'color'
+                mobileColorInput.value = colors.hex
+                mobileColorInput.style.position = 'fixed'
+                mobileColorInput.style.top = '50%'
+                mobileColorInput.style.left = '50%'
+                mobileColorInput.style.transform = 'translate(-50%, -50%)'
+                mobileColorInput.style.zIndex = '9999'
+                mobileColorInput.style.width = '50px'
+                mobileColorInput.style.height = '50px'
+                mobileColorInput.style.border = 'none'
+                mobileColorInput.style.borderRadius = '8px'
+                
+                mobileColorInput.addEventListener('input', (e) => {
+                    handleDeckColorChange(e.target.value)
+                    document.body.removeChild(mobileColorInput)
+                })
+                
+                mobileColorInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (document.body.contains(mobileColorInput)) {
+                            document.body.removeChild(mobileColorInput)
+                        }
+                    }, 100)
+                })
+                
+                document.body.appendChild(mobileColorInput)
+                mobileColorInput.focus()
+                mobileColorInput.click()
+            } else {
+                // Desktop: use hidden input
+                if (deckColorInput.value) {
+                    deckColorInput.value.click()
+                }
             }
             break
     }
