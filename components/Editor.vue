@@ -1518,19 +1518,21 @@ onMounted(() => {
         // Enhanced mobile touch handling configuration
         allowTouchScrolling: false,
         selection: true,
-        targetFindTolerance: isMobile.value ? 20 : 5, // Even larger touch targets on mobile
+        targetFindTolerance: isMobile.value ? 15 : 5, // Moderate touch targets on mobile
         perPixelTargetFind: false, // Disable for better mobile performance
-        // Mobile-specific touch configurations
-        enableRetinaScaling: false, // Disable for consistent touch mapping
-        touchAction: 'none', // Prevent browser touch handling
+        // Mobile-specific touch configurations - simplified for better touch accuracy
+        enableRetinaScaling: true, // Re-enable for better display quality
+        touchAction: 'manipulation', // Allow pinch-zoom but prevent scroll
         fireRightClick: false, // Disable right-click on mobile
         fireMiddleClick: false, // Disable middle-click on mobile
-        stopContextMenu: true // Prevent context menus on mobile
+        stopContextMenu: true, // Prevent context menus on mobile
+        // Ensure fabric.js handles touch events properly
+        preserveObjectStacking: true
     });
     
     // Set appropriate zoom level based on device
     if (isMobile.value) {
-        canvas.setZoom(0.4); // Much larger zoom for mobile
+        canvas.setZoom(0.08); // Conservative zoom for mobile - avoid too small values
         
         // Additional mobile-specific configurations
         canvas.freeDrawingBrush.width = 2
@@ -1563,16 +1565,14 @@ onMounted(() => {
     if (isMobile.value || isMobileDevice.value === true) {
         setTimeout(() => {
             adjustCanvasForMobile()
-        }, 100)
+        }, 500) // Longer delay to ensure everything is initialized
     }
     
     // Initialize mobile features after canvas is ready
-    // setTimeout(() => {
-        if (isMobile.value) {
-            adjustCanvasForMobile()
-            initializeMobileFeatures()
-        }
-    // }, 100)
+    if (isMobile.value) {
+        // Remove duplicate mobile adjustment call
+        initializeMobileFeatures()
+    }
     
     var line9 = new fabric.Line([
         backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
@@ -2793,43 +2793,45 @@ function handleMobileShare(shareData) {
 function adjustCanvasForMobile() {
     if (!canvas) return
     
-    // Adjust canvas size for mobile
+    // Simplified mobile canvas adjustment - avoid complex transforms that interfere with touch
     const container = canvasWrapper.value
     if (container && (isMobile.value || isMobileDevice.value === true)) {
         const containerWidth = window.innerWidth - 32 // Account for padding
         const containerHeight = window.innerHeight - 120 // Account for toolbars
         
-        // Set canvas dimensions to container size
-        canvas.setDimensions({width: containerWidth, height: containerHeight});
-        
-        // Calculate proper zoom to show the skateboard deck
-        // The deck is roughly positioned at backgroundPositionLeft and has specific dimensions
+        // Keep canvas at original size to maintain fabric.js coordinate system
+        // Only adjust zoom level for better visibility
         const deckWidth = deckBackgroundWidth.value || 2833
         const deckHeight = deckBackgroundHeight.value || 10119
         
-        // Scale to fit the deck in the available space with some padding
-        const scaleX = (containerWidth * 0.8) / deckWidth
-        const scaleY = (containerHeight * 0.8) / deckHeight
-        const scale = Math.min(scaleX, scaleY, 0.1) // Cap maximum zoom
+        // Calculate a simple zoom that makes the content visible without complex transforms
+        const scaleX = (containerWidth * 0.6) / deckWidth
+        const scaleY = (containerHeight * 0.6) / deckHeight
+        const scale = Math.min(scaleX, scaleY, 0.08) // Conservative zoom level
         
+        // Apply simple zoom without viewport transforms to maintain touch coordinate accuracy
         canvas.setZoom(scale)
         
-        // Simplified viewport centering to avoid touch coordinate mapping issues
-        canvas.absolutePan(new fabric.Point(
-            containerWidth / 2 - (backgroundPositionLeft.value + deckWidth / 2) * scale,
-            containerHeight / 2 - (calculateBackgroundDeckTopOffset() + deckHeight / 2) * scale
-        ))
+        // Use simple centering by panning to a calculated position
+        // This maintains fabric.js's coordinate system integrity
+        const centerX = (backgroundPositionLeft.value + deckWidth / 2) * scale
+        const centerY = (calculateBackgroundDeckTopOffset() + deckHeight / 2) * scale
+        const panX = containerWidth / 2 - centerX
+        const panY = containerHeight / 2 - centerY
+        
+        // Use relativePan instead of absolutePan to avoid disrupting coordinate system
+        canvas.relativePan(new fabric.Point(panX, panY))
         
         canvas.renderAll()
         
         // Debug: Add console logging for mobile touch events
         if (process.env.NODE_ENV === 'development') {
-            console.log('Mobile canvas adjusted:', {
+            console.log('Mobile canvas adjusted (simplified):', {
                 scale,
+                panX,
+                panY,
                 containerWidth,
                 containerHeight,
-                deckWidth,
-                deckHeight,
                 viewportTransform: canvas.viewportTransform
             })
         }
@@ -2957,28 +2959,17 @@ function showMobileToast(message) {
         padding: 1rem;
         padding-bottom: 100px; /* Space for mobile toolbar toggle */
         overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none; /* Allow clicks to pass through wrapper */
+        /* Remove flex centering that can interfere with fabric.js positioning */
+        /* pointer-events: none removed to avoid touch coordinate issues */
     }
     
     .canvas {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: auto !important;
-        height: auto !important;
-        max-width: calc(100vw - 2rem) !important;
-        max-height: calc(100vh - 120px) !important;
-        margin: 0 auto !important;
-        display: block !important;
+        /* Minimal canvas styling to avoid fabric.js conflicts */
         border: 1px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        /* Ensure canvas maintains aspect ratio */
-        object-fit: contain;
-        pointer-events: auto; /* Canvas itself should receive pointer events */
+        /* Let fabric.js handle positioning and sizing */
+        touch-action: none; /* Prevent browser touch handling */
     }
 }
 
