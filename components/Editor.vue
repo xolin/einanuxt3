@@ -333,7 +333,7 @@ import WelcomeModal from './WelcomeModal.vue'
 
 // Phase 5: Mobile Optimization Setup
 const { isMobile, isTouch, screenSize } = useMobile()
-const { lightHaptic, mediumHaptic, strongHaptic, setupGestureDetection, onGesture, enableGestures, disableGestures } = useTouchGestures()
+const { lightHaptic, mediumHaptic, strongHaptic } = useTouchGestures()
 const { isSupported: isCameraSupported, getImageFromDevice } = useCamera()
 const { isOnline, isOfflineEnabled, cacheDesign, addToSyncQueue } = useOfflineMode()
 
@@ -2569,22 +2569,10 @@ function initializeMobileFeatures() {
         showMobileOnboarding.value = true
     }
     
-    // Setup gesture detection for canvas
-    if (canvasEl.value && isTouch.value) {
-        setupGestureDetection(canvasEl.value)
-    }
-    
-    // Setup mobile-specific event handlers
-    onGesture('swipe', handleCanvasSwipe)
-    onGesture('pinch', handleCanvasPinch)
-    
     // Adjust canvas for mobile
     if (isMobile.value) {
         adjustCanvasForMobile()
     }
-    
-    // Setup smart gesture management for object interactions
-    setupSmartGestureManagement()
 }
 
 function handleMobileToolSelect(tool) {
@@ -2734,116 +2722,6 @@ function handleMobileShare(shareData) {
             url: shareData.url
         })
     }
-}
-
-function handleCanvasSwipe(data) {
-    // Only handle canvas gestures when no objects are selected
-    if (canvas.getActiveObject()) {
-        return // Don't interfere with object manipulation
-    }
-    
-    // Handle swipe gestures on canvas
-    if (data.direction === 'up') {
-        // Zoom in
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.min(zoom * 1.1, 3))
-    } else if (data.direction === 'down') {
-        // Zoom out
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.max(zoom * 0.9, 0.1))
-    } else if (data.direction === 'left') {
-        // Pan left
-        const vpt = canvas.viewportTransform
-        vpt[4] -= 50
-        canvas.renderAll()
-    } else if (data.direction === 'right') {
-        // Pan right
-        const vpt = canvas.viewportTransform
-        vpt[4] += 50
-        canvas.renderAll()
-    }
-    
-    lightHaptic()
-}
-
-function handleCanvasPinch(data) {
-    // Only handle canvas gestures when no objects are selected
-    if (canvas.getActiveObject()) {
-        return // Don't interfere with object manipulation
-    }
-    
-    // Handle pinch-to-zoom
-    if (data.scale > 1) {
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.min(zoom * 1.1, 3))
-    } else {
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.max(zoom * 0.9, 0.1))
-    }
-    
-    lightHaptic()
-}
-
-function setupSmartGestureManagement() {
-    if (!canvas || !isMobile.value) return
-    
-    // Track object manipulation state
-    let isObjectBeingManipulated = false
-    
-    // Disable gestures when object manipulation starts
-    canvas.on('mouse:down', (event) => {
-        if (event.target && event.target.type !== 'background') {
-            isObjectBeingManipulated = true
-            disableGestures()
-        }
-    })
-    
-    // Re-enable gestures when object manipulation ends
-    canvas.on('mouse:up', (event) => {
-        if (isObjectBeingManipulated) {
-            // Small delay to prevent gesture detection from interfering
-            setTimeout(() => {
-                enableGestures()
-                isObjectBeingManipulated = false
-            }, 100)
-        }
-    })
-    
-    // Disable gestures during object events
-    const objectEvents = ['object:moving', 'object:scaling', 'object:rotating']
-    objectEvents.forEach(eventName => {
-        canvas.on(eventName, () => {
-            isObjectBeingManipulated = true
-            disableGestures()
-        })
-    })
-    
-    // Re-enable gestures when object modification ends
-    canvas.on('object:modified', () => {
-        setTimeout(() => {
-            enableGestures()
-            isObjectBeingManipulated = false
-        }, 100)
-    })
-    
-    // Disable gestures when selecting objects
-    canvas.on('selection:created', () => {
-        isObjectBeingManipulated = true
-        disableGestures()
-    })
-    
-    canvas.on('selection:updated', () => {
-        isObjectBeingManipulated = true
-        disableGestures()
-    })
-    
-    // Re-enable gestures when selection is cleared
-    canvas.on('selection:cleared', () => {
-        setTimeout(() => {
-            enableGestures()
-            isObjectBeingManipulated = false
-        }, 100)
-    })
 }
 
 function adjustCanvasForMobile() {
