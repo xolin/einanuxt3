@@ -1448,6 +1448,12 @@ function isMobileDeviceCheck() {
 function resize() {
     if (!canvasWrapper.value || !canvas) return
     
+    // Handle mobile devices with specialized logic
+    if (isMobile.value || isMobileDevice.value === true) {
+        adjustCanvasForMobile()
+        return
+    }
+    
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
     const scale          = containerWidth / canvas.getWidth();
@@ -1523,6 +1529,13 @@ onMounted(() => {
     setCanvasMask()
     createBin()
     makeId()
+    
+    // Final mobile adjustment after all elements are in place
+    if (isMobile.value || isMobileDevice.value === true) {
+        setTimeout(() => {
+            adjustCanvasForMobile()
+        }, 100)
+    }
     
     // Initialize mobile features after canvas is ready
     // setTimeout(() => {
@@ -2761,22 +2774,29 @@ function adjustCanvasForMobile() {
     
     // Adjust canvas size for mobile
     const container = canvasWrapper.value
-    if (container && isMobile.value) {
+    if (container && (isMobile.value || isMobileDevice.value === true)) {
         const containerWidth = window.innerWidth - 32 // Account for padding
-        const containerHeight = window.innerHeight - 160 // Account for toolbars
+        const containerHeight = window.innerHeight - 120 // Account for toolbars
         
-        // Set canvas dimensions
-        canvas.setWidth(containerWidth)
-        canvas.setHeight(containerHeight)
+        // Set canvas dimensions to container size
+        canvas.setDimensions({width: containerWidth, height: containerHeight});
         
-        // Scale canvas to fit mobile screen while maintaining aspect ratio
-        const scale = Math.min(containerWidth / 500, containerHeight / 630) * 0.8
+        // Calculate proper zoom to show the skateboard deck
+        // The deck is roughly positioned at backgroundPositionLeft and has specific dimensions
+        const deckWidth = deckBackgroundWidth.value || 2833
+        const deckHeight = deckBackgroundHeight.value || 10119
+        
+        // Scale to fit the deck in the available space with some padding
+        const scaleX = (containerWidth * 0.8) / deckWidth
+        const scaleY = (containerHeight * 0.8) / deckHeight
+        const scale = Math.min(scaleX, scaleY, 0.1) // Cap maximum zoom
+        
         canvas.setZoom(scale)
         
-        // Center canvas
+        // Center the deck in the viewport
         const vpt = canvas.viewportTransform
-        vpt[4] = (containerWidth - 500 * scale) / 2
-        vpt[5] = (containerHeight - 630 * scale) / 2
+        vpt[4] = containerWidth / 2 - (backgroundPositionLeft.value + deckWidth / 2) * scale
+        vpt[5] = containerHeight / 2 - (calculateBackgroundDeckTopOffset() + deckHeight / 2) * scale
         
         canvas.renderAll()
     }
