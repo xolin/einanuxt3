@@ -199,29 +199,16 @@ v-for="emoji in emojiCategories[activeEmojiCategory].emojis"
     <!-- Mobile Toolbar for mobile devices -->
     <MobileToolbar 
       v-if="isMobile"
-      :active-color-picker="activeColorPicker"
-      :emoji-picker-visible="emojiVisible"
+      :is-mobile-device="isMobile"
       :can-undo="canUndo"
       :can-redo="canRedo"
       :is-generating-download="downloadInProgress"
       :has-selected-text="hasSelectedText"
-      :selected-font="selectedFont"
-      :font-size="fontSize"
-      :font-weight="fontWeight"
-      :is-bold="isBold"
-      :is-italic="isItalic"
-      :is-underline="isUnderline"
-      :text-align="textAlign"
       :deck-color="colors.hex"
       :text-color="textColor.hex"
+      :zoom-level="Math.round(canvas?.getZoom() * 100) || 100"
       @tool-action="handleToolbarAction"
-      @deck-color-change="handleDeckColorChange"
-      @text-color-change="handleTextColorChange"
-      @font-change="handleFontChange"
-      @font-size-change="handleFontSizeChange"
-      @font-weight-change="handleFontWeightChange"
-      @text-style-change="handleTextStyleChange"
-      @text-align-change="handleTextAlignChange"
+      @color-change="handleMobileColorChange"
     />
 
     <!-- Phase 3: Template Gallery -->
@@ -1926,6 +1913,14 @@ function handleTextColorChange(color) {
     }
 }
 
+function handleMobileColorChange(type, color) {
+    if (type === 'deck') {
+        handleDeckColorChange(color)
+    } else if (type === 'text') {
+        handleTextColorChange(color)
+    }
+}
+
 function handleFontChange(fontFamily) {
     selectedFont.value = fontFamily
     const activeObj = getSelectedTextObject()
@@ -2013,6 +2008,9 @@ function handleToolbarAction(action) {
             break
         case 'upload-image':
             document.querySelector('input[type="file"]').click()
+            break
+        case 'add-emoji':
+            toggleEmoji()
             break
         case 'undo':
             undo()
@@ -2793,21 +2791,21 @@ function handleMobileShare(shareData) {
 function adjustCanvasForMobile() {
     if (!canvas) return
     
-    // Simplified mobile canvas adjustment - avoid complex transforms that interfere with touch
+    // Enhanced mobile canvas adjustment for larger skateboard display
     const container = canvasWrapper.value
     if (container && (isMobile.value || isMobileDevice.value === true)) {
-        const containerWidth = window.innerWidth - 32 // Account for padding
-        const containerHeight = window.innerHeight - 120 // Account for toolbars
+        const containerWidth = window.innerWidth - 16 // Reduced padding for more space
+        const containerHeight = window.innerHeight - 90 // Reduced space for toolbars
         
         // Keep canvas at original size to maintain fabric.js coordinate system
         // Only adjust zoom level for better visibility
         const deckWidth = deckBackgroundWidth.value || 2833
         const deckHeight = deckBackgroundHeight.value || 10119
         
-        // Calculate a simple zoom that makes the content visible without complex transforms
-        const scaleX = (containerWidth * 0.6) / deckWidth
-        const scaleY = (containerHeight * 0.6) / deckHeight
-        const scale = Math.min(scaleX, scaleY, 0.08) // Conservative zoom level
+        // Calculate zoom that uses more of the available space
+        const scaleX = (containerWidth * 0.85) / deckWidth // Increased from 0.6 to 0.85
+        const scaleY = (containerHeight * 0.85) / deckHeight // Increased from 0.6 to 0.85
+        const scale = Math.min(scaleX, scaleY, 0.15) // Increased max zoom from 0.08 to 0.15
         
         // Apply simple zoom without viewport transforms to maintain touch coordinate accuracy
         canvas.setZoom(scale)
@@ -2956,8 +2954,8 @@ function showMobileToast(message) {
         bottom: 0;
         z-index: 1; /* Lower z-index to not interfere with UI */
         background-color: #f5f5f5;
-        padding: 1rem;
-        padding-bottom: 100px; /* Space for mobile toolbar toggle */
+        padding: 0.5rem; /* Reduced padding for more canvas space */
+        padding-bottom: 80px; /* Reduced space for mobile toolbar toggle */
         overflow: hidden;
         /* Remove flex centering that can interfere with fabric.js positioning */
         /* pointer-events: none removed to avoid touch coordinate issues */
