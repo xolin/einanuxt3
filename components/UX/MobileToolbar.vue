@@ -1,11 +1,11 @@
 <template>
-  <div class="mobile-toolbar-wrapper" v-if="isMobileDevice">
+  <div v-if="isMobileDevice" class="mobile-toolbar-wrapper">
     <!-- Mobile Toolbar Toggle Button -->
     <button 
-      @click="toggleMobileToolbar"
       class="mobile-toolbar-toggle"
       :class="{ 'active': isToolbarVisible }"
       aria-label="Toggle design tools"
+      @click="toggleMobileToolbar"
     >
       <span class="material-symbols-sharp">{{ isToolbarVisible ? 'close' : 'build' }}</span>
       <span class="toggle-label">{{ isToolbarVisible ? 'Cerrar' : 'Herramientas' }}</span>
@@ -18,7 +18,7 @@
     >
       <div class="mobile-toolbar-header">
         <h3>Herramientas de Diseño</h3>
-        <button @click="toggleMobileToolbar" class="close-toolbar">
+        <button class="close-toolbar" @click="toggleMobileToolbar">
           <span class="material-symbols-sharp">close</span>
         </button>
       </div>
@@ -29,32 +29,32 @@
           <h4 class="section-title">🚀 Acciones Rápidas</h4>
           <div class="quick-actions-grid">
             <button 
-              @click="handleAction('add-text')"
               class="mobile-tool-btn primary"
+              @click="handleAction('add-text')"
             >
               <span class="material-symbols-sharp">text_fields</span>
               <span class="btn-label">Añadir Texto</span>
             </button>
             
             <button 
-              @click="handleAction('deck-color')"
               class="mobile-tool-btn primary"
+              @click="handleAction('deck-color')"
             >
               <span class="material-symbols-sharp">palette</span>
               <span class="btn-label">Color Fondo</span>
             </button>
             
             <button 
-              @click="handleAction('upload-image')"
               class="mobile-tool-btn"
+              @click="handleAction('upload-image')"
             >
               <span class="material-symbols-sharp">add_photo_alternate</span>
               <span class="btn-label">Subir Imagen</span>
             </button>
             
             <button 
-              @click="handleAction('add-emoji')"
               class="mobile-tool-btn"
+              @click="handleAction('add-emoji')"
             >
               <span class="material-symbols-sharp">sentiment_satisfied</span>
               <span class="btn-label">Emojis</span>
@@ -63,7 +63,7 @@
         </div>
 
         <!-- Color Tools Section -->
-        <div class="mobile-section" v-if="expandedSections.includes('colors')">
+        <div v-if="expandedSections.includes('colors')" class="mobile-section">
           <div class="section-header" @click="toggleSection('colors')">
             <h4 class="section-title">🎨 Colores</h4>
             <span class="material-symbols-sharp expand-icon">expand_less</span>
@@ -74,24 +74,24 @@
               <input 
                 type="color" 
                 :value="deckColor" 
-                @input="$emit('color-change', 'deck', $event.target.value)"
                 class="mobile-color-input"
+                @input="$emit('color-change', 'deck', $event.target.value)"
               />
             </div>
-            <div class="color-picker-row" v-if="hasSelectedText">
+            <div v-if="hasSelectedText" class="color-picker-row">
               <label class="color-label">Color de texto:</label>
               <input 
                 type="color" 
                 :value="textColor" 
-                @input="$emit('color-change', 'text', $event.target.value)"
                 class="mobile-color-input"
+                @input="$emit('color-change', 'text', $event.target.value)"
               />
             </div>
           </div>
         </div>
 
         <!-- Actions Section -->
-        <div class="mobile-section" v-if="expandedSections.includes('actions')">
+        <div v-if="expandedSections.includes('actions')" class="mobile-section">
           <div class="section-header" @click="toggleSection('actions')">
             <h4 class="section-title">⚡ Acciones</h4>
             <span class="material-symbols-sharp expand-icon">expand_less</span>
@@ -99,18 +99,18 @@
           <div class="action-tools">
             <div class="action-row">
               <button 
-                @click="$emit('tool-action', 'undo')"
                 :disabled="!canUndo"
                 class="action-btn"
+                @click="$emit('tool-action', 'undo')"
               >
                 <span class="material-symbols-sharp">undo</span>
                 <span>Deshacer</span>
               </button>
               
               <button 
-                @click="$emit('tool-action', 'redo')"
                 :disabled="!canRedo"
                 class="action-btn"
+                @click="$emit('tool-action', 'redo')"
               >
                 <span class="material-symbols-sharp">redo</span>
                 <span>Rehacer</span>
@@ -120,11 +120,11 @@
             <div class="zoom-controls">
               <label class="control-label">Zoom:</label>
               <div class="zoom-buttons">
-                <button @click="$emit('tool-action', 'zoom-out')" class="zoom-btn">
+                <button class="zoom-btn" @click="$emit('tool-action', 'zoom-out')">
                   <span class="material-symbols-sharp">zoom_out</span>
                 </button>
                 <span class="zoom-level">{{ zoomLevel }}%</span>
-                <button @click="$emit('tool-action', 'zoom-in')" class="zoom-btn">
+                <button class="zoom-btn" @click="$emit('tool-action', 'zoom-in')">
                   <span class="material-symbols-sharp">zoom_in</span>
                 </button>
               </div>
@@ -135,9 +135,9 @@
         <!-- Download Section -->
         <div class="mobile-section">
           <button 
-            @click="$emit('tool-action', 'download')"
             class="download-btn"
             :disabled="isGeneratingDownload"
+            @click="$emit('tool-action', 'download')"
           >
             <span v-if="!isGeneratingDownload" class="material-symbols-sharp">download</span>
             <div v-else class="download-spinner">

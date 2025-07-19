@@ -1,5 +1,5 @@
 <template>
-  <div class="mobile-share-modal" v-if="isVisible" @click="handleBackgroundClick">
+  <div v-if="isVisible" class="mobile-share-modal" @click="handleBackgroundClick">
     <div class="share-content" @click.stop>
       <!-- Header -->
       <div class="share-header">
@@ -34,20 +34,20 @@
         </button>
         
         <button 
+          v-if="canSaveToGallery"
           class="quick-action-btn save"
           @click="saveToGallery"
           @touchstart="hapticFeedback"
-          v-if="canSaveToGallery"
         >
           <span class="action-icon">💾</span>
           <span class="action-label">Guardar</span>
         </button>
         
         <button 
+          v-if="canCopyToClipboard"
           class="quick-action-btn copy"
           @click="copyToClipboard"
           @touchstart="hapticFeedback"
-          v-if="canCopyToClipboard"
         >
           <span class="action-icon">📋</span>
           <span class="action-label">Copiar</span>
@@ -55,7 +55,7 @@
       </div>
       
       <!-- Native Share -->
-      <div class="native-share" v-if="canUseNativeShare">
+      <div v-if="canUseNativeShare" class="native-share">
         <button 
           class="native-share-btn"
           @click="shareNative"
@@ -67,7 +67,7 @@
       </div>
       
       <!-- Social Media Options -->
-      <div class="social-options" v-if="!canUseNativeShare">
+      <div v-if="!canUseNativeShare" class="social-options">
         <h3>Compartir en:</h3>
         <div class="social-buttons">
           <button 
@@ -113,11 +113,11 @@
         <h3>Enlace de compartir:</h3>
         <div class="link-container">
           <input 
+            ref="urlInput" 
             type="text" 
             :value="shareUrl" 
-            readonly 
+            readonly
             class="share-url-input"
-            ref="urlInput"
           />
           <button 
             class="copy-link-btn"
@@ -130,7 +130,7 @@
       </div>
       
       <!-- QR Code -->
-      <div class="qr-code" v-if="showQRCode">
+      <div v-if="showQRCode" class="qr-code">
         <h3>Código QR:</h3>
         <div class="qr-container">
           <canvas ref="qrCanvas" class="qr-canvas"></canvas>
@@ -142,8 +142,8 @@
       <div class="share-options">
         <label class="option-item">
           <input 
-            type="checkbox" 
-            v-model="includeWatermark"
+            v-model="includeWatermark" 
+            type="checkbox"
             class="option-checkbox"
           />
           <span>Incluir marca de agua</span>
@@ -151,8 +151,8 @@
         
         <label class="option-item">
           <input 
-            type="checkbox" 
-            v-model="showQRCode"
+            v-model="showQRCode" 
+            type="checkbox"
             class="option-checkbox"
           />
           <span>Mostrar código QR</span>
@@ -160,8 +160,8 @@
         
         <label class="option-item">
           <input 
-            type="checkbox" 
-            v-model="highQuality"
+            v-model="highQuality" 
+            type="checkbox"
             class="option-checkbox"
           />
           <span>Alta calidad</span>

@@ -23,17 +23,19 @@
     
     <!-- Phase 4: Advanced Features & Polish Components -->
     <DesignManager 
-      :canvas-data="getCanvasData()" 
+      ref="designManager" 
+      :canvas-data="getCanvasData()"
+      :class="{ 'desktop-only': isMobile }"
       @load-design="loadDesign"
       @design-saved="onDesignSaved"
       @share-design="shareDesign"
-      ref="designManager"
-      :class="{ 'desktop-only': isMobile }"
     />
     
     <EnhancedLayerManager 
-      :layers="enhancedLayersList" 
+      ref="enhancedLayerManager" 
+      :layers="enhancedLayersList"
       :selected-layer="selectedObject"
+      :class="{ 'desktop-only': isMobile }"
       @select-layer="selectLayer"
       @toggle-visibility="toggleLayerVisibility"
       @toggle-lock="toggleLayerLock"
@@ -42,8 +44,6 @@
       @reorder-layers="reorderLayers"
       @update-layer-opacity="updateLayerOpacity"
       @rename-layer="renameLayer"
-      ref="enhancedLayerManager"
-      :class="{ 'desktop-only': isMobile }"
     />
     
     <ShareDesign 
@@ -58,7 +58,7 @@
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed" :class="{ 'top-12': !isMobile, 'top-0': isMobile }" @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
         <div class="options--bottom-left">
-            <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
+            <span v-if="layersList.length>1000" hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()">
                 layers
             </span>
             <div id="download-modal" class="hidden relative z-10 overflow-x-hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" tabindex="-1" aria-hidden="true">
@@ -95,7 +95,7 @@
                             </svg>
                             </div> -->
                             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Enviando a imprimir!</h3>
+                            <h3 id="modal-title" class="text-center text-base font-semibold leading-6 text-gray-900">Enviando a imprimir!</h3>
                             <div class="mt-2">
                                 <p class="text-center text-sm text-gray-500">Hemos recibido tu diseño.</p>
                                 <p class="text-center text-sm text-gray-500">¡En las próximas 72 horas vamos a enviarte tu tabla personalizada!</p>
@@ -118,17 +118,19 @@
         <!-- Emoji picker (positioned by CSS) -->
         <div v-if="emojiVisible" class="simple-emoji-picker">
             <div class="emoji-categories">
-                <span v-for="(categoryData, categoryName) in emojiCategories" 
+                <span
+v-for="(categoryData, categoryName) in emojiCategories" 
                       :key="categoryName" 
                       class="category-tab" 
                       :class="{ active: activeEmojiCategory === categoryName }"
-                      @click="activeEmojiCategory = categoryName"
-                      :title="categoryName">
+                      :title="categoryName"
+                      @click="activeEmojiCategory = categoryName">
                     {{ categoryData.icon }}
                 </span>
             </div>
             <div class="emoji-grid">
-                <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
+                <span
+v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
                       :key="emoji" 
                       class="emoji-option" 
                       @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
@@ -165,7 +167,7 @@
     </section>
     
     <!-- Phase 3: Organized Toolbar -->
-    <div class="organized-toolbar-container" v-if="!isMobile">
+    <div v-if="!isMobile" class="organized-toolbar-container">
       <OrganizedToolbar 
         :active-color-picker="activeColorPicker"
         :emoji-picker-visible="emojiVisible"
@@ -275,9 +277,9 @@
     <div class="layers-button-container">
       <Tooltip text="Administrar capas" shortcut="L" position="left">
         <button
-          @click="toggleLayersList"
           class="fixed top-32 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
           :class="{ 'right-80': layersListVisible }"
+          @click="toggleLayersList"
         >
           <span class="material-symbols-sharp text-xl">
             layers

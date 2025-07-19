@@ -3,9 +3,9 @@
     <!-- Toggle Button -->
     <Tooltip text="Gestionar diseños guardados" shortcut="Ctrl+S" position="left">
       <button
-        @click="togglePanel"
         class="fixed top-1/2 left-0 transform -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white p-3 rounded-r-lg shadow-lg z-40 transition-colors duration-200"
         :class="{ 'left-80': isOpen }"
+        @click="togglePanel"
       >
         <span class="material-symbols-sharp text-xl">
           {{ isOpen ? 'close' : 'save' }}
@@ -23,8 +23,8 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800">Mis Diseños</h2>
           <button 
-            @click="closePanel"
             class="text-gray-500 hover:text-gray-700 p-1"
+            @click="closePanel"
           >
             <span class="material-symbols-sharp">close</span>
           </button>
@@ -38,8 +38,8 @@
               <p class="text-sm text-blue-700 font-medium">Auto-guardado disponible</p>
               <p class="text-xs text-blue-600 mt-1">Hay cambios sin guardar</p>
               <button 
-                @click="loadAutoSaveDesign"
                 class="text-xs text-blue-600 underline hover:text-blue-800 mt-2"
+                @click="loadAutoSaveDesign"
               >
                 Cargar auto-guardado
               </button>
@@ -61,9 +61,9 @@
               />
             </div>
             <button
-              @click="saveCurrentDesign"
               :disabled="isLoading || !newDesignName.trim()"
               class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center justify-center"
+              @click="saveCurrentDesign"
             >
               <span v-if="isLoading" class="material-symbols-sharp animate-spin mr-2">refresh</span>
               <span v-else class="material-symbols-sharp mr-2">save</span>
@@ -77,14 +77,14 @@
           <h3 class="text-sm font-semibold text-gray-700 mb-3">Importar/Exportar</h3>
           <div class="space-y-2">
             <button
-              @click="showImportDialog = true"
               class="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition duration-200"
+              @click="showImportDialog = true"
             >
               📥 Importar diseño
             </button>
             <button
-              @click="showExportDialog = true"
               class="w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition duration-200"
+              @click="showExportDialog = true"
             >
               📤 Exportar diseño actual
             </button>
@@ -107,8 +107,8 @@
             </h3>
             <button
               v-if="designCount > 0"
-              @click="confirmClearAll = true"
               class="text-xs text-red-600 hover:text-red-800 underline"
+              @click="confirmClearAll = true"
             >
               Limpiar todo
             </button>
@@ -141,32 +141,32 @@
                 <div class="flex items-center space-x-1 ml-2">
                   <Tooltip text="Cargar diseño" position="top">
                     <button
-                      @click="loadSavedDesign(design.id)"
                       class="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                      @click="loadSavedDesign(design.id)"
                     >
                       <span class="material-symbols-sharp text-sm">download</span>
                     </button>
                   </Tooltip>
                   <Tooltip text="Duplicar" position="top">
                     <button
-                      @click="duplicateSavedDesign(design.id)"
                       class="p-1 text-green-600 hover:bg-green-100 rounded"
+                      @click="duplicateSavedDesign(design.id)"
                     >
                       <span class="material-symbols-sharp text-sm">content_copy</span>
                     </button>
                   </Tooltip>
                   <Tooltip text="Compartir" position="top">
                     <button
-                      @click="shareDesign(design)"
                       class="p-1 text-purple-600 hover:bg-purple-100 rounded"
+                      @click="shareDesign(design)"
                     >
                       <span class="material-symbols-sharp text-sm">share</span>
                     </button>
                   </Tooltip>
                   <Tooltip text="Eliminar" position="top">
                     <button
-                      @click="confirmDelete = design.id"
                       class="p-1 text-red-600 hover:bg-red-100 rounded"
+                      @click="confirmDelete = design.id"
                     >
                       <span class="material-symbols-sharp text-sm">delete</span>
                     </button>
@@ -193,15 +193,15 @@
         ></textarea>
         <div class="flex justify-end space-x-3 mt-4">
           <button
-            @click="showImportDialog = false"
             class="px-4 py-2 text-gray-600 hover:text-gray-800"
+            @click="showImportDialog = false"
           >
             Cancelar
           </button>
           <button
-            @click="importDesignFromCode"
             :disabled="!importCode.trim()"
             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg"
+            @click="importDesignFromCode"
           >
             Importar
           </button>
@@ -224,14 +224,14 @@
         ></textarea>
         <div class="flex justify-end space-x-3 mt-4">
           <button
-            @click="showExportDialog = false"
             class="px-4 py-2 text-gray-600 hover:text-gray-800"
+            @click="showExportDialog = false"
           >
             Cerrar
           </button>
           <button
-            @click="copyExportCode"
             class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+            @click="copyExportCode"
           >
             Copiar Código
           </button>
@@ -248,14 +248,14 @@
         </p>
         <div class="flex justify-end space-x-3">
           <button
-            @click="confirmDelete = null"
             class="px-4 py-2 text-gray-600 hover:text-gray-800"
+            @click="confirmDelete = null"
           >
             Cancelar
           </button>
           <button
-            @click="deleteDesignConfirmed"
             class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+            @click="deleteDesignConfirmed"
           >
             Eliminar
           </button>
@@ -272,14 +272,14 @@
         </p>
         <div class="flex justify-end space-x-3">
           <button
-            @click="confirmClearAll = false"
             class="px-4 py-2 text-gray-600 hover:text-gray-800"
+            @click="confirmClearAll = false"
           >
             Cancelar
           </button>
           <button
-            @click="clearAllDesigns"
             class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+            @click="clearAllDesigns"
           >
             Eliminar Todo
           </button>

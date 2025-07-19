@@ -11,9 +11,9 @@
               <p class="text-purple-100 mt-1">{{ designName }}</p>
             </div>
             <button 
-              @click="closeModal"
               class="text-purple-100 hover:text-white p-1"
               title="Cerrar"
+              @click="closeModal"
             >
               <span class="material-symbols-sharp text-xl">close</span>
             </button>
@@ -28,8 +28,8 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <!-- Copy Link -->
               <button
-                @click="copyShareLink"
                 class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                @click="copyShareLink"
               >
                 <span class="material-symbols-sharp text-2xl text-gray-600 mb-2">link</span>
                 <span class="text-sm font-medium text-gray-700">Copiar Enlace</span>
@@ -37,8 +37,8 @@
 
               <!-- Download Image -->
               <button
-                @click="downloadImage"
                 class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                @click="downloadImage"
               >
                 <span class="material-symbols-sharp text-2xl text-gray-600 mb-2">download</span>
                 <span class="text-sm font-medium text-gray-700">Descargar</span>
@@ -47,8 +47,8 @@
               <!-- Native Share (mobile) -->
               <button
                 v-if="canShareNatively()"
-                @click="shareNatively"
                 class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                @click="shareNatively"
               >
                 <span class="material-symbols-sharp text-2xl text-gray-600 mb-2">share</span>
                 <span class="text-sm font-medium text-gray-700">Compartir</span>
@@ -56,8 +56,8 @@
 
               <!-- Email -->
               <button
-                @click="shareViaEmail"
                 class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                @click="shareViaEmail"
               >
                 <span class="material-symbols-sharp text-2xl text-gray-600 mb-2">email</span>
                 <span class="text-sm font-medium text-gray-700">Email</span>
@@ -71,8 +71,8 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <!-- Twitter -->
               <button
-                @click="shareOnSocial('twitter')"
                 class="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                @click="shareOnSocial('twitter')"
               >
                 <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-bold text-sm">T</span>
@@ -82,8 +82,8 @@
 
               <!-- Facebook -->
               <button
-                @click="shareOnSocial('facebook')"
                 class="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                @click="shareOnSocial('facebook')"
               >
                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-bold text-sm">f</span>
@@ -93,8 +93,8 @@
 
               <!-- WhatsApp -->
               <button
-                @click="shareOnSocial('whatsapp')"
                 class="flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200"
+                @click="shareOnSocial('whatsapp')"
               >
                 <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-bold text-sm">W</span>
@@ -104,8 +104,8 @@
 
               <!-- LinkedIn -->
               <button
-                @click="shareOnSocial('linkedin')"
                 class="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                @click="shareOnSocial('linkedin')"
               >
                 <div class="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-bold text-sm">in</span>
@@ -115,8 +115,8 @@
 
               <!-- Telegram -->
               <button
-                @click="shareOnSocial('telegram')"
                 class="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                @click="shareOnSocial('telegram')"
               >
                 <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-bold text-sm">t</span>
@@ -126,8 +126,8 @@
 
               <!-- Pinterest -->
               <button
-                @click="shareOnSocial('pinterest')"
                 class="flex items-center p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                @click="shareOnSocial('pinterest')"
               >
                 <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-bold text-sm">P</span>
@@ -145,15 +145,15 @@
             </p>
             <div class="flex space-x-2">
               <input
+                ref="linkInput"
                 :value="shareableLink"
                 readonly
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm"
                 @click="selectLink"
-                ref="linkInput"
               />
               <button
-                @click="copyShareLink"
                 class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 flex items-center"
+                @click="copyShareLink"
               >
                 <span class="material-symbols-sharp text-sm mr-1">content_copy</span>
                 {{ linkCopied ? 'Copiado!' : 'Copiar' }}
@@ -181,8 +181,8 @@
                   Escanea este código QR para acceder al diseño desde cualquier dispositivo móvil.
                 </p>
                 <button
-                  @click="downloadQRCode"
                   class="text-sm text-purple-600 hover:text-purple-800 underline"
+                  @click="downloadQRCode"
                 >
                   Descargar código QR
                 </button>
@@ -195,8 +195,8 @@
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-lg font-semibold text-gray-800">Código de Inserción</h3>
               <button
-                @click="showEmbedCode = !showEmbedCode"
                 class="text-sm text-purple-600 hover:text-purple-800 underline"
+                @click="showEmbedCode = !showEmbedCode"
               >
                 {{ showEmbedCode ? 'Ocultar' : 'Mostrar' }}
               </button>
@@ -207,15 +207,15 @@
                 Copia este código para insertar tu diseño en una página web:
               </p>
               <textarea
+                ref="embedInput"
                 :value="embedCode"
                 readonly
                 class="w-full h-20 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-mono resize-none"
                 @click="selectEmbed"
-                ref="embedInput"
               ></textarea>
               <button
-                @click="copyEmbedCode"
                 class="text-sm text-purple-600 hover:text-purple-800 underline"
+                @click="copyEmbedCode"
               >
                 {{ embedCopied ? 'Código copiado!' : 'Copiar código' }}
               </button>
@@ -223,7 +223,8 @@
           </div>
 
           <!-- Success/Error Messages -->
-          <div v-if="message" :class="[
+          <div
+v-if="message" :class="[
             'p-4 rounded-lg flex items-center',
             messageType === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
           ]">
@@ -241,8 +242,8 @@
               Los diseños compartidos son públicos y pueden ser vistos por cualquier persona con el enlace.
             </p>
             <button
-              @click="closeModal"
               class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200"
+              @click="closeModal"
             >
               Cerrar
             </button>
