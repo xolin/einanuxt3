@@ -277,7 +277,7 @@ v-for="emoji in emojiCategories[activeEmojiCategory].emojis"
     <HelpPanel />
     
     <!-- Welcome Modal for new users -->
-    <WelcomeModal />
+    <WelcomeModal v-if="!isMobile" />
 </template>
 <script setup>
 import { fabric } from 'fabric-with-gestures-notupdated';
