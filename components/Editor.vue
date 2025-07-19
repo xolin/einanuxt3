@@ -1515,16 +1515,37 @@ onMounted(() => {
     canvas = new fabric.Canvas(canvasEl.value, {
         width: 500, 
         height: 630,
-        // Enable proper touch handling for mobile devices
+        // Enhanced mobile touch handling configuration
         allowTouchScrolling: false,
         selection: true,
-        targetFindTolerance: isMobile.value ? 15 : 5, // Larger touch targets on mobile
-        perPixelTargetFind: true
+        targetFindTolerance: isMobile.value ? 20 : 5, // Even larger touch targets on mobile
+        perPixelTargetFind: false, // Disable for better mobile performance
+        // Mobile-specific touch configurations
+        enableRetinaScaling: false, // Disable for consistent touch mapping
+        touchAction: 'none', // Prevent browser touch handling
+        fireRightClick: false, // Disable right-click on mobile
+        fireMiddleClick: false, // Disable middle-click on mobile
+        stopContextMenu: true // Prevent context menus on mobile
     });
     
     // Set appropriate zoom level based on device
     if (isMobile.value) {
         canvas.setZoom(0.4); // Much larger zoom for mobile
+        
+        // Additional mobile-specific configurations
+        canvas.freeDrawingBrush.width = 2
+        canvas.isDrawingMode = false
+        
+        // Ensure objects are selectable and movable on mobile
+        canvas.forEachObject(function(obj) {
+            if (obj.id !== 'background' && obj.id !== 'deckcolor' && obj.id !== 'bin') {
+                obj.selectable = true
+                obj.evented = true
+                obj.hasControls = true
+                obj.hasBorders = true
+                obj.lockScalingFlip = true
+            }
+        })
     } else {
         canvas.setZoom(0.06); // Original zoom for desktop
     }
@@ -1566,6 +1587,18 @@ onMounted(() => {
 
     canvas.on('selection:created', function(event) {
         console.log('selection:created => event', event);
+        
+        // Mobile debugging
+        if (isMobile.value) {
+            console.log('Mobile selection created:', {
+                objectType: event.selected[0]?.type,
+                objectId: event.selected[0]?.id,
+                objectPosition: {
+                    left: event.selected[0]?.left,
+                    top: event.selected[0]?.top
+                }
+            })
+        }
         
         // Update selected text object for TextFormatting component
         selectedTextObject.value = getSelectedTextObject()
@@ -1626,6 +1659,28 @@ onMounted(() => {
         textcolorpickerVisible.value = 'hidden'
         hideBin()
     })
+    
+    // Add mobile-specific touch debugging
+    if (isMobile.value || isMobileDevice.value) {
+        canvas.on('mouse:down', function(event) {
+            console.log('Mobile touch down:', {
+                target: event.target?.type,
+                targetId: event.target?.id,
+                pointer: event.pointer,
+                e: {
+                    type: event.e.type,
+                    touches: event.e.touches?.length
+                }
+            })
+        })
+        
+        canvas.on('mouse:up', function(event) {
+            console.log('Mobile touch up:', {
+                target: event.target?.type,
+                targetId: event.target?.id
+            })
+        })
+    }
     
     // Only add touch:gesture and mouse:down handlers on desktop to avoid interference with mobile object manipulation
     if (!isMobile.value && !isMobileDevice.value) {
@@ -2759,12 +2814,25 @@ function adjustCanvasForMobile() {
         
         canvas.setZoom(scale)
         
-        // Center the deck in the viewport
-        const vpt = canvas.viewportTransform
-        vpt[4] = containerWidth / 2 - (backgroundPositionLeft.value + deckWidth / 2) * scale
-        vpt[5] = containerHeight / 2 - (calculateBackgroundDeckTopOffset() + deckHeight / 2) * scale
+        // Simplified viewport centering to avoid touch coordinate mapping issues
+        canvas.absolutePan(new fabric.Point(
+            containerWidth / 2 - (backgroundPositionLeft.value + deckWidth / 2) * scale,
+            containerHeight / 2 - (calculateBackgroundDeckTopOffset() + deckHeight / 2) * scale
+        ))
         
         canvas.renderAll()
+        
+        // Debug: Add console logging for mobile touch events
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Mobile canvas adjusted:', {
+                scale,
+                containerWidth,
+                containerHeight,
+                deckWidth,
+                deckHeight,
+                viewportTransform: canvas.viewportTransform
+            })
+        }
     }
 }
 
@@ -2884,7 +2952,7 @@ function showMobileToast(message) {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 50;
+        z-index: 1; /* Lower z-index to not interfere with UI */
         background-color: #f5f5f5;
         padding: 1rem;
         padding-bottom: 100px; /* Space for mobile toolbar toggle */
@@ -2892,6 +2960,7 @@ function showMobileToast(message) {
         display: flex;
         align-items: center;
         justify-content: center;
+        pointer-events: none; /* Allow clicks to pass through wrapper */
     }
     
     .canvas {
@@ -2909,6 +2978,7 @@ function showMobileToast(message) {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         /* Ensure canvas maintains aspect ratio */
         object-fit: contain;
+        pointer-events: auto; /* Canvas itself should receive pointer events */
     }
 }
 
