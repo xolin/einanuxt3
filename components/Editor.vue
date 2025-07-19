@@ -1513,7 +1513,13 @@ onMounted(() => {
     window.addEventListener('resize', detectMobile)
     
     canvas = new fabric.Canvas(canvasEl.value, {
-        width: 500, height:630
+        width: 500, 
+        height: 630,
+        // Enable proper touch handling for mobile devices
+        allowTouchScrolling: false,
+        selection: true,
+        targetFindTolerance: isMobile.value ? 15 : 5, // Larger touch targets on mobile
+        perPixelTargetFind: true
     });
     
     // Set appropriate zoom level based on device
@@ -1621,21 +1627,26 @@ onMounted(() => {
         hideBin()
     })
     
-
-    canvas.on('touch:gesture', function(event) {
-        if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
-            lastSelectedObject.value.opacity = 0.75
-        }
-    })
-    canvas.on('mouse:down', function(event) {
-        if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
-            lastSelectedObject.value.opacity = 0.75
-        }
-        lastSelectedObject.value.opacity = 1
-        if(event.target == null || event.target.id === "background") {
-            showGeneralOptions()
-        }
-    })
+    // Only add touch:gesture and mouse:down handlers on desktop to avoid interference with mobile object manipulation
+    if (!isMobile.value && !isMobileDevice.value) {
+        canvas.on('touch:gesture', function(event) {
+            if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
+                lastSelectedObject.value.opacity = 0.75
+            }
+        })
+        
+        canvas.on('mouse:down', function(event) {
+            if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
+                lastSelectedObject.value.opacity = 0.75
+            }
+            if(lastSelectedObject.value) {
+                lastSelectedObject.value.opacity = 1
+            }
+            if(event.target == null || event.target.id === "background") {
+                showGeneralOptions()
+            }
+        })
+    }
     // canvas.on("mouse:wheel", function(opt) {
     //     opt.e.preventDefault()
     //     opt.e.stopPropagation()
