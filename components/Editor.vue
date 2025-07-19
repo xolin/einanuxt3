@@ -2030,6 +2030,12 @@ function handleToolbarAction(action) {
         case 'template-gallery':
             showTemplateGallery.value = true
             break
+        case 'my-designs':
+            // Open the design manager panel
+            if (designManager.value) {
+                designManager.value.togglePanel()
+            }
+            break
     }
 }
 

@@ -132,15 +132,16 @@
           </div>
         </div>
 
-        <!-- Save & Download Section -->
+        <!-- Designs & Download Section -->
         <div class="mobile-section">
+          <h4 class="section-title">💾 Gestión de Diseños</h4>
           <div class="action-buttons-grid">
             <button 
-              class="save-btn"
-              @click="$emit('tool-action', 'save')"
+              class="designs-btn"
+              @click="$emit('tool-action', 'my-designs')"
             >
-              <span class="material-symbols-sharp">save</span>
-              <span class="btn-text">Guardar</span>
+              <span class="material-symbols-sharp">folder</span>
+              <span class="btn-text">Mis Diseños</span>
             </button>
             
             <button 
@@ -578,14 +579,14 @@ onUnmounted(() => {
   gap: 12px;
 }
 
-.save-btn {
+.designs-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 16px 12px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
   color: white;
   border: none;
   border-radius: 12px;
@@ -594,8 +595,8 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-.save-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+.designs-btn:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
 }
 
 .download-btn {
