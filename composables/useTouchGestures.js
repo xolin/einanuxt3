@@ -33,6 +33,22 @@ export const useTouchGestures = () => {
     const handleTouchStart = (e) => {
       if (!isGestureEnabled.value) return
       
+      // Check if the touch is on a fabric object control or the object itself
+      const target = e.target
+      if (target && (target.classList.contains('upper-canvas') || target.tagName === 'CANVAS')) {
+        // Check if there's a fabric object at this position
+        const canvasElement = target.closest('canvas')
+        if (canvasElement && canvasElement.__fabric) {
+          const pointer = canvasElement.__fabric.getPointer(e.touches[0])
+          const fabricTarget = canvasElement.__fabric.findTarget(e.touches[0])
+          
+          // If there's a fabric object at this position, don't handle swipe gestures
+          if (fabricTarget && fabricTarget.type !== 'background' && fabricTarget.id !== 'deckcolor') {
+            return
+          }
+        }
+      }
+      
       const touch = e.touches[0]
       startX = touch.clientX
       startY = touch.clientY
@@ -47,7 +63,17 @@ export const useTouchGestures = () => {
       const deltaX = touch.clientX - startX
       const deltaY = touch.clientY - startY
       
-      // Prevent scroll during horizontal swipe
+      // Check if we're in a fabric object interaction
+      const target = e.target
+      if (target && target.tagName === 'CANVAS' && target.__fabric) {
+        const fabricTarget = target.__fabric.getActiveObject()
+        if (fabricTarget && fabricTarget.type !== 'background' && fabricTarget.id !== 'deckcolor') {
+          // Don't prevent default when interacting with fabric objects
+          return
+        }
+      }
+      
+      // Prevent scroll during horizontal swipe only if not interacting with objects
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         e.preventDefault()
       }
@@ -55,6 +81,17 @@ export const useTouchGestures = () => {
     
     const handleTouchEnd = (e) => {
       if (!isSwipeActive || !isGestureEnabled.value) return
+      
+      // Check if this was a fabric object interaction
+      const target = e.target
+      if (target && target.tagName === 'CANVAS' && target.__fabric) {
+        const fabricTarget = target.__fabric.getActiveObject()
+        if (fabricTarget && fabricTarget.type !== 'background' && fabricTarget.id !== 'deckcolor') {
+          // Don't trigger swipe gestures when interacting with fabric objects
+          isSwipeActive = false
+          return
+        }
+      }
       
       const touch = e.changedTouches[0]
       const deltaX = touch.clientX - startX
