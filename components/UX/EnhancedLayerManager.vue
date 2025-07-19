@@ -3,7 +3,7 @@
     <!-- Toggle Button -->
     <Tooltip text="Gestionar capas" shortcut="L" position="right">
       <button
-        class="fixed top-1/2 right-0 transform -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
+        class="fixed top-1/3 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
         :class="{ 'right-80': isOpen }"
         @click="togglePanel"
       >

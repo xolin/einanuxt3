@@ -258,8 +258,8 @@ v-for="emoji in emojiCategories[activeEmojiCategory].emojis"
       @dismiss="onHintDismiss"
     />-->
     
-    <!-- Layers Button - Separate from Help Button -->
-    <div class="layers-button-container">
+    <!-- Layers Button - Separate from Help Button (Hidden in favor of EnhancedLayerManager) -->
+    <div class="layers-button-container" style="display: none;">
       <Tooltip text="Administrar capas" shortcut="L" position="left">
         <button
           class="fixed top-1/3 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
