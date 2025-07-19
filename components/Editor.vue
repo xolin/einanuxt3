@@ -53,8 +53,8 @@
       @close="closeShareModal"
     />
     
-    <!-- <section class="fixed pl-200"> -->
-    <!-- <LayersList v-if="layersListVisible" :layers="layersList"></LayersList> -->
+    <!-- Layers Panel -->
+    <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed" :class="{ 'top-12': !isMobile, 'top-0': isMobile }" @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
         <div class="options--bottom-left">

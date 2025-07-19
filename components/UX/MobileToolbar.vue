@@ -132,23 +132,33 @@
           </div>
         </div>
 
-        <!-- Download Section -->
+        <!-- Save & Download Section -->
         <div class="mobile-section">
-          <button 
-            class="download-btn"
-            :disabled="isGeneratingDownload"
-            @click="$emit('tool-action', 'download')"
-          >
-            <span v-if="!isGeneratingDownload" class="material-symbols-sharp">download</span>
-            <div v-else class="download-spinner">
-              <div class="spinner-dot"></div>
-              <div class="spinner-dot"></div>
-              <div class="spinner-dot"></div>
-            </div>
-            <span class="download-text">
-              {{ isGeneratingDownload ? 'Generando...' : 'Descargar Diseño' }}
-            </span>
-          </button>
+          <div class="action-buttons-grid">
+            <button 
+              class="save-btn"
+              @click="$emit('tool-action', 'save')"
+            >
+              <span class="material-symbols-sharp">save</span>
+              <span class="btn-text">Guardar</span>
+            </button>
+            
+            <button 
+              class="download-btn"
+              :disabled="isGeneratingDownload"
+              @click="$emit('tool-action', 'download')"
+            >
+              <span v-if="!isGeneratingDownload" class="material-symbols-sharp">download</span>
+              <div v-else class="download-spinner">
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+              </div>
+              <span class="btn-text">
+                {{ isGeneratingDownload ? 'Generando...' : 'Descargar' }}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -218,11 +228,11 @@ const toggleSection = (sectionName) => {
 
 const handleAction = (action) => {
   emit('tool-action', action)
-  // Keep toolbar open for quick actions but close for major actions
-  if (['add-text', 'upload-image'].includes(action)) {
+  // Close toolbar for actions that open other interfaces
+  if (['add-text', 'upload-image', 'deck-color', 'add-emoji'].includes(action)) {
     setTimeout(() => {
       isToolbarVisible.value = false
-    }, 500)
+    }, 300)
   }
 }
 
@@ -562,13 +572,39 @@ onUnmounted(() => {
   text-align: center;
 }
 
-.download-btn {
-  width: 100%;
+.action-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.save-btn {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 16px;
+  gap: 8px;
+  padding: 16px 12px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+}
+
+.save-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+.download-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 12px;
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
@@ -611,6 +647,11 @@ onUnmounted(() => {
 
 .spinner-dot:nth-child(3) {
   animation-delay: 0s;
+}
+
+.btn-text {
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .download-text {
