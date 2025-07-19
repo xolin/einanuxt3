@@ -25,7 +25,6 @@
     <DesignManager 
       ref="designManager" 
       :canvas-data="getCanvasData()"
-      :class="{ 'desktop-only': isMobile }"
       @load-design="loadDesign"
       @design-saved="onDesignSaved"
       @share-design="shareDesign"
@@ -1988,9 +1987,43 @@ function handleTextAlignChange(align) {
 function handleToolbarAction(action) {
     switch (action) {
         case 'deck-color':
-            // Open native color picker directly
-            if (deckColorInput.value) {
-                deckColorInput.value.click()
+            // On mobile, show color picker differently to ensure it works
+            if (isMobile.value) {
+                // Create and show a visible color input for mobile
+                const mobileColorInput = document.createElement('input')
+                mobileColorInput.type = 'color'
+                mobileColorInput.value = colors.hex
+                mobileColorInput.style.position = 'fixed'
+                mobileColorInput.style.top = '50%'
+                mobileColorInput.style.left = '50%'
+                mobileColorInput.style.transform = 'translate(-50%, -50%)'
+                mobileColorInput.style.zIndex = '9999'
+                mobileColorInput.style.width = '50px'
+                mobileColorInput.style.height = '50px'
+                mobileColorInput.style.border = 'none'
+                mobileColorInput.style.borderRadius = '8px'
+                
+                mobileColorInput.addEventListener('input', (e) => {
+                    handleDeckColorChange(e.target.value)
+                    document.body.removeChild(mobileColorInput)
+                })
+                
+                mobileColorInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (document.body.contains(mobileColorInput)) {
+                            document.body.removeChild(mobileColorInput)
+                        }
+                    }, 100)
+                })
+                
+                document.body.appendChild(mobileColorInput)
+                mobileColorInput.focus()
+                mobileColorInput.click()
+            } else {
+                // Desktop: use hidden input
+                if (deckColorInput.value) {
+                    deckColorInput.value.click()
+                }
             }
             break
         case 'text-color':
