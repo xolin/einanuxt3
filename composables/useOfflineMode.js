@@ -32,9 +32,49 @@ export const useOfflineMode = () => {
   const registerServiceWorker = async () => {
     if (process.client && 'serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js')
+        const registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/',
+          updateViaCache: 'none' // Ensure SW updates aren't cached
+        })
+        
         console.log('Service Worker registered:', registration)
         isOfflineEnabled.value = true
+        
+        // Handle service worker updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing
+          console.log('New service worker found, installing...')
+          
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('New service worker installed, will activate on next page load')
+                // Optionally show update notification
+                showOfflineNotification('Nueva versión disponible. Recarga la página para actualizar.')
+              }
+            })
+          }
+        })
+        
+        // Listen for service worker messages
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'SW_ACTIVATED') {
+            console.log('Service worker activated with version:', event.data.version)
+          }
+        })
+        
+        // Check for updates periodically (but not too often)
+        const updateInterval = setInterval(() => {
+          if (document.visibilityState === 'visible') {
+            registration.update()
+          }
+        }, 60000) // Check every minute when page is visible
+        
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', () => {
+          clearInterval(updateInterval)
+        })
+        
         return registration
       } catch (error) {
         console.error('Service Worker registration failed:', error)
@@ -148,7 +188,20 @@ export const useOfflineMode = () => {
     checkOnlineStatus()
     setupOfflineEvents()
     loadCachedDesigns()
-    registerServiceWorker()
+    
+    // Only register service worker in production or when explicitly enabled
+    const isDev = process.env.NODE_ENV === 'development'
+    const isLocalhost = typeof window !== 'undefined' && 
+      (window.location.hostname === 'localhost' || 
+       window.location.hostname === '127.0.0.1' ||
+       window.location.hostname === '0.0.0.0')
+    
+    // Skip service worker registration in development on localhost to prevent reload loops
+    if (!isDev || !isLocalhost) {
+      registerServiceWorker()
+    } else {
+      console.log('Service Worker registration skipped in development on localhost')
+    }
     
     // Show offline notification if offline
     if (!isOnline.value) {

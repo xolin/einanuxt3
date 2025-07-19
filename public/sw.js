@@ -1,7 +1,8 @@
 // Service Worker for offline functionality
-const CACHE_NAME = 'einanuxt3-mobile-v1'
-const STATIC_CACHE_NAME = 'einanuxt3-static-v1'
-const DYNAMIC_CACHE_NAME = 'einanuxt3-dynamic-v1'
+const VERSION = '2.0.0'
+const CACHE_NAME = `einanuxt3-mobile-v${VERSION}`
+const STATIC_CACHE_NAME = `einanuxt3-static-v${VERSION}`
+const DYNAMIC_CACHE_NAME = `einanuxt3-dynamic-v${VERSION}`
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
@@ -19,9 +20,23 @@ const CACHE_API_ROUTES = [
   '/api/fonts'
 ]
 
+// Files that should never be cached (Nuxt dynamic imports)
+const NEVER_CACHE_PATTERNS = [
+  /_nuxt\/.*\.js$/,
+  /_nuxt\/.*\.mjs$/,
+  /_nuxt\/.*\.css$/,
+  /\.hot-update\./,
+  /\?.*$/,  // Skip files with query parameters
+]
+
+// Check if URL should never be cached
+function shouldNeverCache(url) {
+  return NEVER_CACHE_PATTERNS.some(pattern => pattern.test(url))
+}
+
 // Install event - cache static files
 self.addEventListener('install', event => {
-  console.log('Service Worker installing...')
+  console.log('Service Worker installing version:', VERSION)
   
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME)
@@ -31,6 +46,7 @@ self.addEventListener('install', event => {
       })
       .then(() => {
         console.log('Static files cached successfully')
+        // Skip waiting to activate immediately on update
         return self.skipWaiting()
       })
       .catch(error => {
@@ -39,26 +55,38 @@ self.addEventListener('install', event => {
   )
 })
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and handle updates
 self.addEventListener('activate', event => {
   console.log('Service Worker activating...')
   
   event.waitUntil(
-    caches.keys()
-      .then(cacheNames => {
+    Promise.all([
+      // Clean up old caches
+      caches.keys().then(cacheNames => {
         return Promise.all(
           cacheNames.map(cacheName => {
-            if (cacheName !== STATIC_CACHE_NAME && cacheName !== DYNAMIC_CACHE_NAME) {
+            // Delete any cache that doesn't match current version
+            if (!cacheName.includes(VERSION)) {
               console.log('Deleting old cache:', cacheName)
               return caches.delete(cacheName)
             }
           })
         )
+      }),
+      // Claim all clients to ensure immediate control
+      self.clients.claim()
+    ]).then(() => {
+      console.log('Service Worker activated with version:', VERSION)
+      // Send message to all clients about update
+      return self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_ACTIVATED',
+            version: VERSION
+          })
+        })
       })
-      .then(() => {
-        console.log('Service Worker activated')
-        return self.clients.claim()
-      })
+    })
   )
 })
 
@@ -74,6 +102,18 @@ self.addEventListener('fetch', event => {
   
   // Skip chrome-extension requests
   if (url.protocol === 'chrome-extension:') {
+    return
+  }
+  
+  // Skip files that should never be cached (Nuxt dynamic imports)
+  if (shouldNeverCache(url.pathname + url.search)) {
+    console.log('Bypassing cache for:', url.href)
+    return
+  }
+  
+  // Check for hard refresh (cache bypass)
+  if (request.cache === 'reload') {
+    console.log('Hard refresh detected, bypassing cache for:', url.href)
     return
   }
   
@@ -93,9 +133,14 @@ self.addEventListener('fetch', event => {
   }
 })
 
-// Cache first strategy
+// Cache first strategy with better validation
 async function cacheFirst(request) {
   try {
+    // Check if this should never be cached
+    if (shouldNeverCache(request.url)) {
+      return fetch(request)
+    }
+    
     const cachedResponse = await caches.match(request)
     if (cachedResponse) {
       return cachedResponse
@@ -117,28 +162,42 @@ async function cacheFirst(request) {
   }
 }
 
-// Network first strategy
+// Network first strategy with better error handling
 async function networkFirst(request) {
   try {
+    // Always try network first for dynamic content
     const networkResponse = await fetch(request)
     
     if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(DYNAMIC_CACHE_NAME)
-      cache.put(request, networkResponse.clone())
+      // Only cache successful responses for non-dynamic content
+      if (!shouldNeverCache(request.url)) {
+        const cache = await caches.open(DYNAMIC_CACHE_NAME)
+        cache.put(request, networkResponse.clone())
+      }
     }
     
     return networkResponse
   } catch (error) {
-    console.log('Network failed, trying cache:', error)
+    console.log('Network failed for:', request.url, error)
     
+    // For navigation requests, try cache fallback
+    if (request.mode === 'navigate') {
+      const cachedResponse = await caches.match(request)
+      if (cachedResponse) {
+        return cachedResponse
+      }
+      
+      // Return offline page if available
+      return caches.match('/offline.html') || new Response('Offline - Page not available', {
+        status: 503,
+        statusText: 'Service Unavailable'
+      })
+    }
+    
+    // For other requests, try cache fallback
     const cachedResponse = await caches.match(request)
     if (cachedResponse) {
       return cachedResponse
-    }
-    
-    // If it's a navigation request, return offline page
-    if (request.mode === 'navigate') {
-      return caches.match('/offline.html')
     }
     
     return new Response('Offline - Content not available', {
