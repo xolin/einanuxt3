@@ -2,9 +2,9 @@
   <div class="help-panel">
     <!-- Toggle Button -->
     <button
-      @click="togglePanel"
       class="fixed top-1/2 right-0 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
       :class="{ 'right-80': isOpen }"
+      @click="togglePanel"
     >
       <span class="material-symbols-sharp text-xl">
         {{ isOpen ? 'close' : 'help' }}
@@ -20,8 +20,8 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800">Guía de Uso</h2>
           <button 
-            @click="closePanel"
             class="text-gray-500 hover:text-gray-700 p-1"
+            @click="closePanel"
           >
             <span class="material-symbols-sharp">close</span>
           </button>
@@ -182,8 +182,8 @@
     <!-- Overlay -->
     <div
       v-if="isOpen"
-      @click="closePanel"
       class="fixed inset-0 bg-black bg-opacity-25 z-20"
+      @click="closePanel"
     ></div>
   </div>
 </template>

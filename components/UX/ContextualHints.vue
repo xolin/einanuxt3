@@ -11,7 +11,7 @@
           <div class="hint-title">{{ currentHint.title }}</div>
           <div class="hint-message">{{ currentHint.message }}</div>
         </div>
-        <button @click="dismissHint" class="hint-close">
+        <button class="hint-close" @click="dismissHint">
           <span class="material-symbols-sharp">close</span>
         </button>
       </div>

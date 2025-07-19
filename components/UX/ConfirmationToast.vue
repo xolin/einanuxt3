@@ -20,9 +20,9 @@
         </div>
         <button 
           v-if="closable" 
-          @click="close" 
-          class="toast-close"
+          class="toast-close" 
           aria-label="Cerrar notificación"
+          @click="close"
         >
           <span class="material-symbols-sharp">close</span>
         </button>

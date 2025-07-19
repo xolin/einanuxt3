@@ -23,16 +23,16 @@
     
     <!-- Phase 4: Advanced Features & Polish Components -->
     <DesignManager 
-      :canvas-data="getCanvasData()" 
+      ref="designManager" 
+      :canvas-data="getCanvasData()"
       @load-design="loadDesign"
       @design-saved="onDesignSaved"
       @share-design="shareDesign"
-      ref="designManager"
-      :class="{ 'desktop-only': isMobile }"
     />
     
     <EnhancedLayerManager 
-      :layers="enhancedLayersList" 
+      ref="enhancedLayerManager" 
+      :layers="enhancedLayersList"
       :selected-layer="selectedObject"
       @select-layer="selectLayer"
       @toggle-visibility="toggleLayerVisibility"
@@ -42,8 +42,6 @@
       @reorder-layers="reorderLayers"
       @update-layer-opacity="updateLayerOpacity"
       @rename-layer="renameLayer"
-      ref="enhancedLayerManager"
-      :class="{ 'desktop-only': isMobile }"
     />
     
     <ShareDesign 
@@ -53,12 +51,12 @@
       @close="closeShareModal"
     />
     
-    <!-- <section class="fixed pl-200"> -->
-    <!-- <LayersList v-if="layersListVisible" :layers="layersList"></LayersList> -->
+    <!-- Layers Panel -->
+    <LayersList v-if="layersListVisible" :layers="layersList"></LayersList>
     <section ref="canvasWrapper" v-resize="resize" class="canvas__wrapper fixed" :class="{ 'top-12': !isMobile, 'top-0': isMobile }" @click="canvasEv()">
         <canvas ref="canvasEl" class="canvas"></canvas>
         <div class="options--bottom-left">
-            <span hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()" v-if="layersList.length>1000">
+            <span v-if="layersList.length>1000" hidden class="rounded__btn material-symbols-sharp" @click="toggleLayersList()">
                 layers
             </span>
             <div id="download-modal" class="hidden relative z-10 overflow-x-hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" tabindex="-1" aria-hidden="true">
@@ -95,7 +93,7 @@
                             </svg>
                             </div> -->
                             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                            <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Enviando a imprimir!</h3>
+                            <h3 id="modal-title" class="text-center text-base font-semibold leading-6 text-gray-900">Enviando a imprimir!</h3>
                             <div class="mt-2">
                                 <p class="text-center text-sm text-gray-500">Hemos recibido tu diseño.</p>
                                 <p class="text-center text-sm text-gray-500">¡En las próximas 72 horas vamos a enviarte tu tabla personalizada!</p>
@@ -118,17 +116,19 @@
         <!-- Emoji picker (positioned by CSS) -->
         <div v-if="emojiVisible" class="simple-emoji-picker">
             <div class="emoji-categories">
-                <span v-for="(categoryData, categoryName) in emojiCategories" 
+                <span
+v-for="(categoryData, categoryName) in emojiCategories" 
                       :key="categoryName" 
                       class="category-tab" 
                       :class="{ active: activeEmojiCategory === categoryName }"
-                      @click="activeEmojiCategory = categoryName"
-                      :title="categoryName">
+                      :title="categoryName"
+                      @click="activeEmojiCategory = categoryName">
                     {{ categoryData.icon }}
                 </span>
             </div>
             <div class="emoji-grid">
-                <span v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
+                <span
+v-for="emoji in emojiCategories[activeEmojiCategory].emojis" 
                       :key="emoji" 
                       class="emoji-option" 
                       @click="onSelectEmoji({i: emoji})">{{ emoji }}</span>
@@ -165,7 +165,7 @@
     </section>
     
     <!-- Phase 3: Organized Toolbar -->
-    <div class="organized-toolbar-container" v-if="!isMobile">
+    <div v-if="!isMobile" class="organized-toolbar-container">
       <OrganizedToolbar 
         :active-color-picker="activeColorPicker"
         :emoji-picker-visible="emojiVisible"
@@ -197,29 +197,16 @@
     <!-- Mobile Toolbar for mobile devices -->
     <MobileToolbar 
       v-if="isMobile"
-      :active-color-picker="activeColorPicker"
-      :emoji-picker-visible="emojiVisible"
+      :is-mobile-device="isMobile"
       :can-undo="canUndo"
       :can-redo="canRedo"
       :is-generating-download="downloadInProgress"
       :has-selected-text="hasSelectedText"
-      :selected-font="selectedFont"
-      :font-size="fontSize"
-      :font-weight="fontWeight"
-      :is-bold="isBold"
-      :is-italic="isItalic"
-      :is-underline="isUnderline"
-      :text-align="textAlign"
       :deck-color="colors.hex"
       :text-color="textColor.hex"
+      :zoom-level="Math.round(canvas?.getZoom() * 100) || 100"
       @tool-action="handleToolbarAction"
-      @deck-color-change="handleDeckColorChange"
-      @text-color-change="handleTextColorChange"
-      @font-change="handleFontChange"
-      @font-size-change="handleFontSizeChange"
-      @font-weight-change="handleFontWeightChange"
-      @text-style-change="handleTextStyleChange"
-      @text-align-change="handleTextAlignChange"
+      @color-change="handleMobileColorChange"
     />
 
     <!-- Phase 3: Template Gallery -->
@@ -271,13 +258,13 @@
       @dismiss="onHintDismiss"
     />-->
     
-    <!-- Layers Button - Separate from Help Button -->
-    <div class="layers-button-container">
+    <!-- Layers Button - Separate from Help Button (Hidden in favor of EnhancedLayerManager) -->
+    <div class="layers-button-container" style="display: none;">
       <Tooltip text="Administrar capas" shortcut="L" position="left">
         <button
-          @click="toggleLayersList"
-          class="fixed top-32 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
+          class="fixed top-1/3 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
           :class="{ 'right-80': layersListVisible }"
+          @click="toggleLayersList"
         >
           <span class="material-symbols-sharp text-xl">
             layers
@@ -331,7 +318,7 @@ import WelcomeModal from './WelcomeModal.vue'
 
 // Phase 5: Mobile Optimization Setup
 const { isMobile, isTouch, screenSize } = useMobile()
-const { lightHaptic, mediumHaptic, strongHaptic, setupGestureDetection, onGesture } = useTouchGestures()
+const { lightHaptic, mediumHaptic, strongHaptic } = useTouchGestures()
 const { isSupported: isCameraSupported, getImageFromDevice } = useCamera()
 const { isOnline, isOfflineEnabled, cacheDesign, addToSyncQueue } = useOfflineMode()
 
@@ -1448,6 +1435,12 @@ function isMobileDeviceCheck() {
 function resize() {
     if (!canvasWrapper.value || !canvas) return
     
+    // Handle mobile devices with specialized logic
+    if (isMobile.value || isMobileDevice.value === true) {
+        adjustCanvasForMobile()
+        return
+    }
+    
     const ratio = window.innerWidth / window.innerHeight;
     const containerWidth = canvasWrapper.value.clientWidth;
     const scale          = containerWidth / canvas.getWidth();
@@ -1505,12 +1498,41 @@ onMounted(() => {
     window.addEventListener('resize', detectMobile)
     
     canvas = new fabric.Canvas(canvasEl.value, {
-        width: 500, height:630
+        width: 500, 
+        height: 630,
+        // Enhanced mobile touch handling configuration
+        allowTouchScrolling: false,
+        selection: true,
+        targetFindTolerance: isMobile.value ? 15 : 5, // Moderate touch targets on mobile
+        perPixelTargetFind: false, // Disable for better mobile performance
+        // Mobile-specific touch configurations - simplified for better touch accuracy
+        enableRetinaScaling: true, // Re-enable for better display quality
+        touchAction: 'manipulation', // Allow pinch-zoom but prevent scroll
+        fireRightClick: false, // Disable right-click on mobile
+        fireMiddleClick: false, // Disable middle-click on mobile
+        stopContextMenu: true, // Prevent context menus on mobile
+        // Ensure fabric.js handles touch events properly
+        preserveObjectStacking: true
     });
     
     // Set appropriate zoom level based on device
     if (isMobile.value) {
-        canvas.setZoom(0.4); // Much larger zoom for mobile
+        canvas.setZoom(0.08); // Conservative zoom for mobile - avoid too small values
+        
+        // Additional mobile-specific configurations
+        canvas.freeDrawingBrush.width = 2
+        canvas.isDrawingMode = false
+        
+        // Ensure objects are selectable and movable on mobile
+        canvas.forEachObject(function(obj) {
+            if (obj.id !== 'background' && obj.id !== 'deckcolor' && obj.id !== 'bin') {
+                obj.selectable = true
+                obj.evented = true
+                obj.hasControls = true
+                obj.hasBorders = true
+                obj.lockScalingFlip = true
+            }
+        })
     } else {
         canvas.setZoom(0.06); // Original zoom for desktop
     }
@@ -1524,13 +1546,18 @@ onMounted(() => {
     createBin()
     makeId()
     
-    // Initialize mobile features after canvas is ready
-    // setTimeout(() => {
-        if (isMobile.value) {
+    // Final mobile adjustment after all elements are in place
+    if (isMobile.value || isMobileDevice.value === true) {
+        setTimeout(() => {
             adjustCanvasForMobile()
-            initializeMobileFeatures()
-        }
-    // }, 100)
+        }, 500) // Longer delay to ensure everything is initialized
+    }
+    
+    // Initialize mobile features after canvas is ready
+    if (isMobile.value) {
+        // Remove duplicate mobile adjustment call
+        initializeMobileFeatures()
+    }
     
     var line9 = new fabric.Line([
         backgroundPositionLeft.value+1700 , deckBackgroundHeight.value,
@@ -1545,6 +1572,18 @@ onMounted(() => {
 
     canvas.on('selection:created', function(event) {
         console.log('selection:created => event', event);
+        
+        // Mobile debugging
+        if (isMobile.value) {
+            console.log('Mobile selection created:', {
+                objectType: event.selected[0]?.type,
+                objectId: event.selected[0]?.id,
+                objectPosition: {
+                    left: event.selected[0]?.left,
+                    top: event.selected[0]?.top
+                }
+            })
+        }
         
         // Update selected text object for TextFormatting component
         selectedTextObject.value = getSelectedTextObject()
@@ -1606,21 +1645,48 @@ onMounted(() => {
         hideBin()
     })
     
-
-    canvas.on('touch:gesture', function(event) {
-        if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
-            lastSelectedObject.value.opacity = 0.75
-        }
-    })
-    canvas.on('mouse:down', function(event) {
-        if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
-            lastSelectedObject.value.opacity = 0.75
-        }
-        lastSelectedObject.value.opacity = 1
-        if(event.target == null || event.target.id === "background") {
-            showGeneralOptions()
-        }
-    })
+    // Add mobile-specific touch debugging
+    if (isMobile.value || isMobileDevice.value) {
+        canvas.on('mouse:down', function(event) {
+            console.log('Mobile touch down:', {
+                target: event.target?.type,
+                targetId: event.target?.id,
+                pointer: event.pointer,
+                e: {
+                    type: event.e.type,
+                    touches: event.e.touches?.length
+                }
+            })
+        })
+        
+        canvas.on('mouse:up', function(event) {
+            console.log('Mobile touch up:', {
+                target: event.target?.type,
+                targetId: event.target?.id
+            })
+        })
+    }
+    
+    // Only add touch:gesture and mouse:down handlers on desktop to avoid interference with mobile object manipulation
+    if (!isMobile.value && !isMobileDevice.value) {
+        canvas.on('touch:gesture', function(event) {
+            if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
+                lastSelectedObject.value.opacity = 0.75
+            }
+        })
+        
+        canvas.on('mouse:down', function(event) {
+            if(lastSelectedObject.value && event.target !== lastSelectedObject.value) {
+                lastSelectedObject.value.opacity = 0.75
+            }
+            if(lastSelectedObject.value) {
+                lastSelectedObject.value.opacity = 1
+            }
+            if(event.target == null || event.target.id === "background") {
+                showGeneralOptions()
+            }
+        })
+    }
     // canvas.on("mouse:wheel", function(opt) {
     //     opt.e.preventDefault()
     //     opt.e.stopPropagation()
@@ -1845,6 +1911,14 @@ function handleTextColorChange(color) {
     }
 }
 
+function handleMobileColorChange(type, color) {
+    if (type === 'deck') {
+        handleDeckColorChange(color)
+    } else if (type === 'text') {
+        handleTextColorChange(color)
+    }
+}
+
 function handleFontChange(fontFamily) {
     selectedFont.value = fontFamily
     const activeObj = getSelectedTextObject()
@@ -1912,9 +1986,43 @@ function handleTextAlignChange(align) {
 function handleToolbarAction(action) {
     switch (action) {
         case 'deck-color':
-            // Open native color picker directly
-            if (deckColorInput.value) {
-                deckColorInput.value.click()
+            // On mobile, show color picker differently to ensure it works
+            if (isMobile.value) {
+                // Create and show a visible color input for mobile
+                const mobileColorInput = document.createElement('input')
+                mobileColorInput.type = 'color'
+                mobileColorInput.value = colors.hex
+                mobileColorInput.style.position = 'fixed'
+                mobileColorInput.style.top = '50%'
+                mobileColorInput.style.left = '50%'
+                mobileColorInput.style.transform = 'translate(-50%, -50%)'
+                mobileColorInput.style.zIndex = '9999'
+                mobileColorInput.style.width = '50px'
+                mobileColorInput.style.height = '50px'
+                mobileColorInput.style.border = 'none'
+                mobileColorInput.style.borderRadius = '8px'
+                
+                mobileColorInput.addEventListener('input', (e) => {
+                    handleDeckColorChange(e.target.value)
+                    document.body.removeChild(mobileColorInput)
+                })
+                
+                mobileColorInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (document.body.contains(mobileColorInput)) {
+                            document.body.removeChild(mobileColorInput)
+                        }
+                    }, 100)
+                })
+                
+                document.body.appendChild(mobileColorInput)
+                mobileColorInput.focus()
+                mobileColorInput.click()
+            } else {
+                // Desktop: use hidden input
+                if (deckColorInput.value) {
+                    deckColorInput.value.click()
+                }
             }
             break
         case 'text-color':
@@ -1933,6 +2041,9 @@ function handleToolbarAction(action) {
         case 'upload-image':
             document.querySelector('input[type="file"]').click()
             break
+        case 'add-emoji':
+            toggleEmoji()
+            break
         case 'undo':
             undo()
             break
@@ -1950,6 +2061,12 @@ function handleToolbarAction(action) {
             break
         case 'template-gallery':
             showTemplateGallery.value = true
+            break
+        case 'my-designs':
+            // Open the design manager panel
+            if (designManager.value) {
+                designManager.value.togglePanel()
+            }
             break
     }
 }
@@ -2094,10 +2211,45 @@ function handleEmptyStateAction(action) {
             toggleEmoji()
             break
         case 'deck-color':
-            // Close empty state popup and open native color picker
+            // Close empty state popup and open color picker
             hideEmptyState()
-            if (deckColorInput.value) {
-                deckColorInput.value.click()
+            // Use the same mobile color picker logic as toolbar actions
+            if (isMobile.value) {
+                // Create and show a visible color input for mobile
+                const mobileColorInput = document.createElement('input')
+                mobileColorInput.type = 'color'
+                mobileColorInput.value = colors.hex
+                mobileColorInput.style.position = 'fixed'
+                mobileColorInput.style.top = '50%'
+                mobileColorInput.style.left = '50%'
+                mobileColorInput.style.transform = 'translate(-50%, -50%)'
+                mobileColorInput.style.zIndex = '9999'
+                mobileColorInput.style.width = '50px'
+                mobileColorInput.style.height = '50px'
+                mobileColorInput.style.border = 'none'
+                mobileColorInput.style.borderRadius = '8px'
+                
+                mobileColorInput.addEventListener('input', (e) => {
+                    handleDeckColorChange(e.target.value)
+                    document.body.removeChild(mobileColorInput)
+                })
+                
+                mobileColorInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (document.body.contains(mobileColorInput)) {
+                            document.body.removeChild(mobileColorInput)
+                        }
+                    }, 100)
+                })
+                
+                document.body.appendChild(mobileColorInput)
+                mobileColorInput.focus()
+                mobileColorInput.click()
+            } else {
+                // Desktop: use hidden input
+                if (deckColorInput.value) {
+                    deckColorInput.value.click()
+                }
             }
             break
     }
@@ -2554,15 +2706,6 @@ function initializeMobileFeatures() {
         showMobileOnboarding.value = true
     }
     
-    // Setup gesture detection for canvas
-    if (canvasEl.value && isTouch.value) {
-        setupGestureDetection(canvasEl.value)
-    }
-    
-    // Setup mobile-specific event handlers
-    onGesture('swipe', handleCanvasSwipe)
-    onGesture('pinch', handleCanvasPinch)
-    
     // Adjust canvas for mobile
     if (isMobile.value) {
         adjustCanvasForMobile()
@@ -2718,67 +2861,51 @@ function handleMobileShare(shareData) {
     }
 }
 
-function handleCanvasSwipe(data) {
-    // Handle swipe gestures on canvas
-    if (data.direction === 'up') {
-        // Zoom in
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.min(zoom * 1.1, 3))
-    } else if (data.direction === 'down') {
-        // Zoom out
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.max(zoom * 0.9, 0.1))
-    } else if (data.direction === 'left') {
-        // Pan left
-        const vpt = canvas.viewportTransform
-        vpt[4] -= 50
-        canvas.renderAll()
-    } else if (data.direction === 'right') {
-        // Pan right
-        const vpt = canvas.viewportTransform
-        vpt[4] += 50
-        canvas.renderAll()
-    }
-    
-    lightHaptic()
-}
-
-function handleCanvasPinch(data) {
-    // Handle pinch-to-zoom
-    if (data.scale > 1) {
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.min(zoom * 1.1, 3))
-    } else {
-        const zoom = canvas.getZoom()
-        canvas.setZoom(Math.max(zoom * 0.9, 0.1))
-    }
-    
-    lightHaptic()
-}
-
 function adjustCanvasForMobile() {
     if (!canvas) return
     
-    // Adjust canvas size for mobile
+    // Enhanced mobile canvas adjustment for larger skateboard display
     const container = canvasWrapper.value
-    if (container && isMobile.value) {
-        const containerWidth = window.innerWidth - 32 // Account for padding
-        const containerHeight = window.innerHeight - 160 // Account for toolbars
+    if (container && (isMobile.value || isMobileDevice.value === true)) {
+        const containerWidth = window.innerWidth - 16 // Reduced padding for more space
+        const containerHeight = window.innerHeight - 90 // Reduced space for toolbars
         
-        // Set canvas dimensions
-        canvas.setWidth(containerWidth)
-        canvas.setHeight(containerHeight)
+        // Keep canvas at original size to maintain fabric.js coordinate system
+        // Only adjust zoom level for better visibility
+        const deckWidth = deckBackgroundWidth.value || 2833
+        const deckHeight = deckBackgroundHeight.value || 10119
         
-        // Scale canvas to fit mobile screen while maintaining aspect ratio
-        const scale = Math.min(containerWidth / 500, containerHeight / 630) * 0.8
+        // Calculate zoom that uses more of the available space
+        const scaleX = (containerWidth * 0.85) / deckWidth // Increased from 0.6 to 0.85
+        const scaleY = (containerHeight * 0.85) / deckHeight // Increased from 0.6 to 0.85
+        const scale = Math.min(scaleX, scaleY, 0.15) // Increased max zoom from 0.08 to 0.15
+        
+        // Apply simple zoom without viewport transforms to maintain touch coordinate accuracy
         canvas.setZoom(scale)
         
-        // Center canvas
-        const vpt = canvas.viewportTransform
-        vpt[4] = (containerWidth - 500 * scale) / 2
-        vpt[5] = (containerHeight - 630 * scale) / 2
+        // Use simple centering by panning to a calculated position
+        // This maintains fabric.js's coordinate system integrity
+        const centerX = (backgroundPositionLeft.value + deckWidth / 2) * scale
+        const centerY = (calculateBackgroundDeckTopOffset() + deckHeight / 2) * scale
+        const panX = containerWidth / 2 - centerX
+        const panY = containerHeight / 2 - centerY
+        
+        // Use relativePan instead of absolutePan to avoid disrupting coordinate system
+        canvas.relativePan(new fabric.Point(panX, panY))
         
         canvas.renderAll()
+        
+        // Debug: Add console logging for mobile touch events
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Mobile canvas adjusted (simplified):', {
+                scale,
+                panX,
+                panY,
+                containerWidth,
+                containerHeight,
+                viewportTransform: canvas.viewportTransform
+            })
+        }
     }
 }
 
@@ -2898,25 +3025,22 @@ function showMobileToast(message) {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 1;
+        z-index: 1; /* Lower z-index to not interfere with UI */
         background-color: #f5f5f5;
-        padding: 1rem;
+        padding: 0.5rem; /* Reduced padding for more canvas space */
+        padding-bottom: 80px; /* Reduced space for mobile toolbar toggle */
         overflow: hidden;
+        /* Remove flex centering that can interfere with fabric.js positioning */
+        /* pointer-events: none removed to avoid touch coordinate issues */
     }
     
     .canvas {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        max-width: 100% !important;
-        max-height: calc(100vh - 8rem) !important;
-        margin: 0 auto !important;
-        display: block !important;
+        /* Minimal canvas styling to avoid fabric.js conflicts */
         border: 1px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Let fabric.js handle positioning and sizing */
+        touch-action: none; /* Prevent browser touch handling */
     }
 }
 

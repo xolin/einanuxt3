@@ -7,15 +7,15 @@
           <button 
             v-for="view in viewOptions" 
             :key="view.id"
-            @click="activeView = view.id"
             class="view-btn"
             :class="{ active: activeView === view.id }"
+            @click="activeView = view.id"
           >
             <span class="material-symbols-sharp">{{ view.icon }}</span>
             <span>{{ view.label }}</span>
           </button>
         </div>
-        <button @click="$emit('close')" class="close-btn">
+        <button class="close-btn" @click="$emit('close')">
           <span class="material-symbols-sharp">close</span>
         </button>
       </div>
@@ -74,9 +74,9 @@
                 <button 
                   v-for="format in formatOptions" 
                   :key="format.id"
-                  @click="exportFormat = format.id"
                   class="format-btn"
                   :class="{ active: exportFormat === format.id }"
+                  @click="exportFormat = format.id"
                 >
                   {{ format.label }}
                 </button>
@@ -87,10 +87,10 @@
       </div>
 
       <div class="preview-footer">
-        <button @click="$emit('close')" class="cancel-btn">
+        <button class="cancel-btn" @click="$emit('close')">
           Cancelar
         </button>
-        <button @click="exportDesign" class="export-btn">
+        <button class="export-btn" @click="exportDesign">
           <span class="material-symbols-sharp">download</span>
           Exportar {{ exportFormat.toUpperCase() }}
         </button>

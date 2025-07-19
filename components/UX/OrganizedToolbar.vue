@@ -1,15 +1,15 @@
 <template>
   <div class="organized-toolbar" :class="{ 'toolbar-mobile': isMobile }">
     <!-- Colors Section -->
-    <div class="toolbar-section" id="colors-section">
+    <div id="colors-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">🎨</span>
         <span class="section-title">Colores</span>
         <button 
           v-if="isMobile" 
-          @click="toggleSection('colors')"
           class="section-toggle"
           :class="{ 'active': expandedSections.includes('colors') }"
+          @click="toggleSection('colors')"
         >
           <span class="material-symbols-sharp">expand_more</span>
         </button>
@@ -43,8 +43,8 @@
                 v-if="activeColorPicker === 'text'" 
                 type="color" 
                 :value="textColor" 
-                @input="$emit('text-color-change', $event.target.value)"
-                class="inline-color-picker" 
+                class="inline-color-picker"
+                @input="$emit('text-color-change', $event.target.value)" 
               />
             </div>
           </Tooltip>
@@ -53,15 +53,15 @@
     </div>
 
     <!-- Content Section -->
-    <div class="toolbar-section" id="content-section">
+    <div id="content-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">📝</span>
         <span class="section-title">Contenido</span>
         <button 
           v-if="isMobile" 
-          @click="toggleSection('content')"
           class="section-toggle"
           :class="{ 'active': expandedSections.includes('content') }"
+          @click="toggleSection('content')"
         >
           <span class="material-symbols-sharp">expand_more</span>
         </button>
@@ -107,15 +107,15 @@
     </div>
 
     <!-- Typography Section -->
-    <div class="toolbar-section" id="typography-section" v-if="hasSelectedText">
+    <div v-if="hasSelectedText" id="typography-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">📝</span>
         <span class="section-title">Tipografía</span>
         <button 
           v-if="isMobile" 
-          @click="toggleSection('typography')"
           class="section-toggle"
           :class="{ 'active': expandedSections.includes('typography') }"
+          @click="toggleSection('typography')"
         >
           <span class="material-symbols-sharp">expand_more</span>
         </button>
@@ -130,8 +130,8 @@
             <div class="typography-control">
               <select 
                 :value="selectedFont" 
-                @change="$emit('font-change', $event.target.value)"
                 class="font-selector"
+                @change="$emit('font-change', $event.target.value)"
               >
                 <option v-for="font in fontOptions" :key="font.value" :value="font.value">
                   {{ font.name }}
@@ -145,23 +145,23 @@
             <div class="typography-control size-control">
               <button 
                 class="size-btn" 
-                @click="$emit('font-size-change', 'decrease')"
                 :disabled="fontSize <= 8"
+                @click="$emit('font-size-change', 'decrease')"
               >
                 <span class="material-symbols-sharp">remove</span>
               </button>
               <input 
                 type="number" 
                 :value="fontSize" 
-                @change="$emit('font-size-change', parseInt($event.target.value))"
                 class="size-input"
                 min="8"
                 max="200"
+                @change="$emit('font-size-change', parseInt($event.target.value))"
               />
               <button 
                 class="size-btn" 
-                @click="$emit('font-size-change', 'increase')"
                 :disabled="fontSize >= 200"
+                @click="$emit('font-size-change', 'increase')"
               >
                 <span class="material-symbols-sharp">add</span>
               </button>
@@ -173,8 +173,8 @@
             <div class="typography-control">
               <select 
                 :value="fontWeight" 
-                @change="$emit('font-weight-change', $event.target.value)"
                 class="weight-selector"
+                @change="$emit('font-weight-change', $event.target.value)"
               >
                 <option value="300">Ligera</option>
                 <option value="400">Normal</option>
@@ -256,15 +256,15 @@
     </div>
 
     <!-- Actions Section -->
-    <div class="toolbar-section" id="actions-section">
+    <div id="actions-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">⚡</span>
         <span class="section-title">Acciones</span>
         <button 
           v-if="isMobile" 
-          @click="toggleSection('actions')"
           class="section-toggle"
           :class="{ 'active': expandedSections.includes('actions') }"
+          @click="toggleSection('actions')"
         >
           <span class="material-symbols-sharp">expand_more</span>
         </button>
@@ -314,7 +314,7 @@
     </div>
 
     <!-- Download Section -->
-    <div class="toolbar-section download-section" id="download-section">
+    <div id="download-section" class="toolbar-section download-section">
       <Tooltip text="Descargar diseño finalizado" shortcut="D" position="bottom">
         <button 
           class="download-btn" 

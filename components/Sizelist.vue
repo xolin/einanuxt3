@@ -1,6 +1,6 @@
 <template>
     <div>
-      <Listbox as="div" v-model="selected" class="p-3">
+      <Listbox v-model="selected" as="div" class="p-3">
         <ListboxLabel class="block ml-2 text-sm font-medium text-gray-700">Deck size:</ListboxLabel>
         <div class="relative mt-1">
           <ListboxButton class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-0 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
@@ -14,7 +14,7 @@
 
           <transition leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <ListboxOptions class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              <ListboxOption as="template" v-for="size in sizes" :key="size.id" :value="size" v-slot="{ active, selected }">
+              <ListboxOption v-for="size in sizes" :key="size.id" v-slot="{ active, selected }" as="template" :value="size">
                 <li :class="[active ? 'text-white bg-indigo-600' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-3 pr-9']">
                   <div class="flex items-center">
                       <span :class="[selected ? 'font-semibold' : 'font-normal', 'ml-3 block truncate']">{{ size.name }}</span>

@@ -33,7 +33,7 @@
               </svg>
             </div> -->
             <div class="mt-3 text-center sm:mt-0 sm:text-left">
-              <h3 class="text-center text-base font-semibold leading-6 text-gray-900" id="modal-title">Sólo te falta el último paso!</h3>
+              <h3 id="modal-title" class="text-center text-base font-semibold leading-6 text-gray-900">Sólo te falta el último paso!</h3>
               <div class="mt-2">
                 <p class="text-center text-sm text-gray-500">Envíanos el archivo que te vas a descargar.</p>
                 <p class="text-center text-sm text-gray-500">Mándanoslo por Whatsapp, Email, Wetransfer, o cómo prefieras.</p>

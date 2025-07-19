@@ -6,7 +6,7 @@
           <h2>Plantillas de Diseño</h2>
           <p>Comienza con una plantilla pre-diseñada y personalízala a tu gusto</p>
         </div>
-        <button @click="$emit('close')" class="close-btn">
+        <button class="close-btn" @click="$emit('close')">
           <span class="material-symbols-sharp">close</span>
         </button>
       </div>
@@ -15,9 +15,9 @@
         <button 
           v-for="category in categories" 
           :key="category.id"
-          @click="activeCategory = category.id"
           class="category-tab"
           :class="{ active: activeCategory === category.id }"
+          @click="activeCategory = category.id"
         >
           <span class="category-icon">{{ category.icon }}</span>
           <span class="category-name">{{ category.name }}</span>
@@ -29,9 +29,9 @@
           <div 
             v-for="template in filteredTemplates" 
             :key="template.id"
-            @click="selectTemplate(template)"
             class="template-card"
             :class="{ selected: selectedTemplate?.id === template.id }"
+            @click="selectTemplate(template)"
           >
             <div class="template-preview">
               <div class="skateboard-preview" :style="{ '--deck-color': template.deckColor }">
@@ -63,13 +63,13 @@
       </div>
 
       <div class="gallery-footer">
-        <button @click="$emit('close')" class="cancel-btn">
+        <button class="cancel-btn" @click="$emit('close')">
           Cancelar
         </button>
         <button 
-          @click="useTemplate" 
-          :disabled="!selectedTemplate"
+          :disabled="!selectedTemplate" 
           class="use-template-btn"
+          @click="useTemplate"
         >
           <span class="material-symbols-sharp">add_circle</span>
           Usar Plantilla

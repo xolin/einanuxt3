@@ -18,7 +18,7 @@
                 <button class="bg-blue-200 hover:bg-blue-500 hover:text-white text-blue-500 text-center py-2 px-4 rounded" @click="$refs.file.click()">
                     Upload image
                 </button>
-                <input type="file" ref="file" @change="uploadFile" class="hidden" />
+                <input ref="file" type="file" class="hidden" @change="uploadFile" />
             </div>
 
             <div class="flex h-12 w-full justify-center my-3">

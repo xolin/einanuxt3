@@ -1,5 +1,5 @@
 <template>
-  <div class="mobile-onboarding" v-if="isVisible" @click="handleBackgroundClick">
+  <div v-if="isVisible" class="mobile-onboarding" @click="handleBackgroundClick">
     <div class="onboarding-content" @click.stop>
       <!-- Progress indicator -->
       <div class="progress-container">
@@ -21,12 +21,12 @@
         <p class="step-description">{{ steps[currentStep].description }}</p>
         
         <!-- Interactive demo -->
-        <div class="step-demo" v-if="steps[currentStep].demo">
+        <div v-if="steps[currentStep].demo" class="step-demo">
           <component :is="steps[currentStep].demo" @demo-complete="handleDemoComplete" />
         </div>
         
         <!-- Tips for current step -->
-        <div class="step-tips" v-if="steps[currentStep].tips">
+        <div v-if="steps[currentStep].tips" class="step-tips">
           <h4>💡 Consejos:</h4>
           <ul>
             <li v-for="tip in steps[currentStep].tips" :key="tip">{{ tip }}</li>
@@ -37,25 +37,25 @@
       <!-- Navigation -->
       <div class="navigation">
         <button 
+          v-if="currentStep === 0"
           class="nav-button secondary"
           @click="skipOnboarding"
-          v-if="currentStep === 0"
         >
           Saltar tutorial
         </button>
         
         <button 
+          v-if="currentStep > 0"
           class="nav-button secondary"
           @click="previousStep"
-          v-if="currentStep > 0"
         >
           Anterior
         </button>
         
         <button 
           class="nav-button primary"
-          @click="nextStep"
           :disabled="!canProceed"
+          @click="nextStep"
         >
           {{ currentStep === steps.length - 1 ? 'Finalizar' : 'Siguiente' }}
         </button>

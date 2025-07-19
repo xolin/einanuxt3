@@ -3,10 +3,10 @@
     <!-- Toggle Button -->
     <Tooltip text="Formato de texto avanzado" shortcut="F" position="left">
       <button
-        @click="togglePanel"
         class="fixed top-20 left-0 transform bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-r-lg shadow-lg z-40 transition-colors duration-200"
         :class="{ 'left-80': isOpen }"
         :disabled="!hasSelectedText"
+        @click="togglePanel"
       >
         <span class="material-symbols-sharp text-xl">
           {{ isOpen ? 'close' : 'format_text_wrap' }}
@@ -24,8 +24,8 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800">Formato de Texto</h2>
           <button 
-            @click="closePanel"
             class="text-gray-500 hover:text-gray-700 p-1"
+            @click="closePanel"
           >
             <span class="material-symbols-sharp">close</span>
           </button>
@@ -47,8 +47,8 @@
             </label>
             <select
               v-model="selectedFont"
-              @change="updateFont"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              @change="updateFont"
             >
               <option v-for="font in fontFamilies" :key="font.value" :value="font.value">
                 {{ font.name }}
@@ -66,23 +66,23 @@
             </label>
             <div class="flex items-center space-x-3">
               <button
-                @click="decreaseFontSize"
                 class="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                @click="decreaseFontSize"
               >
                 <span class="material-symbols-sharp text-sm">remove</span>
               </button>
               <input
-                type="range"
                 v-model="fontSize"
-                @input="updateFontSize"
+                type="range"
                 min="8"
                 max="200"
                 step="1"
                 class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                @input="updateFontSize"
               />
               <button
-                @click="increaseFontSize"
                 class="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                @click="increaseFontSize"
               >
                 <span class="material-symbols-sharp text-sm">add</span>
               </button>
@@ -102,7 +102,6 @@
               <button
                 v-for="weight in fontWeights"
                 :key="weight.value"
-                @click="updateFontWeight(weight.value)"
                 :class="[
                   'px-3 py-2 text-sm rounded-lg border transition-colors',
                   fontWeight === weight.value
@@ -110,6 +109,7 @@
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 ]"
                 :style="{ fontWeight: weight.value }"
+                @click="updateFontWeight(weight.value)"
               >
                 {{ weight.name }}
               </button>
@@ -123,35 +123,35 @@
             </label>
             <div class="flex space-x-2">
               <button
-                @click="toggleBold"
                 :class="[
                   'p-2 rounded-lg border transition-colors flex-1',
                   isBold
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 ]"
+                @click="toggleBold"
               >
                 <span class="material-symbols-sharp font-bold">format_bold</span>
               </button>
               <button
-                @click="toggleItalic"
                 :class="[
                   'p-2 rounded-lg border transition-colors flex-1',
                   isItalic
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 ]"
+                @click="toggleItalic"
               >
                 <span class="material-symbols-sharp italic">format_italic</span>
               </button>
               <button
-                @click="toggleUnderline"
                 :class="[
                   'p-2 rounded-lg border transition-colors flex-1',
                   isUnderline
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 ]"
+                @click="toggleUnderline"
               >
                 <span class="material-symbols-sharp underline">format_underlined</span>
               </button>
@@ -167,13 +167,13 @@
               <button
                 v-for="align in textAlignments"
                 :key="align.value"
-                @click="updateTextAlign(align.value)"
                 :class="[
                   'p-2 rounded-lg border transition-colors flex-1',
                   textAlign === align.value
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 ]"
+                @click="updateTextAlign(align.value)"
               >
                 <span class="material-symbols-sharp">{{ align.icon }}</span>
               </button>
@@ -186,13 +186,13 @@
               Altura de línea: {{ lineHeight }}
             </label>
             <input
-              type="range"
               v-model="lineHeight"
-              @input="updateLineHeight"
+              type="range"
               min="0.8"
               max="3"
               step="0.1"
               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              @input="updateLineHeight"
             />
             <div class="flex justify-between text-xs text-gray-500 mt-1">
               <span>0.8</span>
@@ -207,13 +207,13 @@
               Espaciado: {{ letterSpacing }}px
             </label>
             <input
-              type="range"
               v-model="letterSpacing"
-              @input="updateLetterSpacing"
+              type="range"
               min="-5"
               max="20"
               step="0.5"
               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              @input="updateLetterSpacing"
             />
             <div class="flex justify-between text-xs text-gray-500 mt-1">
               <span>-5px</span>
@@ -229,17 +229,17 @@
             </label>
             <div class="flex items-center space-x-3">
               <input
-                type="color"
                 v-model="textColor"
-                @input="updateTextColor"
+                type="color"
                 class="w-12 h-12 border border-gray-300 rounded-lg cursor-pointer"
+                @input="updateTextColor"
               />
               <input
-                type="text"
                 v-model="textColor"
-                @change="updateTextColor"
+                type="text"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                 placeholder="#000000"
+                @change="updateTextColor"
               />
             </div>
             
@@ -250,10 +250,10 @@
                 <button
                   v-for="color in colorPresets"
                   :key="color"
-                  @click="setTextColor(color)"
                   :style="{ backgroundColor: color }"
                   class="w-8 h-8 rounded-lg border-2 border-gray-200 hover:border-gray-400 transition-colors"
                   :title="color"
+                  @click="setTextColor(color)"
                 ></button>
               </div>
             </div>
@@ -270,13 +270,13 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-600">Sombra de texto</span>
                 <button
-                  @click="toggleTextShadow"
                   :class="[
                     'px-3 py-1 text-xs rounded-lg transition-colors',
                     hasTextShadow
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   ]"
+                  @click="toggleTextShadow"
                 >
                   {{ hasTextShadow ? 'ON' : 'OFF' }}
                 </button>
@@ -286,46 +286,46 @@
                 <div>
                   <label class="text-xs text-gray-600">Offset X: {{ shadowOffsetX }}px</label>
                   <input
-                    type="range"
                     v-model="shadowOffsetX"
-                    @input="updateTextShadow"
+                    type="range"
                     min="-10"
                     max="10"
                     step="1"
                     class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    @input="updateTextShadow"
                   />
                 </div>
                 <div>
                   <label class="text-xs text-gray-600">Offset Y: {{ shadowOffsetY }}px</label>
                   <input
-                    type="range"
                     v-model="shadowOffsetY"
-                    @input="updateTextShadow"
+                    type="range"
                     min="-10"
                     max="10"
                     step="1"
                     class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    @input="updateTextShadow"
                   />
                 </div>
                 <div>
                   <label class="text-xs text-gray-600">Blur: {{ shadowBlur }}px</label>
                   <input
-                    type="range"
                     v-model="shadowBlur"
-                    @input="updateTextShadow"
+                    type="range"
                     min="0"
                     max="20"
                     step="1"
                     class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    @input="updateTextShadow"
                   />
                 </div>
                 <div class="flex items-center space-x-2">
                   <label class="text-xs text-gray-600">Color:</label>
                   <input
-                    type="color"
                     v-model="shadowColor"
-                    @input="updateTextShadow"
+                    type="color"
                     class="w-8 h-8 border border-gray-300 rounded cursor-pointer"
+                    @input="updateTextShadow"
                   />
                 </div>
               </div>
@@ -341,13 +341,13 @@
               <button
                 v-for="transform in textTransforms"
                 :key="transform.value"
-                @click="updateTextTransform(transform.value)"
                 :class="[
                   'px-3 py-2 text-sm rounded-lg border transition-colors',
                   textTransform === transform.value
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 ]"
+                @click="updateTextTransform(transform.value)"
               >
                 {{ transform.name }}
               </button>
@@ -359,21 +359,21 @@
             <h3 class="text-sm font-semibold text-gray-700 mb-3">Acciones rápidas</h3>
             <div class="space-y-2">
               <button
-                @click="resetFormatting"
                 class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition duration-200"
+                @click="resetFormatting"
               >
                 🔄 Restablecer formato
               </button>
               <button
-                @click="copyFormatting"
                 class="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition duration-200"
+                @click="copyFormatting"
               >
                 📋 Copiar formato
               </button>
               <button
                 v-if="hasStoredFormat"
-                @click="pasteFormatting"
                 class="w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition duration-200"
+                @click="pasteFormatting"
               >
                 📄 Pegar formato
               </button>

@@ -3,9 +3,9 @@
     <!-- Toggle Button -->
     <Tooltip text="Gestionar capas" shortcut="L" position="right">
       <button
-        @click="togglePanel"
-        class="fixed top-1/2 right-0 transform -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
+        class="fixed top-1/3 right-0 transform bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-l-lg shadow-lg z-40 transition-colors duration-200"
         :class="{ 'right-80': isOpen }"
+        @click="togglePanel"
       >
         <span class="material-symbols-sharp text-xl">
           {{ isOpen ? 'close' : 'layers' }}
@@ -26,8 +26,8 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800">Capas</h2>
           <button 
-            @click="closePanel"
             class="text-gray-500 hover:text-gray-700 p-1"
+            @click="closePanel"
           >
             <span class="material-symbols-sharp">close</span>
           </button>
@@ -40,24 +40,24 @@
             <div class="flex space-x-2">
               <Tooltip text="Mostrar todas" position="top">
                 <button
-                  @click="showAllLayers"
                   class="p-1 text-green-600 hover:bg-green-100 rounded"
+                  @click="showAllLayers"
                 >
                   <span class="material-symbols-sharp text-sm">visibility</span>
                 </button>
               </Tooltip>
               <Tooltip text="Ocultar todas" position="top">
                 <button
-                  @click="hideAllLayers"
                   class="p-1 text-orange-600 hover:bg-orange-100 rounded"
+                  @click="hideAllLayers"
                 >
                   <span class="material-symbols-sharp text-sm">visibility_off</span>
                 </button>
               </Tooltip>
               <Tooltip text="Eliminar capas ocultas" position="top">
                 <button
-                  @click="deleteHiddenLayers"
                   class="p-1 text-red-600 hover:bg-red-100 rounded"
+                  @click="deleteHiddenLayers"
                 >
                   <span class="material-symbols-sharp text-sm">delete_sweep</span>
                 </button>
@@ -102,10 +102,10 @@
           <draggable
             v-model="filteredLayers"
             group="layers"
-            @start="onDragStart"
-            @end="onDragEnd"
             item-key="id"
             class="space-y-2"
+            @start="onDragStart"
+            @end="onDragEnd"
           >
             <template #item="{ element: layer }">
               <div
@@ -134,12 +134,12 @@
                     <!-- Editable Name -->
                     <div v-if="editingLayer === layer.id" class="flex-1">
                       <input
+                        ref="nameInput"
                         v-model="editingName"
+                        class="w-full px-2 py-1 text-sm border border-purple-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
                         @blur="finishRenaming"
                         @keyup.enter="finishRenaming"
                         @keyup.escape="cancelRenaming"
-                        class="w-full px-2 py-1 text-sm border border-purple-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-                        ref="nameInput"
                         @click.stop
                       />
                     </div>
@@ -160,11 +160,11 @@
                     <!-- Visibility Toggle -->
                     <Tooltip :text="layer.opacity > 0 ? 'Ocultar' : 'Mostrar'" position="top">
                       <button
-                        @click.stop="toggleLayerVisibility(layer.id)"
                         :class="[
                           'action-btn',
                           layer.opacity > 0 ? 'text-green-600 hover:bg-green-100' : 'text-gray-400 hover:bg-gray-100'
                         ]"
+                        @click.stop="toggleLayerVisibility(layer.id)"
                       >
                         <span class="material-symbols-sharp text-sm">
                           {{ layer.opacity > 0 ? 'visibility' : 'visibility_off' }}
@@ -175,11 +175,11 @@
                     <!-- Lock Toggle -->
                     <Tooltip :text="layer.locked ? 'Desbloquear' : 'Bloquear'" position="top">
                       <button
-                        @click.stop="toggleLayerLock(layer.id)"
                         :class="[
                           'action-btn',
                           layer.locked ? 'text-orange-600 hover:bg-orange-100' : 'text-gray-400 hover:bg-gray-100'
                         ]"
+                        @click.stop="toggleLayerLock(layer.id)"
                       >
                         <span class="material-symbols-sharp text-sm">
                           {{ layer.locked ? 'lock' : 'lock_open' }}
@@ -190,8 +190,8 @@
                     <!-- Duplicate -->
                     <Tooltip text="Duplicar" position="top">
                       <button
-                        @click.stop="duplicateLayer(layer.id)"
                         class="action-btn text-blue-600 hover:bg-blue-100"
+                        @click.stop="duplicateLayer(layer.id)"
                       >
                         <span class="material-symbols-sharp text-sm">content_copy</span>
                       </button>
@@ -200,8 +200,8 @@
                     <!-- Delete -->
                     <Tooltip text="Eliminar" position="top">
                       <button
-                        @click.stop="deleteLayer(layer.id)"
                         class="action-btn text-red-600 hover:bg-red-100"
+                        @click.stop="deleteLayer(layer.id)"
                       >
                         <span class="material-symbols-sharp text-sm">delete</span>
                       </button>
@@ -225,8 +225,8 @@
                         max="1"
                         step="0.01"
                         :value="layer.opacity || 1"
-                        @input="updateLayerOpacity(layer.id, $event.target.value)"
                         class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        @input="updateLayerOpacity(layer.id, $event.target.value)"
                       />
                     </div>
 
@@ -274,8 +274,8 @@
         <!-- Toggle Properties Panel -->
         <div v-if="layers.length > 0" class="mt-4">
           <button
-            @click="showProperties = !showProperties"
             class="w-full text-left px-3 py-2 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition duration-200"
+            @click="showProperties = !showProperties"
           >
             {{ showProperties ? '🔼' : '🔽' }} {{ showProperties ? 'Ocultar' : 'Mostrar' }} propiedades
           </button>

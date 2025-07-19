@@ -9,9 +9,9 @@
             <p class="text-blue-100 mt-1">Crea tu tabla personalizada en minutos</p>
           </div>
           <button 
-            @click="skipTutorial"
             class="text-blue-100 hover:text-white p-1"
             title="Cerrar"
+            @click="skipTutorial"
           >
             <span class="material-symbols-sharp text-xl">close</span>
           </button>
@@ -159,8 +159,8 @@
       <!-- Footer -->
       <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between items-center">
         <button 
-          @click="skipTutorial"
           class="text-gray-600 hover:text-gray-800 px-4 py-2 text-sm"
+          @click="skipTutorial"
         >
           Saltar tutorial
         </button>
@@ -168,24 +168,24 @@
         <div class="flex space-x-3">
           <button 
             v-if="currentStep > 1"
-            @click="previousStep"
             class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm transition-colors"
+            @click="previousStep"
           >
             Anterior
           </button>
           
           <button 
             v-if="currentStep < totalSteps"
-            @click="nextStep"
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition-colors"
+            @click="nextStep"
           >
             Siguiente
           </button>
           
           <button 
             v-if="currentStep === totalSteps"
-            @click="finishTutorial"
             class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm transition-colors"
+            @click="finishTutorial"
           >
             ¡Empezar a Diseñar!
           </button>

@@ -17,9 +17,9 @@
       
       <div class="quick-actions">
         <button 
-          @click="$emit('action', 'add-text')" 
-          class="quick-action-btn"
+          class="quick-action-btn" 
           title="Añadir texto personalizado"
+          @click="$emit('action', 'add-text')"
         >
           <span class="action-icon">📝</span>
           <span class="action-label">Añadir Texto</span>
@@ -27,9 +27,9 @@
         </button>
         
         <button 
-          @click="$emit('action', 'deck-color')" 
-          class="quick-action-btn"
+          class="quick-action-btn" 
           title="Cambiar color de fondo"
+          @click="$emit('action', 'deck-color')"
         >
           <span class="action-icon">🎨</span>
           <span class="action-label">Elegir Color</span>
@@ -37,9 +37,9 @@
         </button>
         
         <button 
-          @click="$emit('action', 'add-emoji')" 
-          class="quick-action-btn"
+          class="quick-action-btn" 
           title="Explorar emojis"
+          @click="$emit('action', 'add-emoji')"
         >
           <span class="action-icon">😊</span>
           <span class="action-label">Añadir Emoji</span>
@@ -47,9 +47,9 @@
         </button>
         
         <button 
-          @click="$emit('action', 'upload-image')" 
-          class="quick-action-btn"
+          class="quick-action-btn" 
           title="Subir imagen propia"
+          @click="$emit('action', 'upload-image')"
         >
           <span class="action-icon">📷</span>
           <span class="action-label">Subir Imagen</span>
@@ -57,9 +57,9 @@
         </button>
         
         <button 
-          @click="$emit('action', 'browse-templates')" 
-          class="quick-action-btn template-action"
+          class="quick-action-btn template-action" 
           title="Explorar plantillas pre-diseñadas"
+          @click="$emit('action', 'browse-templates')"
         >
           <span class="action-icon">🎨</span>
           <span class="action-label">Usar Plantilla</span>
@@ -78,10 +78,10 @@
       </div>
       
       <div class="dismiss-section">
-        <button @click="$emit('dismiss')" class="dismiss-btn">
+        <button class="dismiss-btn" @click="$emit('dismiss')">
           No mostrar de nuevo
         </button>
-        <button @click="$emit('close')" class="close-btn">
+        <button class="close-btn" @click="$emit('close')">
           <span class="material-symbols-sharp">close</span>
         </button>
       </div>

@@ -3,8 +3,8 @@
       <div class="mx-auto w-full max-w-md rounded-l bg-white p-2">
         <ul v-for="layer in layers" :key="layer.id">
             <li @click="selectObjectFromList(layer.id)">{{layer.id}} - {{layer.type}}
-                <button class="icon mr-4 cursor-pointer" @click="toggleHideObjectFromList(layer.id, 'hide')" v-if="layer.opacity > 0.1">Hide</button>
-                <button class="icon mr-4 cursor-pointer" @click="toggleHideObjectFromList(layer.id, 'show')" v-if="layer.opacity == 0">Show</button>
+                <button v-if="layer.opacity > 0.1" class="icon mr-4 cursor-pointer" @click="toggleHideObjectFromList(layer.id, 'hide')">Hide</button>
+                <button v-if="layer.opacity == 0" class="icon mr-4 cursor-pointer" @click="toggleHideObjectFromList(layer.id, 'show')">Show</button>
                 <button class="icon mr-4 cursor-pointer right" @click="removeObjectFromList(layer.id)">X</button>
             </li>
         </ul>
