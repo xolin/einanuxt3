@@ -2340,9 +2340,64 @@ function handlePreviewExport(exportOptions) {
 function startEnhancedDownload(options = {}) {
     const quality = options.quality || 'high'
     const format = options.format || 'jpg'
+    const resolution = options.resolution || { width: 1800, height: 1200, dpi: 150 }
     
-    // Use existing download logic but with enhanced options
-    startDownload()
+    // Enhanced image generation with proper format and quality
+    try {
+        if (!canvas) {
+            throw new Error('Canvas not available')
+        }
+        
+        // Store current canvas state
+        const currentZoom = canvas.getZoom()
+        const currentVpTransform = [...canvas.viewportTransform]
+        
+        // Temporarily adjust canvas for high-quality export
+        canvas.discardActiveObject().renderAll()
+        hideBin()
+        
+        // Calculate multiplier based on quality
+        const qualityMultiplier = {
+            'standard': 1,
+            'high': 2,
+            'print': 4
+        }[quality] || 2
+        
+        // Generate high-quality image data
+        const imageFormat = format === 'png' ? 'png' : 'jpeg'
+        const imageQuality = format === 'png' ? 1.0 : (quality === 'print' ? 1.0 : 0.9)
+        
+        const dataURL = canvas.toDataURL(`image/${imageFormat}`, {
+            quality: imageQuality,
+            multiplier: qualityMultiplier,
+            format: imageFormat,
+            width: resolution.width,
+            height: resolution.height
+        })
+        
+        // Create download link
+        const link = document.createElement('a')
+        link.download = `skateboard-design.${format}`
+        link.href = dataURL
+        
+        // Trigger download
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        
+        // Restore canvas state
+        canvas.setZoom(currentZoom)
+        canvas.setViewportTransform(currentVpTransform)
+        canvas.renderAll()
+        
+        return dataURL
+        
+    } catch (error) {
+        console.error('Export error:', error)
+        showToast('error', 'Error al exportar el diseño. Inténtalo de nuevo.', 'Error de exportación')
+        hideLoading()
+        throw error
+    }
 }
 
 // Phase 4: Advanced Features & Polish Methods
