@@ -286,7 +286,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import draggable from 'vuedraggable'
 
 const props = defineProps({
@@ -294,7 +294,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  selectedLayer: String
+  selectedLayer: {
+    type: String,
+    default: null
+  }
 })
 
 const emit = defineEmits([
@@ -463,13 +466,14 @@ const getDefaultLayerName = (layer) => {
   return names[layer.type] || 'Capa'
 }
 
-// Watch for auto-open on layer changes
-watch(() => props.layers.length, (newCount, oldCount) => {
-  if (newCount > oldCount && newCount === 1) {
-    // Auto-open when first layer is added
-    isOpen.value = true
-  }
-})
+// Auto-open functionality removed as per issue requirement
+// Previously: automatically opened layers panel when first element was added
+// watch(() => props.layers.length, (newCount, oldCount) => {
+//   if (newCount > oldCount && newCount === 1) {
+//     // Auto-open when first layer is added
+//     isOpen.value = true
+//   }
+// })
 
 // Expose methods for parent component
 defineExpose({
