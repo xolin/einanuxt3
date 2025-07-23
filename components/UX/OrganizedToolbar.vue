@@ -71,6 +71,13 @@
         :class="{ 'collapsed': isMobile && !expandedSections.includes('content') }"
       >
         <div class="tool-group">
+          <Tooltip text="Añadir texto editable" shortcut="T" position="bottom">
+            <button class="tool-btn" @click="$emit('tool-action', 'add-text')">
+              <span class="material-symbols-sharp">text_fields</span>
+              <span class="tool-label">Texto</span>
+            </button>
+          </Tooltip>
+          
           <Tooltip text="Explorar colección de emojis" shortcut="E" position="bottom">
             <button 
               class="tool-btn" 

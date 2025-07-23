@@ -2367,13 +2367,35 @@ function startEnhancedDownload(options = {}) {
         const imageFormat = format === 'png' ? 'png' : 'jpeg'
         const imageQuality = format === 'png' ? 1.0 : (quality === 'print' ? 1.0 : 0.9)
         
-        const dataURL = canvas.toDataURL(`image/${imageFormat}`, {
-            quality: imageQuality,
-            multiplier: qualityMultiplier,
-            format: imageFormat,
-            width: resolution.width,
-            height: resolution.height
-        })
+        // Set canvas size based on quality multiplier
+        const originalWidth = canvas.getWidth()
+        const originalHeight = canvas.getHeight()
+        
+        // Scale canvas for higher quality export
+        if (qualityMultiplier > 1) {
+            canvas.setDimensions({
+                width: originalWidth * qualityMultiplier,
+                height: originalHeight * qualityMultiplier
+            })
+            canvas.setZoom(canvas.getZoom() * qualityMultiplier)
+        }
+        
+        // Generate data URL with correct format and quality
+        let dataURL
+        if (format === 'svg') {
+            dataURL = 'data:image/svg+xml;base64,' + btoa(canvas.toSVG())
+        } else {
+            dataURL = canvas.toDataURL(`image/${imageFormat}`, imageQuality)
+        }
+        
+        // Restore original canvas dimensions
+        if (qualityMultiplier > 1) {
+            canvas.setDimensions({
+                width: originalWidth,
+                height: originalHeight
+            })
+            canvas.setZoom(canvas.getZoom() / qualityMultiplier)
+        }
         
         // Create download link
         const link = document.createElement('a')
