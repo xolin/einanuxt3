@@ -1,7 +1,7 @@
 <template>
   <div class="organized-toolbar" :class="{ 'toolbar-mobile': isMobile }">
     <!-- Colors Section -->
-    <div id="colors-section" class="toolbar-section">
+    <div v-if="!hasSelectedText" id="colors-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">🎨</span>
         <span class="section-title">Colores</span>
@@ -53,7 +53,7 @@
     </div>
 
     <!-- Content Section -->
-    <div id="content-section" class="toolbar-section">
+    <div v-if="!hasSelectedText" id="content-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">📝</span>
         <span class="section-title">Contenido</span>
@@ -256,7 +256,7 @@
     </div>
 
     <!-- Actions Section -->
-    <div id="actions-section" class="toolbar-section">
+    <div v-if="!hasSelectedText" id="actions-section" class="toolbar-section">
       <div class="section-header">
         <span class="section-icon">⚡</span>
         <span class="section-title">Acciones</span>
@@ -274,7 +274,8 @@
         :class="{ 'collapsed': isMobile && !expandedSections.includes('actions') }"
       >
         <div class="tool-group">
-          <Tooltip text="Deshacer última acción" shortcut="Ctrl+Z" position="bottom">
+          <!-- Hide Undo and Redo buttons until functionality is developed -->
+          <!-- <Tooltip text="Deshacer última acción" shortcut="Ctrl+Z" position="bottom">
             <button 
               class="tool-btn" 
               :disabled="!canUndo"
@@ -294,7 +295,7 @@
               <span class="material-symbols-sharp">redo</span>
               <span class="tool-label">Rehacer</span>
             </button>
-          </Tooltip>
+          </Tooltip> -->
           
           <div class="tool-subgroup">
             <Tooltip text="Acercar vista" shortcut="+" position="bottom">
@@ -314,7 +315,7 @@
     </div>
 
     <!-- Download Section -->
-    <div id="download-section" class="toolbar-section download-section">
+    <div v-if="!hasSelectedText" id="download-section" class="toolbar-section download-section">
       <Tooltip text="Descargar diseño finalizado" shortcut="D" position="bottom">
         <button 
           class="download-btn" 

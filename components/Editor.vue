@@ -2340,9 +2340,89 @@ function handlePreviewExport(exportOptions) {
 function startEnhancedDownload(options = {}) {
     const quality = options.quality || 'high'
     const format = options.format || 'jpg'
+    const resolution = options.resolution || { width: 1800, height: 1200, dpi: 150 }
     
-    // Use existing download logic but with enhanced options
-    startDownload()
+    // Enhanced image generation with proper format and quality
+    try {
+        if (!canvas) {
+            throw new Error('Canvas not available')
+        }
+        
+        // Store current canvas state
+        const currentZoom = canvas.getZoom()
+        const currentVpTransform = [...canvas.viewportTransform]
+        
+        // Temporarily adjust canvas for high-quality export
+        canvas.discardActiveObject().renderAll()
+        hideBin()
+        
+        // Calculate multiplier based on quality
+        const qualityMultiplier = {
+            'standard': 1,
+            'high': 2,
+            'print': 4
+        }[quality] || 2
+        
+        // Generate high-quality image data
+        const imageFormat = format === 'png' ? 'png' : 'jpeg'
+        const imageQuality = format === 'png' ? 1.0 : (quality === 'print' ? 1.0 : 0.9)
+        
+        // Set canvas size based on quality multiplier
+        const originalWidth = canvas.getWidth()
+        const originalHeight = canvas.getHeight()
+        
+        // Scale canvas for higher quality export
+        if (qualityMultiplier > 1) {
+            canvas.setDimensions({
+                width: originalWidth * qualityMultiplier,
+                height: originalHeight * qualityMultiplier
+            })
+            canvas.setZoom(canvas.getZoom() * qualityMultiplier)
+        }
+        
+        // Generate data URL with correct format and quality
+        let dataURL
+        if (format === 'svg') {
+            dataURL = 'data:image/svg+xml;base64,' + btoa(canvas.toSVG())
+        } else {
+            dataURL = canvas.toDataURL({
+                format: imageFormat,
+                quality: imageQuality
+            })
+        }
+        
+        // Restore original canvas dimensions
+        if (qualityMultiplier > 1) {
+            canvas.setDimensions({
+                width: originalWidth,
+                height: originalHeight
+            })
+            canvas.setZoom(canvas.getZoom() / qualityMultiplier)
+        }
+        
+        // Create download link
+        const link = document.createElement('a')
+        link.download = `skateboard-design.${format}`
+        link.href = dataURL
+        
+        // Trigger download
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        
+        // Restore canvas state
+        canvas.setZoom(currentZoom)
+        canvas.setViewportTransform(currentVpTransform)
+        canvas.renderAll()
+        
+        return dataURL
+        
+    } catch (error) {
+        console.error('Export error:', error)
+        showToast('error', 'Error al exportar el diseño. Inténtalo de nuevo.', 'Error de exportación')
+        hideLoading()
+        throw error
+    }
 }
 
 // Phase 4: Advanced Features & Polish Methods
