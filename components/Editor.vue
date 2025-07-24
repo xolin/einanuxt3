@@ -2385,7 +2385,10 @@ function startEnhancedDownload(options = {}) {
         if (format === 'svg') {
             dataURL = 'data:image/svg+xml;base64,' + btoa(canvas.toSVG())
         } else {
-            dataURL = canvas.toDataURL(`image/${imageFormat}`, imageQuality)
+            dataURL = canvas.toDataURL({
+                format: imageFormat,
+                quality: imageQuality
+            })
         }
         
         // Restore original canvas dimensions
